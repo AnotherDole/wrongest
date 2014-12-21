@@ -118,6 +118,9 @@ exports.addPlayer = function(playerName, playerID){
 	if (reqName.length < 3){
 		return {success: false, message: "Your name must be longer than 2 characters"};
 	}
+	if(/[^A-Za-z0-9 ]/.test(reqName)){
+		return {success: false, message: "Your name can only contain letters, numbers, and spaces."}
+	}
 	//check if that playerID has already signed on
 	if(players[playerID] != null){
 		return {success: false, message: "You have already chosen a name."};
@@ -149,6 +152,9 @@ exports.createRoom = function(playerID,thename){
 	//no really short names
 	if (reqname.length < 3){
 		return {success: false, message: "Room names must be at least 3 characters long"};
+	}
+	if(/[^A-Za-z0-9 ]/.test(reqname)){
+		return {success: false, message: "Room names can only contain letters, numbers, and spaces."}
 	}
 	//check if room name already exists
 	if(rooms[reqname] != null){
