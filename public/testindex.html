@@ -112,8 +112,8 @@ function leaveroom(){
 
 //received after leaving a room
 socket.on('leaveresult',function(data){
-	$('#roommembers').empty();
 	if(data.success){
+		$('#roommembers').empty();
 		$('#roommembers').text('Not in a room yet');
 	}	
 });

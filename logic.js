@@ -151,10 +151,8 @@ exports.createRoom = function(playerID,thename){
 		return {success: false, message: "Room names must be at least 3 characters long"};
 	}
 	//check if room name already exists
-	for (var room in rooms){
-		if(rooms[room].name == reqname){
-			return {success: false, message:"A room with that name already exists"};
-		}
+	if(rooms[reqname] != null){
+		return {success: false, message:"A room with that name already exists"};
 	}
 	rooms[reqname] = new gameRoom(reqname,playerID);
 	players[playerID].room = reqname;
