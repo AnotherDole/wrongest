@@ -18,18 +18,19 @@ exports.reset = function(){
 	rooms = {};
 }
 
-function gamePlayer(name){
+function gamePlayer(name, playerID){
 	this.name = name;
+	this.ID = playerID;
 	this.room = null;
 	this.score = 0;
 	this.cardNum = 0;
 	this.voted = false;
 }
 
-function gameRoom(name, leaderID){
+function gameRoom(name, leaderName){
 	this.name = name;
-	this.leader = leaderID;
-	this.players = [leaderID];
+	this.leader = leaderName;
+	this.players = [leaderName];
 	this.gameState = GAME_NOT_STARTED;
 	this.roundNumber = 0;
 	this.votesReceived = 0;
@@ -122,25 +123,18 @@ exports.addPlayer = function(playerName, playerID){
 		return {success: false, message: "Your name can only contain letters, numbers, and spaces."}
 	}
 	//check if that playerID has already signed on
-	if(players[playerID] != null){
-		return {success: false, message: "You have already chosen a name."};
+	if(players[reqName] != null){
+		return {success: false, message: "Someone else already has that name."};
 	}
-	//check if that name already exists
-	for(var player in players){
-		if(players[player].name == reqName){
-			return {success:false, message: "Someone else has that name."};
-		}
-	}
-	var newplayer = new gamePlayer(reqName);
-	players[playerID] = newplayer;
+	players[reqName] = new gamePlayer(reqName, playerID);
 	console.log('Added player ' + reqName);
 	return {success:true, name:reqName};
 }
 
 //Create a new room. playerID is the requestor, name is requested name
-exports.createRoom = function(playerID,thename){
+exports.createRoom = function(playerName,thename){
 	//check if player has chosen a name yet
-	var thePlayer = players[playerID];
+	var thePlayer = players[playerName];
 	if(thePlayer == null){
 		return {success:false, message: "You must choose a username first."};
 	}
@@ -160,9 +154,9 @@ exports.createRoom = function(playerID,thename){
 	if(rooms[reqname] != null){
 		return {success: false, message:"A room with that name already exists"};
 	}
-	rooms[reqname] = new gameRoom(reqname,playerID);
-	players[playerID].room = reqname;
-	console.log("Created room " + reqname + " with leader " + thePlayer.name);
+	rooms[reqname] = new gameRoom(reqname,playerName);
+	players[playerName].room = reqname;
+	console.log("Created room " + reqname + " with leader " + playerName);
 	return {success: true, name:reqname};
 }
 
@@ -182,20 +176,19 @@ exports.getPlayersIn = function(roomName){
 	if(theRoom == null){
 		return {success: false, message:"That room doesn't exist."};
 	}
-
 	var toReturn = {success: true};
 	toReturn["roomName"] = roomName;
-	toReturn["leader"] = players[theRoom.leader].name;
+	toReturn["leader"] = theRoom.leader;
 	toReturn["players"] = [];
 	for(var i = 0; i < theRoom.players.length; i++){
-		toReturn["players"].push(players[theRoom.players[i]].name);
+		toReturn["players"].push(theRoom.players[i]);
 	}
 	return toReturn; 
 }
 
-//playerID requests to join roomName
-exports.joinRequest = function(playerID, roomName){
-	var thePlayer = players[playerID];
+//playerName requests to join roomName
+exports.joinRequest = function(playerName, roomName){
+	var thePlayer = players[playerName];
 	var theRoom = rooms[roomName];
 	//check if room exits. this should just be for safety.
 	if (theRoom == null){
@@ -216,15 +209,15 @@ exports.joinRequest = function(playerID, roomName){
 		return {success: false, message:"You cannot join a game in progress."};
 	}
 	thePlayer.room = roomName;
-	theRoom.players.push(playerID);
-	console.log(thePlayer.name + " joined room " + theRoom.name);
+	theRoom.players.push(playerName);
+	console.log(playerName + " joined room " + theRoom.name);
 	return {success: true};
 }
 
 //playerID requests to leave their current room
-exports.leaveRequest = function(playerID){
+exports.leaveRequest = function(playerName){
 	//to be safe
-	var thePlayer = players[playerID];
+	var thePlayer = players[playerName];
 	if(thePlayer == null){
 		return {success: false, message: "Player does not exist"};
 	}	
@@ -232,8 +225,8 @@ exports.leaveRequest = function(playerID){
 	if(theRoom == null){
 		return {success: false, message: "Player is not in a room."};
 	}
-	theRoom.players.splice(theRoom.players.indexOf(playerID),1);
-	console.log(thePlayer.name + " left room " + theRoom.name);
+	theRoom.players.splice(theRoom.players.indexOf(playerName),1);
+	console.log(playerName + " left room " + theRoom.name);
 	//no one left in room, so delete it
 	if(theRoom.players.length == 0){
 		console.log(theRoom.name + " was deleted");
@@ -243,22 +236,22 @@ exports.leaveRequest = function(playerID){
 	}
 	thePlayer.room = null;
 	//need to find new leader
-	if(theRoom.leader == playerID){
+	if(theRoom.leader == playerName){
 		theRoom.leader = theRoom.players[Math.floor(Math.random() * theRoom.players.length)];
 		console.log(players[theRoom.leader].name + " is the new leader");
 	}
 	return {success: true, roomDeleted: false, theRoom:theRoom.name};
 }
 
-exports.disconnect = function(playerID){
-	var result = exports.leaveRequest(playerID);
-	delete players[playerID];
+exports.disconnect = function(playerName){
+	var result = exports.leaveRequest(playerName);
+	delete players[playerName];
 	return result;
 }
 
 //playerID requests to start the room they are leading
-exports.startRequest = function(playerID){
-	var thePlayer = players[playerID];
+exports.startRequest = function(playerName){
+	var thePlayer = players[playerName];
 	if(thePlayer == null){
 		return {success: false, message: "You do not exist"};
 	}
@@ -266,7 +259,7 @@ exports.startRequest = function(playerID){
 	if(theRoom == null){
 		return {success: false, message: "You are not in a room."};
 	}
-	if(theRoom.leader != playerID){
+	if(theRoom.leader != playerName){
 		return {success: false, message: "You are not the leader of your current room."};
 	}
 	if(theRoom.players.length < 3){
@@ -297,9 +290,8 @@ exports.getStatements = function(roomName){
 				keep = false;
 				selectedCards.push(selected);
 				players[theRoom.players[i]].cardNum = selected;
-				var playerName = players[theRoom.players[i]].name;
+				var playerName = theRoom.players[i];
 				result[playerName] = {
-					playerNum: (i+1),
 					quote: theRoom.deck[selected].quote,
 					author: theRoom.deck[selected].author,
 					episode: theRoom.deck[selected].episode,
@@ -313,8 +305,8 @@ exports.getStatements = function(roomName){
 }
 
 //playerID is done defending their statement
-exports.doneDefending = function(playerID){
-	var thePlayer = players[playerID];
+exports.doneDefending = function(playerName){
+	var thePlayer = players[playerName];
 	//i hate having to do this
 	if (thePlayer == null){
 		return {success: false, message: "You don't exist."};
@@ -333,7 +325,7 @@ exports.doneDefending = function(playerID){
 	//okay, the vote matters
 	thePlayer.voted = true;
 	theRoom.votesReceived++;
-	console.log(thePlayer.name + " is done defending");
+	console.log(playerName + " is done defending");
 	return {success:true, roomName:theRoom.name, votesNeeded: (theRoom.players.length - theRoom.votesReceived)};
 }
 
@@ -346,29 +338,31 @@ exports.prepareForVotes = function(roomName){
 	}
 }
 
-exports.processVote = function(playerID,mostWrong,leastWrong){
-	var thePlayer = players[playerID];
+exports.processVote = function(playerName,mostWrong,leastWrong){
+	var thePlayer = players[playerName];
 	if (thePlayer == null){
-		return {success: false};
+		return {success: false, message: "You haven't signed in yet."};
 	}
 	var theRoom = rooms[thePlayer.room];
 	if(theRoom == null){
-		return {success: false};
+		return {success: false,message:"Not in a room."};
 	}
 	if(theRoom.gameState != GAME_WAITING_VOTES){
-		return {success:false};
+		return {success:false, message:"It's not time to vote yet!"};
 	}
 	if(thePlayer.voted){
-		console.log("Player " + thePlayer.name + " tried to commit voter fraud.");
 		return {success: false, message: "You already voted."};
 	}
 	if(mostWrong == leastWrong){
 		return {success: false, message: "You must vote for different players."};
 	}
-	var mostPlayer = players[theRoom.players[mostWrong-1]];
-	var leastPlayer = players[theRoom.players[leastWrong-1]];
+	var mostPlayer = players[mostWrong];
+	var leastPlayer = players[leastWrong];
 	if(mostPlayer == null || leastPlayer == null){
-		return {success: false, message: "Invalid player numbers."};
+		return {success: false, message: "Invalid player names."};
+	}
+	if(mostPlayer.room != theRoom.name || leastPlayer.room != theRoom.name){
+		return {success: false, message: "Invalid player names."};
 	}
 	if(mostPlayer == thePlayer || leastPlayer == thePlayer){
 		return {success: false, message: "You cannot vote for yourself"};
@@ -377,7 +371,6 @@ exports.processVote = function(playerID,mostWrong,leastWrong){
 	var leastCard = theRoom.deck[leastPlayer.cardNum];
 	thePlayer.voted = true;
 	theRoom.votesReceived++;
-	console.log("Player " + thePlayer.name + " votes: most is " + mostPlayer.name + ", least is " + leastPlayer.name);
-	return { success: true, roomName: theRoom.name, voter: thePlayer.name, mostNum: mostWrong,
-	       		mostName: mostPlayer.name, leastNum: leastWrong, leastName: leastPlayer.name};
+	console.log("Player " + thePlayer.name + " votes: most is " + mostWrong + ", least is " + leastWrong);
+	return { success: true, roomName: theRoom.name, voter: playerName, mostName: mostWrong, leastName: leastWrong};
 }

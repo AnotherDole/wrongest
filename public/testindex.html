@@ -24,14 +24,11 @@ Name: <input type="text" id='usernameinput' maxlength="15"> <button onclick="sen
 <h2 id='statement'></h2>
 <br>
 <h1>Other players</h1>
-<div id='playerstatement1'></div>
-<div id='playerstatement2'></div>
-<div id='playerstatement3'></div>
-<div id='playerstatement4'></div>
+<div id='statementsdiv'></div>
 <br>
 <button onclick='donedefend();'>I am done defending my point.</button>
 <div id='votestatus'>It is not time to vote yet.</div>
-Least Wrong: <input id='least' type='number' min='1' max='8' value='1'> Most Wrong: <input id='most' type='number' min='1' max='8' value='1'>
+Least Wrong: <select id='least'></select> Most Wrong: <select id='most'></select> 
 <button onclick='sendvotes();'>Send my votes.</button>
 <div id='voteresult'></div>
 
@@ -150,8 +147,10 @@ socket.on('startresult', function(data){
 //Receive the statments that everyone will be defending this round.
 //Automatically sent out at the start of a new round
 socket.on('getstatements', function(data){	
+	var $thediv = $('#statementsdiv').empty();
+	var $leastselect = $('#least').empty();
+	var $mostselect = $('#most').empty();
 	for(var player in data){
-		var playerNum = data[player].playerNum;
 		var quote = data[player].quote;
 		var author = data[player].author;
 		var episode = data[player].episode;
@@ -160,9 +159,9 @@ socket.on('getstatements', function(data){
 			$('#statement').empty().append(quote);
 		}
 		else{
-			var $thediv = $('#playerstatement'+playerNum);
-			$thediv.empty();
-			$thediv.append(playerNum + " " + player + ": " + quote);
+			$thediv.append(player + ": " + quote + "<br>");
+			$leastselect.append($('<option/>', {text: player, value: player}));
+			$mostselect.append($('<option/>', {text: player, value: player}));
 		}
 	}	
 });
@@ -175,7 +174,7 @@ function donedefend(){
 //received when anyone in the room says they are done defending
 //data is the # of people who are not done
 socket.on('newdefendcount',function(data){
-	if(data >0){
+	if(data > 0){
 		$('#votestatus').text('Dones needed to continue:' + data);	
 	}
 	else{
@@ -204,11 +203,9 @@ socket.on('votefailed', function(data){
 //received when someone else in the same room has voted
 socket.on('receivevote', function(data){
 	var whoVoted = data.voter;
-	var mostPlayerNum = data.mostNum;
-	var mostPlayerName = data.mostName;
-	var leastPlayerNum = data.leastNum;
-	var leastPlayerName = data.leastName;
-	$('#voteresult').append(whoVoted + " says that " + leastPlayerName + " is least wrong and " + mostPlayerName + " is most wrong.<br>");
+	var most = data.mostName;
+	var least = data.leastName;
+	$('#voteresult').append(whoVoted + " says that " + least + " is least wrong and " + most + " is most wrong.<br>");
 });
 </script>
 </html>

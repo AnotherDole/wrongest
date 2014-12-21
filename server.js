@@ -22,13 +22,21 @@ function getAndSendStatements(roomName){
 io.on('connection', function (socket){
 	//data is requested username
 	socket.on('logon', function(data){
-		var success = logic.addPlayer(data,socket.id);
-		socket.emit('logonresult',success);
+		if(socket.username != null){
+			socket.emit('logonresult',{success:false,message:"You have already chosen a name."});
+		}
+		else{
+			var result = logic.addPlayer(data,socket.id);
+			if(result.success){
+				socket.username = result.name;
+			}
+			socket.emit('logonresult',result);
+		}
 	});
 
 	//data is the requested room name
 	socket.on('createroom', function(data){
-		var result = logic.createRoom(socket.id,data);
+		var result = logic.createRoom(socket.username,data);
 		socket.emit('createresult',result);
 		var thename = result.name;
 		if(result.success){
@@ -48,7 +56,7 @@ io.on('connection', function (socket){
 
 	// data is requested room name
 	socket.on('requestjoin', function(data){
-		var result = logic.joinRequest(socket.id,data);
+		var result = logic.joinRequest(socket.username,data);
 		if (result.success){
 			//join socket.io room
 			socket.join(data);
@@ -61,7 +69,7 @@ io.on('connection', function (socket){
 
 	//data isn't necessary 
 	socket.on('requestleave', function(data){
-		var result = logic.leaveRequest(socket.id);
+		var result = logic.leaveRequest(socket.username);
 		if (result.success){
 			socket.leave(result.theRoom);
 			//tell everyone else in room to update list
@@ -75,7 +83,7 @@ io.on('connection', function (socket){
 
 	//data isn't necessary
 	socket.on('requeststart', function(data){
-		var result = logic.startRequest(socket.id);
+		var result = logic.startRequest(socket.username);
 		socket.emit('startresult',result);
 		//time to start game, send out the first statements
 		if(result.success){
@@ -84,7 +92,7 @@ io.on('connection', function (socket){
 	});
 
 	socket.on('donedefending', function(data){
-		var result = logic.doneDefending(socket.id);
+		var result = logic.doneDefending(socket.username);
 		if(result.success){
 			//tell everyone in room new votesNeeded
 			io.to(result.roomName).emit('newdefendcount',result.votesNeeded);
@@ -100,7 +108,7 @@ io.on('connection', function (socket){
 
 	socket.on('playervotes',function(data){
 		var most = data.most, least = data.least;
-		var result = logic.processVote(socket.id,most,least);
+		var result = logic.processVote(socket.username,most,least);
 		if (result.success){
 			//tell everyone in room about vote
 			io.to(result.roomName).emit('receivevote',result);
@@ -111,7 +119,7 @@ io.on('connection', function (socket){
 	});
 
 	socket.on('disconnect', function(data){
-		var result = logic.disconnect(socket.id);
+		var result = logic.disconnect(socket.username);
 		if(result.success && !result.roomDeleted){
 			io.to(result.theRoom).emit('updatecurrentroom',logic.getPlayersIn(result.theRoom));
 		}
