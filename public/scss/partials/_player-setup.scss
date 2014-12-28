@@ -1,0 +1,15 @@
+$size:7vh;
+
+#PlayerSetup { background-color:$black; color:$white; font-size:$size;
+  h1 { text-align: center; margin-bottom: 2em; color: $green; }
+  label { display: block; }
+  .name-wrapper, .create-wrapper, .join-wrapper { @include flex-container(); }
+  .name-input, .create-input, .join-select { @include flex-item(70%); font-size:$size; }
+  .name-button, .create-button { @include flex-item(30%); font-size:$size; }
+  .join-button { @include flex-item(15%); font-size:$size; }
+  
+  .room-choices {
+    dt { color:$green; font-weight:400; }
+    dd { padding-left: 1em; }
+  }
+}

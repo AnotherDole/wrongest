@@ -1,3 +1,5 @@
+/*jshint -W117 */
+
 /*
  * Game logic for The Wrongest Words
  */

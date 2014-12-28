@@ -1,0 +1,4 @@
+button { cursor: pointer; background-color:$yellow; border:none; outline: none;
+  &:hover { background-color:lighten($yellow,20%); }
+  &:active { box-shadow:inset .1em .1em .2em darken($yellow,20%); }
+}

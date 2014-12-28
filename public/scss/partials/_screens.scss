@@ -1,0 +1,16 @@
+html, body { max-height: 100vh; overflow: hidden; }
+
+section { width: 100%; height:100vh; overflow-x: hidden; overflow-y: auto;  padding:2vh 2vw; @include transition(all .6s);
+  /**
+ .slideblock { @include transition(all .6s); position:absolute; height: 100vh; padding-top: 30vh; top:0; left:0; right:0; padding-left: 3vw; padding-right: 3vw;
+  &.hidden { @include translateY(102%); }
+ } 
+  **/
+  .slideblock {
+    &.hidden { display: none; }
+  }
+  
+  
+  &.above { @include translateY(-102%); }
+  &.below { @include translateY(102%); }
+}
