@@ -6,6 +6,8 @@
   <link href="css/wrongest.css" rel="stylesheet" />
   
   <body>
+    
+    <div id="NameDisplay"></div>
 
     <section id="PlayerSetup">
       <h1>The Wrongest Words</h1>
@@ -34,25 +36,28 @@
           </dd>
         </dl>
         <div id='roomresult'> </div>
-        <div id='roommembers'> </div>
+        <!-- <div id='roommembers'> </div> -->
       </div>
     </section>
     
     <section id="GameScreen" class="below">
-      <button id='startgamebutton' onclick='startgame();'>Start Game</button>
-      <div id='startresult'></div>
-
-      <h1>Defend this Statement:</h1>
-      <h2 id='statement'></h2>
-      <br>
-      <h1>Other players</h1>
-      <div id='statementsdiv'></div>
-      <br>
-      <button onclick='donedefend();'>I am done defending my point.</button>
-      <div id='votestatus'>It is not time to vote yet.</div>
-      Least Wrong: <select id='least'></select> Most Wrong: <select id='most'></select> 
-      <button onclick='sendvotes();'>Send my votes.</button>
-      <div id='voteresult'></div>
+      <div id="PreGame" class="slideblock">
+        <h3 id="RoomStatusHeadline"></h1>
+        <ol id='roommembers'></ol>
+        <button id="StartGameButton" id='startgamebutton' onclick='startgame();'>Start Game</button>
+        <div id='startresult'></div>
+      </div>
+      <div id="CardDisplay" class="slideblock hidden">
+        
+        <!--<h1>Defend this Statement:</h1>
+        <h2 id='statement'></h2> -->
+        <button onclick='donedefend();'>I am done defending my point.</button>
+        <div id='votestatus'>It is not time to vote yet.</div>
+        Least Wrong: <select id='least'></select> Most Wrong: <select id='most'></select> 
+        <button onclick='sendvotes();'>Send my votes.</button>
+        <div id='voteresult'></div>
+      </div>
+      
     </section>
 
     <script src="https://cdn.socket.io/socket.io-1.2.1.js"></script>
@@ -71,7 +76,9 @@
         if(data.success){
           $('#NameSetup').addClass('hidden');
           $('#RoomSetup').removeClass('hidden');
+          $('#RoomSetup').removeClass('hidden');
           username = data.name;
+          $('#NameDisplay').text(data.name);
           updaterooms();
         }
         else{
@@ -144,15 +151,17 @@
         var $toChange = $('#roommembers');
         $toChange.empty();
 
-        $toChange.append('Currently in ' + data.roomName + ':<br>');
+        //$toChange.append('Currently in ' + data.roomName + ':<br>');
+        $('#RoomStatusHeadline').text('Currently in '+data.roomName+':');
         $('#PlayerSetup').addClass('above');
         $('#GameScreen').removeClass('below').addClass('above');
         for (var i = 0; i < data.players.length; i++){
-          $toChange.append(data.players[i]);
+          
           if(data.players[i] == data.leader){
-            $toChange.append(" (leader)");
+            $toChange.append('<li>'+data.players[i]+' (leader)</li>');
+          } else {
+            $toChange.append('<li>'+data.players[i]+'</li>');
           }
-          $toChange.append("<br>");
         }
       });
 
@@ -163,7 +172,9 @@
 
       socket.on('startresult', function(data){
         if(data.success){
-          $('#startresult').text('Game Started');		
+          $('#startresult').text('Game Started');
+          $('#PreGame').addClass('hidden');
+          $('#CardDisplay').removeClass('hidden');
         }
         else{
           $('#startresult').text(data.message);

@@ -10,7 +10,10 @@ section { width: 100%; height:100vh; overflow-x: hidden; overflow-y: auto;  padd
     &.hidden { display: none; }
   }
   
-  
   &.above { @include translateY(-102%); }
   &.below { @include translateY(102%); }
+  
+  ol { padding-left: 2em;
+    li { list-style-type: decimal; }
+  }
 }
