@@ -156,10 +156,10 @@ socket.on('getstatements', function(data){
 		var episode = data[player].episode;
 		var score = data[player].score;
 		if(player == username){
-			$('#statement').empty().append(quote);
+			$('#statement').empty().append(quote + '<br>Card Score:' + score);
 		}
 		else{
-			$thediv.append(player + ": " + quote + "<br>");
+			$thediv.append(player + ': ' + quote + '<br>Card Score: ' + score + '<br>');
 			$leastselect.append($('<option/>', {text: player, value: player}));
 			$mostselect.append($('<option/>', {text: player, value: player}));
 		}
@@ -179,6 +179,7 @@ socket.on('newdefendcount',function(data){
 	}
 	else{
 		$('#votestatus').text('Time to vote!');
+		$('#voteresult').empty();
 	}
 });
 
@@ -206,6 +207,18 @@ socket.on('receivevote', function(data){
 	var most = data.mostName;
 	var least = data.leastName;
 	$('#voteresult').append(whoVoted + " says that " + least + " is least wrong and " + most + " is most wrong.<br>");
+});
+
+//received at the end of a round
+socket.on('roundend', function(data){
+	var gameData = data.gameData;
+	var playerData = data.playerData;
+	var $resultDiv = $('#voteresult');
+	$resultDiv.append('<b>End of round ' + gameData.round + '</b>');
+	for(var player in playerData){
+		$resultDiv.append('<br>' + player + ' gains ' + playerData[player].scoreChange + ' points. Current Score: ' + playerData[player].newScore);
+	}
+	$resultDiv.append('<br>Cards left: ' + gameData.cardsLeft + '<br><b> Defend your next point. </b>');
 });
 </script>
 </html>

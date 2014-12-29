@@ -4,7 +4,6 @@
  * Game logic for The Wrongest Words
  */
 
-//should probably use a database for that at some point
 var players = {}, rooms = {};
 
 var MIN_PLAYERS = 3;
@@ -34,9 +33,9 @@ function gameRoom(name, leaderName){
 	this.leader = leaderName;
 	this.players = [leaderName];
 	this.gameState = GAME_NOT_STARTED;
-	this.roundNumber = 0;
 	this.votesReceived = 0;
 	this.deck = [];
+	this.round = 1;
 }
 
 function card(number, quote, author, episode) {
@@ -45,13 +44,10 @@ function card(number, quote, author, episode) {
         this.author=author;
         this.episode=episode;
         this.inplay=false;
-        this.played=false;
         this.discarded=false;
-        this.rightcount=0;
-        this.wrongcount=0;
+	this.mostVotes = 0;
+	this.leastVotes = 0;
         this.score=0;
-        this.votesagainst=0;
-        this.votesfor=0;
 }
 
 function initializeGame(gameRoom) {
@@ -80,7 +76,7 @@ function initializeGame(gameRoom) {
     	new card(15,"[Dolphins] know how to access multiple dimensions.","Joan Ocean",65),
     	new card(16,"It is legal to post nude photos of someone without their consent","unattributed",64),
     	new card(17,"Laura Ingalls Wilder is God.","John Charles Wilson",30),
-    	new card(18,"Disney’s Roadside Romeo has opened in India and it’s a huge hit. Let me repeat that: It’s a HUGE HIT.","Amid Amidi",36),
+    	new card(18,"Disney's Roadside Romeo has opened in India and it's a huge hit. Let me repeat that: It's a HUGE HIT.","Amid Amidi",36),
     	new card(19,"Frozen cum is a refreshing summer treat","cumpantyboy",63),
     	new card(20,"A beautiful woman is like a wild horse; she will need to be tamed before you can enjoy each other’s company.","ewokdisco",35),
     	new card(21,"a toilet is becoming a completely foreign object to women.","antifeministtech.info",103),
@@ -113,6 +109,8 @@ function initializeGame(gameRoom) {
     	new card(48,"Minors find it difficult to masturbate.","AWOL",115),
     	new card(49,"Man used to live for hundreds of years disease free.","winddance",38)];
 	gameRoom.gameState = GAME_WAITING_ARGUMENTS;
+	gameRoom.cardsLeft = gameRoom.deck.length;
+	gameRoom.round = 1;
 }
 
 //Register playerID's name as playerName
@@ -281,23 +279,25 @@ exports.startRequest = function(playerName){
 exports.getStatements = function(roomName){
 	//eventually check that this makes sense
 	var theRoom = rooms[roomName];
-	var selectedCards = [];
-	var i,selected;
+	var i,selected, theCard;
 	var result = {};
 	for(i = 0; i < theRoom.players.length; i++){
 		var keep = true;
 		while(keep){
 			selected = Math.floor(Math.random() * theRoom.deck.length);
-			if(selectedCards.indexOf(selected) == -1){
+			theCard = theRoom.deck[selected];
+			if(theCard.inplay == false && theCard.discarded == false){
 				keep = false;
-				selectedCards.push(selected);
-				players[theRoom.players[i]].cardNum = selected;
+				theCard.inplay = true;
+				theCard.mostVotes = 0;
+				theCard.leastVote = 0;
 				var playerName = theRoom.players[i];
+				players[playerName].cardNum = selected;
 				result[playerName] = {
-					quote: theRoom.deck[selected].quote,
-					author: theRoom.deck[selected].author,
-					episode: theRoom.deck[selected].episode,
-					score: theRoom.deck[selected].score
+					quote: theCard.quote,
+					author: theCard.author,
+					episode: theCard.episode,
+					score: theCard.score
 				};
 			}
 		}
@@ -369,10 +369,58 @@ exports.processVote = function(playerName,mostWrong,leastWrong){
 	if(mostPlayer == thePlayer || leastPlayer == thePlayer){
 		return {success: false, message: "You cannot vote for yourself"};
 	}
+	//vote is go
 	var mostCard = theRoom.deck[mostPlayer.cardNum];
 	var leastCard = theRoom.deck[leastPlayer.cardNum];
+	mostCard.mostVotes++
+	leastCard.leastVotes++;
 	thePlayer.voted = true;
 	theRoom.votesReceived++;
+	var votesNeeded = theRoom.players.length - theRoom.votesReceived;
 	console.log("Player " + thePlayer.name + " votes: most is " + mostWrong + ", least is " + leastWrong);
-	return { success: true, roomName: theRoom.name, voter: playerName, mostName: mostWrong, leastName: leastWrong};
+	return { success: true, roomName: theRoom.name, voter: playerName, mostName: mostWrong, leastName: leastWrong,
+		votesNeeded: votesNeeded};
+}
+
+//return game summary
+exports.endRound = function(roomName){
+	var theRoom = rooms[roomName];
+	var i, theCard, thePlayer, toAdd;
+	var result = {};
+	result.playerData = {};
+	for(i = 0; i < theRoom.players.length; i++){
+		thePlayer = players[theRoom.players[i]];
+		theCard = theRoom.deck[thePlayer.cardNum];
+		toAdd = theCard.leastVotes;
+		if(theCard.score < -1){
+			toAdd *= 2;
+		}
+		thePlayer.score += toAdd;
+		result.playerData[thePlayer.name] = {scoreChange: toAdd, newScore: thePlayer.score};
+		theCard.score += theCard.leastVotes;
+		theCard.score -= theCard.mostVotes;
+		if(theCard.score >= 0){
+			theCard.discarded = true;
+			theRoom.cardsLeft--;
+		}
+		else if(theCard.score == -1){
+			var coinflip = Math.floor(Math.random() * 2);
+			if(coinflip == 0){
+				theCard.discarded = true;
+				theRoom.cardsLeft--;
+			}
+			//put card back in play
+			else{
+				theCard.inplay = false;
+			}
+		}
+		else{
+			theCard.inplay = false;
+		}
+	}
+	theRoom.gameState = GAME_WAITING_ARGUMENTS;
+	result.gameData = {round: theRoom.round, cardsLeft: theRoom.cardsLeft};
+	theRoom.round++;
+	theRoom.votesReceived = 0;
+	return result;
 }

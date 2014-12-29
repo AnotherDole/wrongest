@@ -49,7 +49,7 @@ io.on('connection', function (socket){
 		logic.doneDefending('Player1');
 		logic.prepareForVotes('Test Room');
 		io.to('Test Room').emit('newdefendcount',0);
-		io.to('Test Room').emit('receivevote',logic.processVote('WillieDangDoodle','Player1','Varzandeh'));
+		io.to('Test Room').emit('receivevote',logic.processVote('WillieDangDoodle','Matt Crow','Varzandeh'));
 		io.to('Test Room').emit('receivevote',logic.processVote('Varzandeh','Player1','Matt Crow'));
 		io.to('Test Room').emit('receivevote',logic.processVote('Matt Crow','Player1','Varzandeh'));
 	});
@@ -59,6 +59,16 @@ io.on('connection', function (socket){
 		if (result.success){
 			//tell everyone in room about vote
 			io.to(result.roomName).emit('receivevote',result);
+			if(result.votesNeeded == 0){
+				var roomName = result.roomName;
+				result = logic.endRound(result.roomName);
+				io.to(roomName).emit('roundend',result);
+				getAndSendStatements('Test Room');
+				logic.doneDefending('WillieDangDoodle');
+				logic.doneDefending('Varzandeh');
+				logic.doneDefending('Matt Crow');
+				io.to('Test Room').emit('newdefendcount',1);
+			}
 		}
 		else{
 			socket.emit('votefailed',result.message);
