@@ -1,4 +1,10 @@
 #GameScreen { background-color:$white; font-size:5vh; padding-top:5vh;
-  #StartGameButton { display: block; width:100%; text-align: center; font-size:10vw; }
   #roommembers { margin-bottom: 2em; }
+  
+  .wrong-wrapper { @include flex-container();
+    label { @include flex-item(40%); text-align: right; padding-right: 0.5em }
+    select { @include flex-item(60%); font-size:5vh; padding-left: 0.5em; }
+  }
+  
+  button { display: block; width:100%; text-align: center; font-size:6vw; font-weight: 400; padding: 0.25em 1em; margin: 1em 0; }
 }

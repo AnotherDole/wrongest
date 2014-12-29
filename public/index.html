@@ -44,16 +44,24 @@
       <div id="PreGame" class="slideblock">
         <h3 id="RoomStatusHeadline"></h1>
         <ol id='roommembers'></ol>
-        <button id="StartGameButton" id='startgamebutton' onclick='startgame();'>Start Game</button>
+        <button id="StartGameButton" id='startgamebutton' disabled onclick='startgame();'>Start Game</button>
         <div id='startresult'></div>
       </div>
       <div id="CardDisplay" class="slideblock hidden">
-        
         <h3>Defend this Statement:</h1>
         <h2 id='statement'></h2>
-        <button onclick='donedefend();'>I am done defending my point.</button>
+        <button id="DoneDefendingButton" onclick='donedefend();'>I am done defending my point.</button>
         <div id='votestatus'>It is not time to vote yet.</div>
-        Least Wrong: <select id='least'></select> Most Wrong: <select id='most'></select> 
+      </div>
+      <div id="VotingBooth" class="slideblock hidden">
+        <div class="wrong-wrapper">
+          <label for="least">Least Wrong</label>
+          <select id='least'></select>
+        </div>
+        <div class="wrong-wrapper">
+          <label for="most">Most Wrong</label>
+          <select id='most'></select> 
+        </div>
         <button onclick='sendvotes();'>Send my votes.</button>
         <div id='voteresult'></div>
       </div>
@@ -150,6 +158,11 @@
       socket.on('updatecurrentroom', function(data){
         var $toChange = $('#roommembers');
         $toChange.empty();
+        if (data.players.length > 2) {
+          $('#StartGameButton').attr('disabled',false);
+        } else {
+          $('#StartGameButton').attr('disabled',true);
+        }
 
         //$toChange.append('Currently in ' + data.roomName + ':<br>');
         $('#RoomStatusHeadline').text('Currently in '+data.roomName+':');
@@ -173,8 +186,6 @@
       socket.on('startresult', function(data){
         if(data.success){
           $('#startresult').text('Game Started');
-          $('#PreGame').addClass('hidden');
-          $('#CardDisplay').removeClass('hidden');
         }
         else{
           $('#startresult').text(data.message);
@@ -183,7 +194,9 @@
 
       //Receive the statments that everyone will be defending this round.
       //Automatically sent out at the start of a new round
-      socket.on('getstatements', function(data){	
+      socket.on('getstatements', function(data){
+        $('#PreGame').addClass('hidden');
+        $('#CardDisplay').removeClass('hidden');
         var $thediv = $('#statementsdiv').empty();
         var $leastselect = $('#least').empty();
         var $mostselect = $('#most').empty();
@@ -216,6 +229,8 @@
         }
         else{
           $('#votestatus').text('Time to vote!');
+          $('#CardDisplay').addClass('hidden');
+          $('#VotingBooth').removeClass('hidden');
         }
       });
 
