@@ -1,0 +1,25 @@
+{
+  "name": "wrongest",
+  "version": "0.1.0",
+  "description": "The Wrongest Words Game",
+  "main": "server.js",
+  "dependencies": {
+    "express": "^4.10.6",
+    "socket.io": "^1.2.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AnotherDole/wrongest.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AnotherDole/wrongest/issues"
+  },
+  "homepage": "https://github.com/AnotherDole/wrongest"
+}

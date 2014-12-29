@@ -10,7 +10,7 @@ server.listen(port, function(){
 	console.log('Server listening at port %d', port);
 });
 
-app.use(express.static(__dirname + '/public'))
+app.use(express.static(__dirname + '/public'));
 
 //call logic to assign statements to everyone
 //receive a summary to send to everyone in room
