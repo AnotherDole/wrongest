@@ -14,9 +14,16 @@ app.use(express.static(__dirname + '/public'));
 
 //call logic to assign statements to everyone
 //receive a summary to send to everyone in room
+//Or declare a winner
 function getAndSendStatements(roomName){
 	var result = logic.getStatements(roomName);
-	io.to(roomName).emit('getstatements',result);
+	if(result == false){
+		result = logic.getWinner(roomName);
+		io.to(roomName).emit('gameover',result);
+	}
+	else{
+		io.to(roomName).emit('getstatements',result);
+	}
 }
 
 io.on('connection', function (socket){
@@ -112,6 +119,12 @@ io.on('connection', function (socket){
 		if (result.success){
 			//tell everyone in room about vote
 			io.to(result.roomName).emit('receivevote',result);
+			if(result.votesNeeded == 0){
+				var roomName = result.roomName;
+				result = logic.endRound(result.roomName);
+				io.to(roomName).emit('roundend',result);
+				getAndSendStatements(roomName);
+			}
 		}
 		else{
 			socket.emit('votefailed',result.message);

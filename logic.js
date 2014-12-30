@@ -276,11 +276,15 @@ exports.startRequest = function(playerName){
 
 //return an object containing all the the statements
 //assigned to the players in the room.
+//return false if game is over
 exports.getStatements = function(roomName){
 	//eventually check that this makes sense
 	var theRoom = rooms[roomName];
-	var i,selected, theCard;
+	if(theRoom.cardsLeft < theRoom.players.length){
+		return false;
+	}
 	var result = {};
+	var i,selected, theCard;
 	for(i = 0; i < theRoom.players.length; i++){
 		var keep = true;
 		while(keep){
@@ -290,7 +294,7 @@ exports.getStatements = function(roomName){
 				keep = false;
 				theCard.inplay = true;
 				theCard.mostVotes = 0;
-				theCard.leastVote = 0;
+				theCard.leastVotes = 0;
 				var playerName = theRoom.players[i];
 				players[playerName].cardNum = selected;
 				result[playerName] = {
@@ -304,6 +308,28 @@ exports.getStatements = function(roomName){
 	}
 	console.log("Sent statements to " + theRoom.name);
 	return result;
+}
+
+exports.getWinner = function(roomName){
+	var theRoom = rooms[roomName];
+	theRoom.gameState = GAME_FINISHED;
+	var result = {};
+	var wPlayer, playerScore = -1, wCard, cardScore = 99999, i;
+	for (i = 0; i < theRoom.players.length; i++){
+		var thePlayer = players[theRoom.players[i]];
+		if(thePlayer.score > playerScore){
+			playerScore = thePlayer.score;
+			wPlayer = thePlayer.name;
+		}
+	}
+	for(i = 0; i < theRoom.deck.length; i++){
+		var theCard = theRoom.deck[i];
+		if(theCard.score < cardScore){
+			cardScore = theCard.score;
+			wCard = theCard.quote;
+		}
+	}
+	return {player: wPlayer, playerScore: playerScore, card: wCard, cardScore: cardScore};
 }
 
 //playerID is done defending their statement

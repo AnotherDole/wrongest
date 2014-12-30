@@ -12,11 +12,18 @@ server.listen(port, function(){
 
 app.use(express.static(__dirname + '/public'));
 
-//call logic to assign statements to everyone
-//receive a summary to send to everyone in room
+//Call logic to assign statements to everyone
+//Receive a summary to send to everyone in room
+//Or declare a winner
 function getAndSendStatements(roomName){
 	var result = logic.getStatements(roomName);
-	io.to(roomName).emit('getstatements',result);
+	if(result == false){
+		result = logic.getWinner(roomName);
+		io.to(roomName).emit('gameover',result);
+	}
+	else{
+		io.to(roomName).emit('getstatements',result);
+	}
 }
 
 io.on('connection', function (socket){

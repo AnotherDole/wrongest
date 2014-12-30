@@ -220,5 +220,12 @@ socket.on('roundend', function(data){
 	}
 	$resultDiv.append('<br>Cards left: ' + gameData.cardsLeft + '<br><b> Defend your next point. </b>');
 });
+
+socket.on('gameover', function(data){
+	var $resultDiv = $('#voteresult');
+	$resultDiv.empty().append('<b>Game Over!</b><br>');
+	$resultDiv.append('Winner: ' + data.player + ' with a score of ' + data.playerScore + '.<br>');
+	$resultDiv.append('Wrongest Words: ' + data.card + ' with a score of ' + data.cardScore);
+});
 </script>
 </html>
