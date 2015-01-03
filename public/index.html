@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <title>The Wrongest Words v0.1</title>
-  <link href='http://fonts.googleapis.com/css?family=Cabin:400,500,600' rel='stylesheet' type='text/css'>
+  <link href='http://fonts.googleapis.com/css?family=Roboto+Slab:400,100,700' rel='stylesheet' type='text/css'>
   <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
   <link href="css/wrongest.css" rel="stylesheet" />
   
@@ -48,22 +48,43 @@
         <div id='startresult'></div>
       </div>
       <div id="CardDisplay" class="slideblock hidden">
-        <h3>Defend this Statement:</h1>
-        <h2 id='statement'></h2>
-        <button id="DoneDefendingButton" onclick='donedefend();'>I am done defending my point.</button>
-        <div id='votestatus'>It is not time to vote yet.</div>
+        <!-- <h3>Defend this Statement:</h1> -->
+        <div class="flip-container">
+          <div class="flipper">
+            <div class="front">
+              <div class="inner">
+                <blockquote id="statement"></blockquote>
+                <i class="fa fa-share fa-2x" onclick='donedefend();'></i>
+              </div>
+            </div>
+            <div class="back">
+              <div class="inner">
+                <div id='votestatus'>It is not time to vote yet.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- <button id="DoneDefendingButton" onclick='donedefend();'>I am done defending my point.</button> -->
       </div>
       <div id="VotingBooth" class="slideblock hidden">
-        <div class="wrong-wrapper">
-          <label for="least">Least Wrong</label>
-          <select id='least'></select>
+        <div class="wrong-wrapper least-wrong">
+          <div class="inner">
+            <label for="least">Least Wrong</label>
+            <select id='least'>
+              <option value=""></option>
+            </select>
+          </div>
         </div>
-        <div class="wrong-wrapper">
-          <label for="most">Most Wrong</label>
-          <select id='most'></select> 
+        <div class="wrong-wrapper most-wrong">
+          <div class="inner">
+            <label for="most">Most Wrong</label>
+            <select id='most'>
+              <option value=""></option>
+            </select> 
+          </div>
         </div>
-        <button onclick='sendvotes();'>Send my votes.</button>
-        <div id='voteresult'></div>
+        <button id="SendVotes" onclick='sendvotes();'><i class="fa fa-check fa-2x"></i></button>
+        <div id='voteresult' style="display:none;"></div>
       </div>
       
     </section>
@@ -191,6 +212,27 @@
           $('#startresult').text(data.message);
         }
       });
+      
+      $('select#least').change(function() {
+        if ( $(this).val() == "" ) {
+          $(this).parent('.inner').parent('.wrong-wrapper').removeClass('selected');
+        } else {
+          $(this).parent('.inner').parent('.wrong-wrapper').addClass('selected');
+          if ( $(this).parent('.inner').parent('.wrong-wrapper').siblings('.most-wrong').hasClass('selected') ) {
+            $('#SendVotes').addClass('visible');
+          }
+        }
+      });
+      $('select#most').change(function() {
+        if ( $(this).val() == "" ) {
+          $(this).parent('.inner').parent('.wrong-wrapper').removeClass('selected');
+        } else {
+          $(this).parent('.inner').parent('.wrong-wrapper').addClass('selected');
+          if ( $(this).parent('.inner').parent('.wrong-wrapper').siblings('.least-wrong').hasClass('selected') ) {
+            $('#SendVotes').addClass('visible');
+          }
+        }
+      });
 
       //Receive the statments that everyone will be defending this round.
       //Automatically sent out at the start of a new round
@@ -198,8 +240,8 @@
         $('#PreGame').addClass('hidden');
         $('#CardDisplay').removeClass('hidden');
         var $thediv = $('#statementsdiv').empty();
-        var $leastselect = $('#least').empty();
-        var $mostselect = $('#most').empty();
+        var $leastselect = $('#least').empty().append('<option val=""></option>');
+        var $mostselect = $('#most').empty().append('<option val=""></option>');
         for(var player in data){
           var quote = data[player].quote;
           var author = data[player].author;
@@ -218,6 +260,7 @@
 
       //Tell server you are done defending your statement
       function donedefend(){
+        $('.flip-container').toggleClass('hover');
         socket.emit('donedefending');
       }
 
@@ -231,6 +274,8 @@
           $('#votestatus').text('Time to vote!');
           $('#CardDisplay').addClass('hidden');
           $('#VotingBooth').removeClass('hidden');
+          $('.wrong-wrapper').removeClass('selected');
+          $('#SendVotes').removeClass('visible');
         }
       });
 
@@ -245,6 +290,8 @@
         var mostWrong = $('#most').val();
         var leastWrong = $('#least').val();
         socket.emit('playervotes',{most: mostWrong, least: leastWrong});
+        $('#VotingBooth').addClass('hidden');
+        $('.flip-container').removeClass('hover');
       }
 
       //received if the submitted votes were invalid

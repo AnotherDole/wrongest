@@ -1,10 +1,29 @@
 #GameScreen { background-color:$white; font-size:5vh; padding-top:5vh;
   #roommembers { margin-bottom: 2em; }
   
+  /**
   .wrong-wrapper { @include flex-container();
     label { @include flex-item(40%); text-align: right; padding-right: 0.5em }
     select { @include flex-item(60%); font-size:5vh; padding-left: 0.5em; }
   }
+  **/
   
-  button { display: block; width:100%; text-align: center; font-size:6vw; font-weight: 400; padding: 0.25em 1em; margin: 1em 0; }
+  button { text-align: center; font-size:6vw; font-weight: 400; padding: 0.25em 1em; }
+}
+
+#VotingBooth:not(.hidden) { position: absolute; top:0; right:0; bottom:0; left:0;
+  .wrong-wrapper { position: absolute; height: 50%; width:100%; left: 0; display: table;
+    &.least-wrong { top:0; background-color:$green;
+      &.selected { background-color:desaturate($green, 50%); }
+    }
+    &.most-wrong { bottom:0; background-color: $red;
+      &.selected { background-color:desaturate($red, 50%); }
+    }
+    .inner { display: table-cell; vertical-align: middle; padding-left: 3vw; padding-right: 3vw; }
+    label { display: block; text-align: center; }
+    select { display: block; width:100%; font-size:7vw; margin-top: 2vh; }
+  }
+}
+#SendVotes { position: absolute; width: auto; top:45vh; margin-left: 40vw; display: none;
+  &.visible { display: block; }
 }

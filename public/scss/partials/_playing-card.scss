@@ -1,0 +1,27 @@
+.playing-card { padding:4vw; border-radius:$radius; background-color:#fff; border:1px solid darken($white, 10%); box-shadow: 2px 2px 0 darken($white, 25%);  
+  height:90vh; display: table;
+  article { display: table-cell; vertical-align: middle; text-align: center;
+    
+  }
+}
+.flip-container { perspective: 1000;
+  /* &:hover .flipper, */ &.hover .flipper { @include rotateY(-180deg); }
+  blockquote {
+    &:before { content:"\201C"; }
+    &:after { content:"\201D"; }
+  }
+}
+.flip-container, .front, .back { width: 100%; height: 90vh; }
+
+/* flip speed goes here */
+.flipper { transition: 0.6s; transform-style: preserve-3d; position: relative }
+
+.front, .back { backface-visibility: hidden; position: absolute; top: 0; left: 0; padding: 4vw; border-radius: 4vw; display: table;
+  .inner { display: table-cell; vertical-align: middle; text-align: center;
+    .fa { margin-top: 1em; color:$red; }
+  }
+}
+
+/* front pane, placed above back */
+.front { z-index: 2; transform: rotateY(0deg); background-color:#fff; border:3px solid darken($white, 20%); }
+.back { transform: rotateY(180deg); background-color:$red; color:$white; border:3px solid darken($red, 20%); }
