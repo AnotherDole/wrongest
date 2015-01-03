@@ -4,10 +4,11 @@ var server = require('http').createServer(app);
 var io = require('socket.io')(server);
 var fs = require('fs');
 var logic = require('./logic.js');
-var port = 3000;
+var port = process.env.OPENSHIFT_NODEJS_PORT || 3000;
+var server_ip_address = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1';
 
 server.listen(port, function(){
-	console.log('Server listening at port %d', port);
+	console.log('Server listening on ' + server_ip_address + ' on port ' + port);
 });
 
 app.use(express.static(__dirname + '/public'));
