@@ -121,7 +121,7 @@ io.on('connection', function (socket){
 			io.to(result.roomName).emit('receivevote',result);
 			if(result.votesNeeded == 0){
 				var roomName = result.roomName;
-				result = logic.endRound(result.roomName);
+				result = logic.endRound(roomName);
 				io.to(roomName).emit('roundend',result);
 				getAndSendStatements(roomName);
 			}

@@ -416,6 +416,7 @@ exports.endRound = function(roomName){
 	result.playerData = {};
 	for(i = 0; i < theRoom.players.length; i++){
 		thePlayer = players[theRoom.players[i]];
+		thePlayer.voted = false;
 		theCard = theRoom.deck[thePlayer.cardNum];
 		toAdd = theCard.leastVotes;
 		if(theCard.score < -1){
