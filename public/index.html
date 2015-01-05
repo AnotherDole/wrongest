@@ -92,7 +92,13 @@
     <script src="https://cdn.socket.io/socket.io-1.2.1.js"></script>
     <script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
     <script>
-      var socket = io('');
+      var socket;
+      if(location.hostname.indexOf('rhcloud.com') > -1){
+	socket = io(location.hostname + ':8000');
+      }
+      else{
+	socket = io();
+      }
       var username = "";
 
       //send username string
