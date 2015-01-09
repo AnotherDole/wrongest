@@ -13,6 +13,8 @@ Name: <input type="text" id='usernameinput' maxlength="15"> <button onclick="sen
 <button id='joinroombutton' onclick='joinroom();'>Join Selected Room</button>
 <button id='updaterooms' onclick='updaterooms();'>Update Room Selection</button>
 <button id='leaveroom' onclick='leaveroom();'>Leave Current Room</button>
+<select id='deck' onchange='updateDeckDescription();'></select>
+<div id='deckdescription'></div>
 <div id='roomresult'>No result yet.</div>
 <div id='roommembers'>Not in a room yet.</div>
 
@@ -44,6 +46,7 @@ else{
 	socket = io();
 }
 var username = "";
+var deckData;
 
 //send username string
 function sendusername(){
@@ -61,6 +64,21 @@ socket.on('logonresult',function(data){
 		$('#logonresult').text(data.message);
 	}
 });
+
+//received after logon
+socket.on('deckdata',function(data){
+	deckData = data;
+	$('#deck').empty();
+	for(var deck in data){
+		$('#deck').append($('<option/>', {text: deck, value: deck}));
+	}
+	updateDeckDescription();
+});
+
+function updateDeckDescription(){
+	var theDeck = deckData[$('#deck').val()];
+	$('#deckdescription').empty().append(theDeck.description + ' Cards: ' + theDeck.numCards);
+}
 
 //send roomname string
 function createroom(){
@@ -85,7 +103,7 @@ function updaterooms(){
 //recieved after emitting request for name and player count of all rooms
 socket.on('roomdata',function(data){
 	$('#roomselector').empty();
-	for(room in data){
+	for(var room in data){
 		var name = data[room].name;
 		var toAppend = '<option value="'+name+ '">' + name + ' (' + data[room].playerCount;
 		toAppend = toAppend +'/8) </option>';
@@ -139,7 +157,7 @@ socket.on('updatecurrentroom', function(data){
 
 //Request to start the game. Only works if you are the leader of the room
 function startgame(){
-	socket.emit('requeststart');
+	socket.emit('requeststart',$('#deck').val());
 }
 
 socket.on('startresult', function(data){

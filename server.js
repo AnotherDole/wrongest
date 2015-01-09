@@ -38,6 +38,7 @@ io.on('connection', function (socket){
 				socket.username = result.name;
 			}
 			socket.emit('logonresult',result);
+			socket.emit('deckdata',logic.getDeckData());
 		}
 	});
 
@@ -86,9 +87,9 @@ io.on('connection', function (socket){
 		socket.emit('leaveresult',result);
 	});
 
-	//data isn't necessary
+	//data is deck name 
 	socket.on('requeststart', function(data){
-		var result = logic.startRequest(socket.username);
+		var result = logic.startRequest(socket.username,data);
 		socket.emit('startresult',result);
 		//time to start game, send out the first statements
 		if(result.success){

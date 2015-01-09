@@ -1,10 +1,11 @@
-/*jshint -W117 */
-
 /*
  * Game logic for The Wrongest Words
  */
 
-var players = {}, rooms = {};
+var fs = require('fs');
+var path = require('path');
+
+var players = {}, rooms = {}, decks = {};
 
 var MIN_PLAYERS = 3;
 var MAX_PLAYERS = 8;
@@ -14,6 +15,27 @@ var GAME_WAITING_ARGUMENTS = 1;
 var GAME_WAITING_VOTES = 2;
 var GAME_FINISHED = 3;
 
+/************************** Begin deck loading logic ************/
+fs.readdir('./decks/',function(err, list){
+	var fileList = list.filter(function (file){
+		return path.extname(file) === '.txt';
+	})
+	makeDecks(fileList);
+});
+
+function makeDecks(list){
+	for(var i = 0; i < list.length; i++){
+		var theFile = fs.readFileSync('./decks/'+list[i]);
+		theFile = theFile.toString().split('\n');
+		var theName = theFile[0].trim();
+		decks[theName] = new masterDeck(theName,theFile[1].trim());
+		for(var j = 3; j < theFile.length; j+=4){
+			decks[theName].cards.push(new masterCard(theFile[j].trim(),
+						theFile[j+1].trim(),theFile[j+2].trim()));
+		}
+	}
+}
+/************************ End deck loading logic **********************/
 exports.reset = function(){
 	players = {};
 	rooms = {};
@@ -35,15 +57,25 @@ function gameRoom(name, leaderName,password){
 	this.players = [leaderName];
 	this.gameState = GAME_NOT_STARTED;
 	this.votesReceived = 0;
+	this.masterDeck = null;
 	this.deck = [];
 	this.round = 1;
 }
 
-function card(number, quote, author, episode) {
+function masterDeck(name, description){
+	this.name = name;
+	this.description = description;
+	this.cards = [];
+}
+
+function masterCard(quote, author, episode){
+	this.quote = quote;
+	this.author = author;
+	this.episode = episode;
+}
+
+function gameCard(number) {
         this.number=number;
-        this.quote=quote;
-        this.author=author;
-        this.episode=episode;
         this.inplay=false;
         this.discarded=false;
 	this.mostVotes = 0;
@@ -51,7 +83,7 @@ function card(number, quote, author, episode) {
         this.score=0;
 }
 
-function initializeGame(gameRoom) {
+function initializeGame(gameRoom,deckName) {
 	var i;
 	//reset player data
 	for (i=0; i < gameRoom.players.length; i++){
@@ -59,59 +91,24 @@ function initializeGame(gameRoom) {
 		players[gameRoom.players[i]].cardNum=0;
 		players[gameRoom.players[i]].voted = false;
 	}
-	gameRoom.deck = [ 
-	new card(1,"Clowns are sexy.", "Sofonda Silicone", 113),
-    	new card(2,"Not being turned on by bugs is unnatural", "Bugger", 95),
-    	new card(3,"Liverpool fc is the best football team ever","lukepa",90),
-    	new card(4,"JRR Tolkein might have been into mudding","Lomax",82),
-    	new card(5,"We don't know what makes people fat","unattributed",89),
-    	new card(6,"Slavery did not exist in America","Free Free",79),
-    	new card(7,"I was having sex with my ladyfriend and we're both prego","Snuffleboo",79),
-    	new card(8,"A boy gets married with a girl and they both can't hump","234567890",79),
-    	new card(9,"Car never change since automobile invention","Thien63",94),
-    	new card(10,"I am fully capable of going backwards and forwards in time and at will","Deus Ex Machina 42",75),
-    	new card(11,"The first polio vaccine, the Salk vaccine, was a total disaster","mamakay",92),
-    	new card(12,"The formation of planets is a lie. Climate science is a lie.","mnemeth1",75),
-    	new card(13, "Two-Dimoensional love is controversial, yet not psychologically, philosophically or biologically wrong","anonymous",74),
-    	new card(14,"Interpreters say there is no difference between night dreams and daytime dreams except about elephant.","Varzandeh",73),
-    	new card(15,"[Dolphins] know how to access multiple dimensions.","Joan Ocean",65),
-    	new card(16,"It is legal to post nude photos of someone without their consent","unattributed",64),
-    	new card(17,"Laura Ingalls Wilder is God.","John Charles Wilson",30),
-    	new card(18,"Disney's Roadside Romeo has opened in India and it's a huge hit. Let me repeat that: It's a HUGE HIT.","Amid Amidi",36),
-    	new card(19,"Frozen cum is a refreshing summer treat","cumpantyboy",63),
-    	new card(20,"A beautiful woman is like a wild horse; she will need to be tamed before you can enjoy each other’s company.","ewokdisco",35),
-    	new card(21,"a toilet is becoming a completely foreign object to women.","antifeministtech.info",103),
-    	new card(22,"I think the logical thing is for the company to provide the male bosses with a prostitution expense account","unattributed",103),
-    	new card(23,"Obama told children to take away my money","TigerMegatron",9),
-    	new card(24,"polio (the actual polio virus) was never the plague it was made out to be.","mamakay",92),
-    	new card(25,"The Kardashians are in league with Al-Qaeda","Johnathan Lee Riches",80),
-    	new card(26,"many bad boys are overweight or otherwise physically unattractive.","Love Shy Wiki",114),
-    	new card(27,"The Latino people have never had a revolution","femalepharoe",75),
-    	new card(28,"Che Guevara failed spectacularly at everything he attempted in his life.","Conservapedia",15),
-    	new card(29,"Homosexual bait-and-switch is a technique used by covert homosexuals to convert heterosexuals to homosexuality, using deceit and powerful mind-control techniques.","GeorgeE",15),
-    	new card(30,"Light creates gravity. Since photons from the sky do not have mass their bombardment doesn't hurt, but they don't let you jump very high either.","Smithjustinb",75),
-    	new card(31,"Elisha Cuthbert has to pee sometimes, and that's hot.","Spurting",84),
-    	new card(32,"I want to punch a hippo right there in the face. He wouldn't even feel it, but I'd feel fuckin' ace.","nevski pazza",85),
-    	new card(33,"In alternate universes, mirror images of yourself are living out their lives, just as you are.","Burt Goldman",104),
-    	new card(34,"Everything will be okay if you just let me yiff the otter.","nekobe",100),
-    	new card(35,"Light is the most basic corrosive we know","theRhenn",35),
-    	new card(36,"Pour vegetable oil and flour into a baking dish and microwave at 70% power for 6 minutes. This will create a white roux","flatscat",26),
-    	new card(37,"There is a way you can be a wizard in reality.","wikihow",44),
-    	new card(38,"Most people are not intellectual enough to understand Family Guy, making it superior.",90),
-    	new card(39,"The smell of fresh pee isn't nasty and the residual dry smell is like a perfume.","Humidresearcher",52),
-    	new card(40,"Forums are like the herpes of the internet","WillieDangDoodle",108),
-    	new card(41,"There is no such thing as a “best” when it comes to sports or sports teams. It would take away the ability of people to have opinions.","Bangbangcoconut",90),
-    	new card(42,"Gucci Mane best rapper alive","youtube",0),
-    	new card(43,"The urinal is just for you as a man. It's impossible for her to use it.","The Spearhead",103),
-    	new card(44,"As of 2002, love went extinct","Msshardy",109),
-    	new card(45,"Being a juggalo is just like being a normal person","unattributed",21),
-    	new card(46, "Warhammer 40,000 can make anything awesome.", "this troper", 60),
-    	new card(47,"There's nothing perverted about sniffing a pretty girl's seatcushon","quaps",66),
-    	new card(48,"Minors find it difficult to masturbate.","AWOL",115),
-    	new card(49,"Man used to live for hundreds of years disease free.","winddance",38)];
+	var theDeck = decks[deckName];
+	gameRoom.deck = [];
+	for(i = 0; i < theDeck.cards.length; i++){
+		gameRoom.deck.push(new gameCard(i));
+	}
+	gameRoom.masterDeck = theDeck;
 	gameRoom.gameState = GAME_WAITING_ARGUMENTS;
 	gameRoom.cardsLeft = gameRoom.deck.length;
 	gameRoom.round = 1;
+}
+
+exports.getDeckData = function(){
+	var theAnswer = {};
+	for (var deck in decks){
+		theAnswer[deck] = {name: deck, description: decks[deck].description, 
+			numCards: decks[deck].cards.length};
+	}
+	return theAnswer;
 }
 
 //Register playerID's name as playerName
@@ -268,7 +265,7 @@ exports.disconnect = function(playerName){
 }
 
 //playerID requests to start the room they are leading
-exports.startRequest = function(playerName){
+exports.startRequest = function(playerName,deckName){
 	var thePlayer = players[playerName];
 	if(thePlayer == null){
 		return {success: false, message: "You do not exist"};
@@ -286,9 +283,12 @@ exports.startRequest = function(playerName){
 	if(theRoom.gameState != GAME_NOT_STARTED){
 		return {success: false, message: "The game is already in progress."};
 	}
+	if(decks[deckName] == null){
+		return {success: false, message: "That deck doesn't exist"};
+	}
 	//everything's fine, start the game
-	console.log(theRoom.name + " has started playing.");
-	initializeGame(theRoom);
+	console.log(theRoom.name + " has started playing with deck "+deckName);
+	initializeGame(theRoom,deckName);
 	return {success: true, theRoom:theRoom.name};
 }
 
@@ -314,11 +314,12 @@ exports.getStatements = function(roomName){
 				theCard.mostVotes = 0;
 				theCard.leastVotes = 0;
 				var playerName = theRoom.players[i];
+				var masterCard = theRoom.masterDeck.cards[theCard.number];
 				players[playerName].cardNum = selected;
 				result[playerName] = {
-					quote: theCard.quote,
-					author: theCard.author,
-					episode: theCard.episode,
+					quote: masterCard.quote,
+					author: masterCard.author,
+					episode: masterCard.episode,
 					score: theCard.score
 				};
 			}
@@ -344,9 +345,10 @@ exports.getWinner = function(roomName){
 		var theCard = theRoom.deck[i];
 		if(theCard.score < cardScore){
 			cardScore = theCard.score;
-			wCard = theCard.quote;
+			wCard = theRoom.masterDeck.cards[theCard.number].quote;
 		}
 	}
+	console.log("Game in " + roomName + " is over.");
 	return {player: wPlayer, playerScore: playerScore, card: wCard, cardScore: cardScore};
 }
 
@@ -359,7 +361,7 @@ exports.doneDefending = function(playerName){
 	}
 	var theRoom = rooms[thePlayer.room];
 	if (theRoom == null){
-		return {success: false, message: "You are not in a room. Stop fucking with me."};
+		return {success: false, message: "You are not in a room."};
 	}
 	if (theRoom.gameState != GAME_WAITING_ARGUMENTS){
 		return {success: false, message: "It's not time for that."};

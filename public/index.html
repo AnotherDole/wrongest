@@ -207,7 +207,7 @@
 
       //Request to start the game. Only works if you are the leader of the room
       function startgame(){
-        socket.emit('requeststart');
+        socket.emit('requeststart','Mini Deck');
       }
 
       socket.on('startresult', function(data){

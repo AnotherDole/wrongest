@@ -6,6 +6,8 @@ var fs = require('fs');
 var logic = require('./logic.js');
 var port = 3000;
 
+var gameOver = false;
+
 server.listen(port, function(){
 	console.log('Server listening at port %d', port);
 });
@@ -18,8 +20,10 @@ app.use(express.static(__dirname + '/public'));
 function getAndSendStatements(roomName){
 	var result = logic.getStatements(roomName);
 	if(result == false){
+		gameOver = true;
 		result = logic.getWinner(roomName);
 		io.to(roomName).emit('gameover',result);
+		console.log("Game over, restart server to try again.");
 	}
 	else{
 		io.to(roomName).emit('getstatements',result);
@@ -38,7 +42,7 @@ io.on('connection', function (socket){
 	logic.addPlayer('Matt Crow','3');
 	logic.joinRequest('Matt Crow','Test Room');
 	io.to('Test Room').emit('updatecurrentroom',logic.getPlayersIn('Test Room'));
-	logic.startRequest('Player1');
+	logic.startRequest('Player1','Mini Deck');
 	getAndSendStatements('Test Room');
 	logic.doneDefending('WillieDangDoodle');
 	logic.doneDefending('Varzandeh');
