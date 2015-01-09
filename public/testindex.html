@@ -8,6 +8,7 @@ Name: <input type="text" id='usernameinput' maxlength="15"> <button onclick="sen
 </select>
 
 <input type="text" id='roomnamer' maxlength="15">
+<input type="text" id='password' maxlength='15'>
 <button id='createroombutton' onclick='createroom();'>Create New Room</button>
 <button id='joinroombutton' onclick='joinroom();'>Join Selected Room</button>
 <button id='updaterooms' onclick='updaterooms();'>Update Room Selection</button>
@@ -63,7 +64,7 @@ socket.on('logonresult',function(data){
 
 //send roomname string
 function createroom(){
-	socket.emit('createroom',$('#roomnamer').val());
+	socket.emit('createroom',$('#roomnamer').val(),$('#password').val());
 }
 
 //received after emitting createroom
@@ -95,7 +96,7 @@ socket.on('roomdata',function(data){
 
 //send name of room to join
 function joinroom(){
-	socket.emit('requestjoin',$('#roomselector').val());
+	socket.emit('requestjoin',$('#roomselector').val(),$('#password').val());
 }
 
 //received after emitting requestjoin

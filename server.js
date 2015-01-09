@@ -42,8 +42,8 @@ io.on('connection', function (socket){
 	});
 
 	//data is the requested room name
-	socket.on('createroom', function(data){
-		var result = logic.createRoom(socket.username,data);
+	socket.on('createroom', function(data,password){
+		var result = logic.createRoom(socket.username,data,password);
 		socket.emit('createresult',result);
 		var thename = result.name;
 		if(result.success){
@@ -62,8 +62,8 @@ io.on('connection', function (socket){
 	});
 
 	// data is requested room name
-	socket.on('requestjoin', function(data){
-		var result = logic.joinRequest(socket.username,data);
+	socket.on('requestjoin', function(data,password){
+		var result = logic.joinRequest(socket.username,data,password);
 		if (result.success){
 			//join socket.io room
 			socket.join(data);

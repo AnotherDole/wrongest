@@ -28,9 +28,10 @@ function gamePlayer(name, playerID){
 	this.voted = false;
 }
 
-function gameRoom(name, leaderName){
+function gameRoom(name, leaderName,password){
 	this.name = name;
 	this.leader = leaderName;
+	this.password = password;
 	this.players = [leaderName];
 	this.gameState = GAME_NOT_STARTED;
 	this.votesReceived = 0;
@@ -132,7 +133,7 @@ exports.addPlayer = function(playerName, playerID){
 }
 
 //Create a new room. playerID is the requestor, name is requested name
-exports.createRoom = function(playerName,thename){
+exports.createRoom = function(playerName,thename,password){
 	//check if player has chosen a name yet
 	var thePlayer = players[playerName];
 	if(thePlayer == null){
@@ -154,7 +155,14 @@ exports.createRoom = function(playerName,thename){
 	if(rooms[reqname] != null){
 		return {success: false, message:"A room with that name already exists"};
 	}
-	rooms[reqname] = new gameRoom(reqname,playerName);
+	var reqPass;
+	if(password == null){
+		reqPass = "";
+	}
+	else{
+		reqPass = password.trim();
+	}
+	rooms[reqname] = new gameRoom(reqname,playerName,reqPass);
 	players[playerName].room = reqname;
 	console.log("Created room " + reqname + " with leader " + playerName);
 	return {success: true, name:reqname};
@@ -187,7 +195,7 @@ exports.getPlayersIn = function(roomName){
 }
 
 //playerName requests to join roomName
-exports.joinRequest = function(playerName, roomName){
+exports.joinRequest = function(playerName, roomName,password){
 	var thePlayer = players[playerName];
 	var theRoom = rooms[roomName];
 	//check if room exits. this should just be for safety.
@@ -207,6 +215,16 @@ exports.joinRequest = function(playerName, roomName){
 	}
 	if(theRoom.gameState != GAME_NOT_STARTED){
 		return {success: false, message:"You cannot join a game in progress."};
+	}
+	var givenPass;
+	if(password == null){
+		givenPass = "";
+	}
+	else{
+		givenPass = password.trim();
+	}
+	if(givenPass != theRoom.password){
+		return {success: false, message:"Wrong password."}
 	}
 	thePlayer.room = roomName;
 	theRoom.players.push(playerName);
