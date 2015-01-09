@@ -69,7 +69,6 @@ io.on('connection', function (socket){
 			socket.join(data);
 			//tell everyone in same room to update display
 			io.to(data).emit('updatecurrentroom',logic.getPlayersIn(data));
-			io.emit('roomdata',logic.getAllRoomData());
 		}
 		socket.emit('joinresult',result);
 	});
@@ -83,7 +82,6 @@ io.on('connection', function (socket){
 			if(!result.roomDeleted){
 				io.to(result.theRoom).emit('updatecurrentroom',logic.getPlayersIn(result.theRoom));
 			}
-			io.emit('roomdata',logic.getAllRoomData());
 		}
 		socket.emit('leaveresult',result);
 	});
