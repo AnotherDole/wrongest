@@ -47,6 +47,9 @@ else{
 }
 var username = "";
 var deckData;
+var currentStatements;
+var playerList;
+var needUpdateDisplay;
 
 //send username string
 function sendusername(){
@@ -135,6 +138,7 @@ function leaveroom(){
 //received after leaving a room
 socket.on('leaveresult',function(data){
 	if(data.success){
+		needUpdateDisplay = false;
 		$('#roommembers').empty();
 		$('#roommembers').text('Not in a room yet');
 	}	
@@ -144,6 +148,8 @@ socket.on('leaveresult',function(data){
 socket.on('updatecurrentroom', function(data){
 	var $toChange = $('#roommembers');
 	$toChange.empty();
+	playerList = data.players;
+	console.log(playerList);
 
 	$toChange.append('Currently in ' + data.roomName + ':<br>');
 	for (var i = 0; i < data.players.length; i++){
@@ -152,6 +158,9 @@ socket.on('updatecurrentroom', function(data){
 			$toChange.append(" (leader)");
 		}
 		$toChange.append("<br>");
+	}
+	if(needUpdateDisplay){
+		updateDisplay();
 	}
 });
 
@@ -169,17 +178,16 @@ socket.on('startresult', function(data){
 	}
 });
 
-//Receive the statments that everyone will be defending this round.
-//Automatically sent out at the start of a new round
-socket.on('getstatements', function(data){	
+function updateDisplay() {
 	var $thediv = $('#statementsdiv').empty();
 	var $leastselect = $('#least').empty();
 	var $mostselect = $('#most').empty();
-	for(var player in data){
-		var quote = data[player].quote;
-		var author = data[player].author;
-		var episode = data[player].episode;
-		var score = data[player].score;
+	for(var i = 0; i < playerList.length; i++){
+		var player = playerList[i];
+		var quote = currentStatements[player].quote;
+		var author = currentStatements[player].author;
+		var episode = currentStatements[player].episode;
+		var score = currentStatements[player].score;
 		if(player == username){
 			$('#statement').empty().append(quote + '<br>Card Score:' + score);
 		}
@@ -188,7 +196,15 @@ socket.on('getstatements', function(data){
 			$leastselect.append($('<option/>', {text: player, value: player}));
 			$mostselect.append($('<option/>', {text: player, value: player}));
 		}
-	}	
+	}
+}
+
+//Receive the statments that everyone will be defending this round.
+//Automatically sent out at the start of a new round
+socket.on('getstatements', function(data){	
+	needUpdateDisplay = true;
+	currentStatements = data;
+	updateDisplay();
 });
 
 //Tell server you are done defending your statement
@@ -252,5 +268,6 @@ socket.on('gameover', function(data){
 	$resultDiv.append('Winner: ' + data.player + ' with a score of ' + data.playerScore + '.<br>');
 	$resultDiv.append('Wrongest Words: ' + data.card + ' with a score of ' + data.cardScore);
 });
+
 </script>
 </html>

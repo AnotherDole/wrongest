@@ -240,6 +240,7 @@ exports.leaveRequest = function(playerName){
 	if(theRoom == null){
 		return {success: false, message: "Player is not in a room."};
 	}
+
 	theRoom.players.splice(theRoom.players.indexOf(playerName),1);
 	console.log(playerName + " left room " + theRoom.name);
 	//no one left in room, so delete it
@@ -250,12 +251,26 @@ exports.leaveRequest = function(playerName){
 		return {success: true, roomDeleted: true};
 	}
 	thePlayer.room = null;
+
 	//need to find new leader
 	if(theRoom.leader == playerName){
 		theRoom.leader = theRoom.players[Math.floor(Math.random() * theRoom.players.length)];
 		console.log(players[theRoom.leader].name + " is the new leader");
 	}
-	return {success: true, roomDeleted: false, theRoom:theRoom.name};
+	var toReturn = {success: true, roomDeleted: false, theRoom:theRoom.name, whoLeft: playerName, duringArg: false, newNeeded: 0, duringVote: false};
+	if(theRoom.gameState == GAME_WAITING_ARGUMENTS){
+		theRoom.deck[thePlayer.cardNum].inplay = false;
+		toReturn.duringArg = true;
+		if(thePlayer.voted){
+			theRoom.votesReceived--;
+		}
+		toReturn.newNeeded = theRoom.players.length - theRoom.votesReceived;
+	}
+	else if (theRoom.gameState == GAME_WAITING_VOTES){
+		theRoom.deck[thePlayer.cardNum].inplay = false;
+		toReturn.duringVote = true;
+	}
+	return toReturn;
 }
 
 exports.disconnect = function(playerName){

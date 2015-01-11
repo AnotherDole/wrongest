@@ -26,6 +26,25 @@ function getAndSendStatements(roomName){
 	}
 }
 
+//Common code for when a player leaves or disconnects
+function leaveOrDisconnect(result){
+	//tell everyone else in room to update list
+	if(!result.roomDeleted){
+		io.to(result.theRoom).emit('updatecurrentroom',logic.getPlayersIn(result.theRoom));
+	}
+	if(result.duringArg){
+		if(result.newNeeded == 0){
+			logic.prepareForVotes(result.theRoom);
+		}
+		io.to(result.theRoom).emit('newdefendcount',result.newNeeded);
+	}
+	else if(result.duringVote){
+		//For now, just call for a new vote
+		logic.prepareForVotes(result.theRoom);
+		io.to(result.theRoom).emit('newdefendcount',0);
+	}
+}
+
 io.on('connection', function (socket){
 	//data is requested username
 	socket.on('logon', function(data){
@@ -50,7 +69,6 @@ io.on('connection', function (socket){
 		if(result.success){
 			//join the socket.io room
 			socket.join(thename);
-			io.emit('roomdata',logic.getAllRoomData());
 		}
 		//tell that person to update room display
 		io.to(thename).emit('updatecurrentroom',logic.getPlayersIn(thename));
@@ -79,10 +97,7 @@ io.on('connection', function (socket){
 		var result = logic.leaveRequest(socket.username);
 		if (result.success){
 			socket.leave(result.theRoom);
-			//tell everyone else in room to update list
-			if(!result.roomDeleted){
-				io.to(result.theRoom).emit('updatecurrentroom',logic.getPlayersIn(result.theRoom));
-			}
+			leaveOrDisconnect(result);
 		}
 		socket.emit('leaveresult',result);
 	});
@@ -134,7 +149,7 @@ io.on('connection', function (socket){
 		var result = logic.disconnect(socket.username);
 		if(result.success && !result.roomDeleted){
 			io.to(result.theRoom).emit('updatecurrentroom',logic.getPlayersIn(result.theRoom));
+			leaveOrDisconnect(result);
 		}
-		io.emit('roomdata',logic.getAllRoomData());
 	});
 });
