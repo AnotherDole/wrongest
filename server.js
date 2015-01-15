@@ -46,32 +46,18 @@ function leaveOrDisconnect(result){
 }
 
 io.on('connection', function (socket){
-	//data is requested username
-	socket.on('logon', function(data){
-		if(socket.username != null){
-			socket.emit('logonresult',{success:false,message:"You have already chosen a name."});
-		}
-		else{
-			var result = logic.addPlayer(data,socket.id);
-			if(result.success){
-				socket.username = result.name;
-			}
-			socket.emit('logonresult',result);
-			socket.emit('deckdata',logic.getDeckData());
-		}
-	});
-
 	//data is the requested room name
-	socket.on('createroom', function(data,password){
-		var result = logic.createRoom(socket.username,data,password);
+	socket.on('createroom', function(playerName,roomName,password){
+		var result = logic.createRoom(playerName, socket.id, roomName, password);
 		socket.emit('createresult',result);
-		var thename = result.name;
 		if(result.success){
 			//join the socket.io room
-			socket.join(thename);
+			socket.username = result.playerName;
+			socket.roomName = result.roomName;
+			socket.join(result.roomName);
+			socket.emit('deckdata',logic.getDeckData());
+			io.to(result.roomName).emit('updatecurrentroom',logic.getPlayersIn(result.roomName));
 		}
-		//tell that person to update room display
-		io.to(thename).emit('updatecurrentroom',logic.getPlayersIn(thename));
 	});
 
 	// data isn't necessary
@@ -81,44 +67,50 @@ io.on('connection', function (socket){
 	});
 
 	// data is requested room name
-	socket.on('requestjoin', function(data,password){
-		var result = logic.joinRequest(socket.username,data,password);
+	socket.on('requestjoin', function(playerName,roomName,password){
+		var result = logic.joinRequest(playerName, socket.id, roomName, password);
 		if (result.success){
 			//join socket.io room
-			socket.join(data);
+			socket.join(roomName);
+			socket.username = playerName;
+			socket.roomName = roomName;
+			socket.emit('deckdata',logic.getDeckData());
 			//tell everyone in same room to update display
-			io.to(data).emit('updatecurrentroom',logic.getPlayersIn(data));
+			io.to(roomName).emit('updatecurrentroom',logic.getPlayersIn(roomName));
 		}
 		socket.emit('joinresult',result);
 	});
 
 	//data isn't necessary 
 	socket.on('requestleave', function(data){
-		var result = logic.leaveRequest(socket.username);
+		var result = logic.leaveRequest(socket.username,socket.roomName);
 		if (result.success){
-			socket.leave(result.theRoom);
+			socket.leave(socket.roomName);
+			delete socket.username;
+			delete socket.roomName;
 			leaveOrDisconnect(result);
 		}
 		socket.emit('leaveresult',result);
 	});
 
-	//data is deck name 
-	socket.on('requeststart', function(data){
-		var result = logic.startRequest(socket.username,data);
+	//request to start a game with certain options
+	socket.on('requeststart', function(deckName, time, allowRedraw, dealerFirstOrLast){
+		var options = {deckName: deckName, time: time, allowRedraw: allowRedraw, dealerFirstOrLast: dealerFirstOrLast};
+		var result = logic.startRequest(socket.username,socket.roomName,options);
 		socket.emit('startresult',result);
 		//time to start game, send out the first statements
 		if(result.success){
-			getAndSendStatements(result.theRoom);
+			getAndSendStatements(socket.roomName);
 		}
 	});
 
 	socket.on('donedefending', function(data){
-		var result = logic.doneDefending(socket.username);
+		var result = logic.doneDefending(socket.roomName, socket.username);
 		if(result.success){
 			//tell everyone in room new votesNeeded
-			io.to(result.roomName).emit('newdefendcount',result.votesNeeded);
+			io.to(socket.roomName).emit('newdefendcount',result.votesNeeded);
 			if(result.votesNeeded <= 0){
-				logic.prepareForVotes(result.roomName);
+				logic.prepareForVotes(socket.roomName);
 			}
 		}
 		else{
@@ -127,17 +119,15 @@ io.on('connection', function (socket){
 		}
 	});
 
-	socket.on('playervotes',function(data){
-		var most = data.most, least = data.least;
-		var result = logic.processVote(socket.username,most,least);
+	socket.on('playervotes',function(most,least){
+		var result = logic.processVote(socket.roomName,socket.username,most,least);
 		if (result.success){
 			//tell everyone in room about vote
-			io.to(result.roomName).emit('receivevote',result);
+			io.to(socket.roomName).emit('receivevote',result);
 			if(result.votesNeeded == 0){
-				var roomName = result.roomName;
-				result = logic.endRound(roomName);
-				io.to(roomName).emit('roundend',result);
-				getAndSendStatements(roomName);
+				result = logic.endRound(socket.roomName);
+				io.to(socket.roomName).emit('roundend',result);
+				getAndSendStatements(socket.roomName);
 			}
 		}
 		else{
@@ -146,7 +136,7 @@ io.on('connection', function (socket){
 	});
 
 	socket.on('disconnect', function(data){
-		var result = logic.disconnect(socket.username);
+		var result = logic.leaveRequest(socket.username,socket.roomName);
 		if(result.success && !result.roomDeleted){
 			io.to(result.theRoom).emit('updatecurrentroom',logic.getPlayersIn(result.theRoom));
 			leaveOrDisconnect(result);

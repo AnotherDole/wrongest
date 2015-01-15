@@ -1,42 +1,68 @@
 <!DOCTYPE html>
 <html>
-Name: <input type="text" id='usernameinput' maxlength="15"> <button onclick="sendusername();">Send Username</button>
-<div id="logonresult">No result yet.</div>
-<br>
 
-<select id='roomselector'>
-</select>
+<div id='startDiv'>
+	<button id='pickCreate' onclick='showCreate();'>Create a room</button>
+	<button id='pickJoin' onclick='showJoin();'>Join a room</button>
+</div>
 
-<input type="text" id='roomnamer' maxlength="15">
-<input type="text" id='password' maxlength='15'>
-<button id='createroombutton' onclick='createroom();'>Create New Room</button>
-<button id='joinroombutton' onclick='joinroom();'>Join Selected Room</button>
-<button id='updaterooms' onclick='updaterooms();'>Update Room Selection</button>
-<button id='leaveroom' onclick='leaveroom();'>Leave Current Room</button>
-<select id='deck' onchange='updateDeckDescription();'></select>
-<div id='deckdescription'></div>
-<div id='roomresult'>No result yet.</div>
-<div id='roommembers'>Not in a room yet.</div>
+<div id = 'createDiv' style='display:none'>
+	<h1>Create Room</h1>
+	Name: <input type="text" id='createUsernameInput' maxlength="50">
+	Room Name: <input type='text' id='createRoomNameInput' maxlength='50'>
+	Password: <input type='text' id='createPasswordInput'>
+	<button id='createroombutton' onclick='createroom();'>Create New Room</button>
+	<button onclick="$('#createDiv').hide();$('#startDiv').show();">Back</button>
+	<div id='createResult'></div>
+</div>
 
-<br><br>
+<div id='joinDiv' style='display:none'>
+	<h1>Join Room</h1>
+	<select id='roomselector'>
+	</select>
 
-<button id='startgamebutton' onclick='startgame();'>Start Game</button>
-<div id='startresult'></div>
+	Name: <input type='text' id='joinUsernameInput' maxlength='50'>
+	Password: <input type="text" id='joinPasswordInput'>
+	<button id='joinroombutton' onclick='joinroom();'>Join Selected Room</button>
+	<button id='updaterooms' onclick='updaterooms();'>Update Room Selection</button>
+	<button onclick="$('#joinDiv').hide();$('#startDiv').show();">Back</button>
+	<div id='joinResult'></div>
+</div>
 
-<h1>Defend this Statement:</h1>
-<h2 id='statement'></h2>
-<br>
-<h1>Other players</h1>
-<div id='statementsdiv'></div>
-<br>
-<button onclick='donedefend();'>I am done defending my point.</button>
-<div id='votestatus'>It is not time to vote yet.</div>
-Least Wrong: <select id='least'></select> Most Wrong: <select id='most'></select> 
-<button onclick='sendvotes();'>Send my votes.</button>
-<div id='voteresult'></div>
+<div id='roomDiv' style='display:none'>
+	<div id='roommembers'>Not in a room yet.</div>
+	<button id='leaveroom' onclick='leaveroom();'>Leave Current Room</button>
+	<div id='leaderControls'>
+		<select id='deck' onchange='updateDeckDescription();'></select>
+		<div id='deckdescription'></div>
+		<button id='startgamebutton' onclick='startgame();'>Start Game</button>
+		<div id='startresult'></div>
+	</div>
+</div>
+
+<div id='statementsDiv' style='display:none'>
+	<h1>Defend this Statement:</h1>
+	<h2 id='statement'></h2>
+	<h1>Other players</h1>
+	<div id='statementsdiv'></div>
+	<br>
+	<button onclick='donedefend();'>I am done defending my point.</button>
+	<div id='votestatus'>It is not time to vote yet.</div>
+</div>
+
+<div id='voteDiv' style='display:none'>
+	Least Wrong: <select id='least'></select> Most Wrong: <select id='most'></select> 
+	<button onclick='sendvotes();'>Send my votes.</button>
+	<div id='voteResult'></div>
+</div>
+
+<div id='roundDiv' style='display:none'>
+	<div id='roundText'></div>
+	<button onclick='$("#roundDiv").hide();'>Got it, thanks.</button>
+</div>
 
 <script src="https://cdn.socket.io/socket.io-1.2.1.js"></script>
-<script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
+<script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
 <script>
 var socket;
 if(location.hostname.indexOf('rhcloud.com') > -1){
@@ -51,24 +77,18 @@ var currentStatements;
 var playerList;
 var needUpdateDisplay;
 
-//send username string
-function sendusername(){
-	socket.emit('logon', $('#usernameinput').val());
+function showCreate(){
+	$('#startDiv').hide();
+	$('#createDiv').show();
 }
 
-//received after emitting logon
-socket.on('logonresult',function(data){
-	if(data.success){
-		$('#logonresult').text('Success!');
-		username = data.name;
-		updaterooms();
-	}
-	else{
-		$('#logonresult').text(data.message);
-	}
-});
+function showJoin(){
+	$('#startDiv').hide();
+	$('#joinDiv').show();
+	updaterooms();
+}
 
-//received after logon
+//received after creating or joining a room
 socket.on('deckdata',function(data){
 	deckData = data;
 	$('#deck').empty();
@@ -83,18 +103,23 @@ function updateDeckDescription(){
 	$('#deckdescription').empty().append(theDeck.description + ' Cards: ' + theDeck.numCards);
 }
 
-//send roomname string
+//send username, room name, password 
 function createroom(){
-	socket.emit('createroom',$('#roomnamer').val(),$('#password').val());
+	socket.emit('createroom',$('#createUsernameInput').val(),
+				$('#createRoomNameInput').val(),
+				$('#createPasswordInput').val());
 }
 
 //received after emitting createroom
 socket.on('createresult',function(data){
 	if(data.success){
 		$('#roomresult').text('Room created!');
+		username = data.playerName;
+		$('#createDiv').hide();
+		$('#roomDiv').show();
 	}
 	else{
-		$('#roomresult').text(data.message);
+		$('#createResult').text(data.message);
 	}	
 });
 
@@ -115,15 +140,20 @@ socket.on('roomdata',function(data){
 });
 
 
-//send name of room to join
+//send username, room name, password 
 function joinroom(){
-	socket.emit('requestjoin',$('#roomselector').val(),$('#password').val());
+	socket.emit('requestjoin',$('#joinUsernameInput').val(),
+			$('#roomselector').val(),
+			$('#joinPasswordInput').val());
 }
 
 //received after emitting requestjoin
 socket.on('joinresult',function(data){
 	if(data.success){
 		$('#roomresult').text('Successfully joined room');
+		$('#joinDiv').hide();
+		$('#roomDiv').show();
+		username = data.playerName;
 	}
 	else{
 		$('#roomresult').text(data.message);
@@ -139,8 +169,14 @@ function leaveroom(){
 socket.on('leaveresult',function(data){
 	if(data.success){
 		needUpdateDisplay = false;
+		username = false;
 		$('#roommembers').empty();
 		$('#roommembers').text('Not in a room yet');
+		$('#roomDiv').hide();
+		$('#statementsDiv').hide();
+		$('#voteDiv').hide();
+		$('#voteResult').hide();
+		$('#startDiv').show();
 	}	
 });
 
@@ -149,7 +185,6 @@ socket.on('updatecurrentroom', function(data){
 	var $toChange = $('#roommembers');
 	$toChange.empty();
 	playerList = data.players;
-	console.log(playerList);
 
 	$toChange.append('Currently in ' + data.roomName + ':<br>');
 	for (var i = 0; i < data.players.length; i++){
@@ -158,6 +193,12 @@ socket.on('updatecurrentroom', function(data){
 			$toChange.append(" (leader)");
 		}
 		$toChange.append("<br>");
+	}
+	if(data.leader == username){
+		$('#leaderControls').show();
+	}
+	else{
+		$('#leaderControls').hide();
 	}
 	if(needUpdateDisplay){
 		updateDisplay();
@@ -193,8 +234,8 @@ function updateDisplay() {
 		}
 		else{
 			$thediv.append(player + ': ' + quote + '<br>Card Score: ' + score + '<br>');
-			$leastselect.append($('<option/>', {text: player, value: player}));
-			$mostselect.append($('<option/>', {text: player, value: player}));
+			$leastselect.append($('<option/>', {text: quote, value: player}));
+			$mostselect.append($('<option/>', {text: quote, value: player}));
 		}
 	}
 }
@@ -202,6 +243,9 @@ function updateDisplay() {
 //Receive the statments that everyone will be defending this round.
 //Automatically sent out at the start of a new round
 socket.on('getstatements', function(data){	
+	$('#roomDiv').hide();
+	$('#voteDiv').hide();
+	$('#statementsDiv').show();
 	needUpdateDisplay = true;
 	currentStatements = data;
 	updateDisplay();
@@ -219,8 +263,10 @@ socket.on('newdefendcount',function(data){
 		$('#votestatus').text('Dones needed to continue:' + data);	
 	}
 	else{
+		$('#statementsDiv').hide();
+		$('#voteDiv').show();
 		$('#votestatus').text('Time to vote!');
-		$('#voteresult').empty();
+		$('#voteResult').empty();
 	}
 });
 
@@ -230,31 +276,34 @@ socket.on('donefailed',function(data){
 });
 
 //send votes for most/least wrong
-//most and least should be the ID of the player
+//most and least should be the name of the player
 function sendvotes(){
 	var mostWrong = $('#most').val();
 	var leastWrong = $('#least').val();
-	socket.emit('playervotes',{most: mostWrong, least: leastWrong});
+	socket.emit('playervotes',mostWrong,leastWrong);
 }
 
 //received if the submitted votes were invalid
 socket.on('votefailed', function(data){
-	$('#voteresult').append(data + "<br>");	
+	$('#voteResult').append(data + "<br>");	
 });
 
 //received when someone else in the same room has voted
 socket.on('receivevote', function(data){
+	$('#voteResult').show();
 	var whoVoted = data.voter;
 	var most = data.mostName;
 	var least = data.leastName;
-	$('#voteresult').append(whoVoted + " says that " + least + " is least wrong and " + most + " is most wrong.<br>");
+	$('#voteResult').append(whoVoted + " says that " + least + " is least wrong and " + most + " is most wrong.<br>");
 });
 
 //received at the end of a round
 socket.on('roundend', function(data){
+	$('#roundDiv').show();
+	var $resultDiv = $('#roundText');
 	var gameData = data.gameData;
 	var playerData = data.playerData;
-	var $resultDiv = $('#voteresult');
+	$resultDiv.empty();
 	$resultDiv.append('<b>End of round ' + gameData.round + '</b>');
 	for(var player in playerData){
 		$resultDiv.append('<br>' + player + ' gains ' + playerData[player].scoreChange + ' points. Current Score: ' + playerData[player].newScore);
@@ -263,7 +312,7 @@ socket.on('roundend', function(data){
 });
 
 socket.on('gameover', function(data){
-	var $resultDiv = $('#voteresult');
+	var $resultDiv = $('#voteResult');
 	$resultDiv.empty().append('<b>Game Over!</b><br>');
 	$resultDiv.append('Winner: ' + data.player + ' with a score of ' + data.playerScore + '.<br>');
 	$resultDiv.append('Wrongest Words: ' + data.card + ' with a score of ' + data.cardScore);
