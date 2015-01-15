@@ -101,6 +101,15 @@ io.on('connection', function (socket){
 		//time to start game, send out the first statements
 		if(result.success){
 			getAndSendStatements(socket.roomName);
+			var order = logic.adjustOrder(socket.roomName);
+			io.to(socket.roomName).emit('roundorder',order['order'],order['dealer']);
+		}
+	});
+
+	socket.on('makedefend', function(){
+		var result = logic.getWhosUp(socket.roomName, socket.username);
+		if(result){
+			io.to(socket.roomName).emit('timetodefend',result.player,result.time);
 		}
 	});
 
@@ -128,6 +137,8 @@ io.on('connection', function (socket){
 				result = logic.endRound(socket.roomName);
 				io.to(socket.roomName).emit('roundend',result);
 				getAndSendStatements(socket.roomName);
+				var order = logic.adjustOrder(socket.roomName);
+				io.to(socket.roomName).emit('roundorder',order['order'],order['dealer']);
 			}
 		}
 		else{

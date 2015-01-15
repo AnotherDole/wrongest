@@ -56,14 +56,31 @@
 	</div>
 </div>
 
-<div id='statementsDiv' style='display:none'>
-	<h1>Defend this Statement:</h1>
-	<h2 id='statement'></h2>
-	<h1>Other players</h1>
-	<div id='statementsdiv'></div>
+<div id='orderDiv' style='display:none'>
+	<div id='player1' style='display:none'></div>
+	<div id='player2' style='display:none'></div>
+	<div id='player3' style='display:none'></div>
+	<div id='player4' style='display:none'></div>
+	<div id='player5' style='display:none'></div>
+	<div id='player6' style='display:none'></div>
+	<div id='player7' style='display:none'></div>
+	<div id='player8' style='display:none'></div>
+	<div id='dealerControls' style='display:none'>
+		<button onclick='makeDefend();'>Deal a Card</button>
+	</div>
+</div>
+
+<div id='timerDiv' style='display:none'>
+	<div id='timeLeftDiv'>Time goes here.</div>
+</div>
+
+<div id='defendDiv' style='display:none'>
+	<h1>Defend this Statement</h1>
+	<div id='statementDiv'></div>
+	<div id='authorDiv'></div>
+	<div id='sourceDiv'></div>
 	<br>
-	<button onclick='donedefend();'>I am done defending my point.</button>
-	<div id='votestatus'>It is not time to vote yet.</div>
+	<button onclick='donedefend()'>I'm done early.</button>
 </div>
 
 <div id='voteDiv' style='display:none'>
@@ -72,9 +89,9 @@
 	<div id='voteResult'></div>
 </div>
 
-<div id='roundDiv' style='display:none'>
+<div id='scoreDiv' style='display:none'>
 	<div id='roundText'></div>
-	<button onclick='$("#roundDiv").hide();'>Got it, thanks.</button>
+	<button onclick='$("#scoreDiv").hide();'>Got it, thanks.</button>
 </div>
 
 <script src="https://cdn.socket.io/socket.io-1.2.1.js"></script>
@@ -91,7 +108,9 @@ var username = "";
 var deckData;
 var currentStatements;
 var playerList;
-var needUpdateDisplay;
+var timeLeft;
+var timerVar;
+var meDefending = false;
 
 function showCreate(){
 	$('#startDiv').hide();
@@ -184,11 +203,11 @@ function leaveroom(){
 //received after leaving a room
 socket.on('leaveresult',function(data){
 	if(data.success){
-		needUpdateDisplay = false;
 		username = false;
 		$('#roommembers').empty();
 		$('#roommembers').text('Not in a room yet');
 		$('#roomDiv').hide();
+		$('#orderDiv').hide();
 		$('#statementsDiv').hide();
 		$('#voteDiv').hide();
 		$('#voteResult').hide();
@@ -216,9 +235,6 @@ socket.on('updatecurrentroom', function(data){
 	else{
 		$('#leaderControls').hide();
 	}
-	if(needUpdateDisplay){
-		updateDisplay();
-	}
 });
 
 //Request to start the game. Only works if you are the leader of the room
@@ -238,56 +254,106 @@ socket.on('startresult', function(data){
 	}
 });
 
-function updateDisplay() {
-	var $thediv = $('#statementsdiv').empty();
-	var $leastselect = $('#least').empty();
-	var $mostselect = $('#most').empty();
-	for(var i = 0; i < playerList.length; i++){
-		var player = playerList[i];
-		var quote = currentStatements[player].quote;
-		var author = currentStatements[player].author;
-		var episode = currentStatements[player].episode;
-		var score = currentStatements[player].score;
-		if(player == username){
-			$('#statement').empty().append(quote + '<br>Card Score:' + score);
-		}
-		else{
-			$thediv.append(player + ': ' + quote + '<br>Card Score: ' + score + '<br>');
-			$leastselect.append($('<option/>', {text: quote, value: player}));
-			$mostselect.append($('<option/>', {text: quote, value: player}));
-		}
-	}
-}
-
 //Receive the statments that everyone will be defending this round.
 //Automatically sent out at the start of a new round
 socket.on('getstatements', function(data){	
 	$('#roomDiv').hide();
 	$('#voteDiv').hide();
-	$('#statementsDiv').show();
-	needUpdateDisplay = true;
+	$('#orderDiv').show();
 	currentStatements = data;
-	updateDisplay();
 });
+
+//Received at the start of a round
+//Includes the order for the current round and the dealer
+socket.on('roundorder', function(list,dealer){
+	if(dealer == username){
+		$('#dealerControls').show();
+	}
+	else{
+		$('#dealerControls').hide();
+	}
+	for (var i = 0; i < list.length; i++){
+		var $theDiv = $('#player' + (i+1)).show();
+		$theDiv.empty().append(list[i]);
+		if(list[i] == dealer){
+			$theDiv.append(' (dealer)');
+		}
+	}
+	for(var i = list.length+1; i <= 8; i++){
+		$('#player' + i).hide();
+	}
+});
+
+function makeDefend(){
+	socket.emit('makedefend');
+}
+
+socket.on('timetodefend',function(player,time){
+	$('#orderDiv').hide();
+	timeLeft = time;
+	if(player == username){
+		meDefending = true;
+		$('#defendDiv').show();
+		var myStatement = currentStatements[username];
+		$('#statementDiv').empty().text(myStatement.quote);
+		$('#authorDiv').empty().text(myStatement.author);
+		$('#sourceDiv').empty().text(myStatement.source);
+	}	
+	else{
+		meDefending = false;
+	}
+	$('#timerDiv').show();
+	$('#timeLeftDiv').text(time);
+	timerVar = window.setInterval(function() {timerFunction()},1000);
+})
+
+function timerFunction(){
+	if(timeLeft > 0){
+		timeLeft--;
+	}
+	$('#timeLeftDiv').text(timeLeft);
+	if(timeLeft == 0 && meDefending){
+		donedefend();
+	}
+}
+
 
 //Tell server you are done defending your statement
 function donedefend(){
+	$('#defendDiv').hide();
 	socket.emit('donedefending');
 }
 
 //received when anyone in the room says they are done defending
 //data is the # of people who are not done
 socket.on('newdefendcount',function(data){
+	$('#timerDiv').hide();
+	$('#orderDiv').show();
+	window.clearInterval(timerVar);
 	if(data > 0){
-		$('#votestatus').text('Dones needed to continue:' + data);	
+		var playersDone = playerList.length - data;
+		for(var i = 1; i <= playersDone; i++){
+			$('#player' + i).css('background-color','green');
+		}
 	}
 	else{
-		$('#statementsDiv').hide();
+		$('#orderDiv').hide();
 		$('#voteDiv').show();
-		$('#votestatus').text('Time to vote!');
 		$('#voteResult').empty();
+		updateVoteSelectors();
 	}
 });
+
+function updateVoteSelectors(){
+	$mostSelect = $('#most').empty();
+	$leastSelect = $('#least').empty();
+	for(var i = 0; i < playerList.length; i++){
+		if (playerList[i] == username) continue;
+		var theStatement = currentStatements[playerList[i]];
+		$mostSelect.append($('<option/>').val(playerList[i]).text(theStatement.quote));
+		$leastSelect.append($('<option/>').val(playerList[i]).text(theStatement.quote));
+	}
+}
 
 //received if your attempt to say you are done voting failed for some reason
 socket.on('donefailed',function(data){
@@ -318,16 +384,22 @@ socket.on('receivevote', function(data){
 
 //received at the end of a round
 socket.on('roundend', function(data){
-	$('#roundDiv').show();
+	$('#scoreDiv').show();
 	var $resultDiv = $('#roundText');
 	var gameData = data.gameData;
 	var playerData = data.playerData;
+
 	$resultDiv.empty();
 	$resultDiv.append('<b>End of round ' + gameData.round + '</b>');
 	for(var player in playerData){
 		$resultDiv.append('<br>' + player + ' gains ' + playerData[player].scoreChange + ' points. Current Score: ' + playerData[player].newScore);
 	}
 	$resultDiv.append('<br>Cards left: ' + gameData.cardsLeft + '<br><b> Defend your next point. </b>');
+	
+	//reset player div colors
+	for(var i = 1; i <= playerList.length; i++){
+		$('#player' + i).css('background-color','white');
+	}
 });
 
 socket.on('gameover', function(data){

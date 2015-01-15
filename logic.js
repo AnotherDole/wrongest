@@ -51,7 +51,7 @@ function gameRoom(name, leaderName,UID,password){
 	this.leader = new gamePlayer(leaderName,UID);
 	this.password = password;
 	this.players = [this.leader];
-	this.dealer = this.leader;
+	this.dealer = null;
 	this.gameState = GAME_NOT_STARTED;
 	this.votesReceived = 0;
 	this.masterDeck = null;
@@ -59,6 +59,7 @@ function gameRoom(name, leaderName,UID,password){
 	this.timeLimit = 60;
 	this.allowRedraw = false;
 	this.dealerFirst = false;
+	this.whosUp = 0;
 	this.round = 1;
 }
 
@@ -68,10 +69,10 @@ function masterDeck(name, description){
 	this.cards = [];
 }
 
-function masterCard(quote, author, episode){
+function masterCard(quote, author, source){
 	this.quote = quote;
 	this.author = author;
-	this.episode = episode;
+	this.source = source;
 }
 
 function gameCard(number,masterCard) {
@@ -238,7 +239,7 @@ exports.leaveRequest = function(playerName,roomName){
 	//need to find new leader
 	if(theRoom.leader == thePlayer){
 		theRoom.leader = theRoom.players[Math.floor(Math.random() * theRoom.players.length)];
-		console.log(theRoom.leader + " is the new leader");
+		console.log(theRoom.leader.name + " is the new leader");
 	}
 	var toReturn = {success: true, roomDeleted: false, theRoom:theRoom.name, whoLeft: playerName, duringArg: false, newNeeded: 0, duringVote: false};
 	if(theRoom.gameState == GAME_BETWEEN_ARGUMENTS){
@@ -332,11 +333,66 @@ exports.getStatements = function(roomName){
 		theCard.inplay = true;
 		result[thePlayer.name] = {quote: theCard.masterCard.quote,
 					  author: theCard.masterCard.author,
-	       				  episode: theCard.masterCard.episode,
+	       				  source: theCard.masterCard.source,
 					  score: theCard.score};
 	}
 	console.log("Sent statements to " + theRoom.name);
 	return result;
+}
+
+//adjust the play order for the given room
+//return the play order to dispense to the players
+exports.adjustOrder = function(roomName){
+	//shouldn't have to check this, only called by the server
+	var theRoom = rooms[roomName];
+	var playerList = theRoom.players;
+	//room leader is the first dealer
+	if(theRoom.round == 1){
+		theRoom.dealer = theRoom.leader;
+		//move leader to first
+		if(theRoom.dealerFirst){
+			while(playerList[0] != theRoom.leader){
+				playerList.push(playerList.shift());	
+			}
+		}
+		else{
+			while(playerList[playerList.length-1] != theRoom.leader){
+				playerList.unshift(playerList.pop());
+			}
+		}
+	}
+	else{
+		playerList.unshift(playerList.pop());
+		if(theRoom.dealerFirst){
+			theRoom.dealer = playerList[0]
+		}
+		else{
+			theRoom.dealer = playerList[playerList.length-1];
+		}
+	}
+	theRoom.whosUp = 0;
+	//adjustments done, return the list;
+	var result = {};
+	result["dealer"] = theRoom.dealer.name;
+	result["order"] = [];
+	for(var i = 0; i < playerList.length; i++){
+		result["order"].push(playerList[i].name);
+	}
+	return result;
+}
+
+//only called when there is a request to make someone defend
+exports.getWhosUp = function(roomName,playerName){
+	var theRoom = rooms[roomName];
+	var thePlayer = getPlayer(theRoom,playerName);
+	if(thePlayer != theRoom.dealer){
+		return false;
+	}
+	if(theRoom.gameState != GAME_BETWEEN_ARGUMENTS){
+		return false;
+	}
+	theRoom.gameState = GAME_SOMEONE_ARGUING;
+	return {player: theRoom.players[theRoom.whosUp].name,time: theRoom.timeLimit};
 }
 
 exports.getWinner = function(roomName){
@@ -368,20 +424,25 @@ exports.doneDefending = function(roomName,playerName){
 	if (theRoom == null){
 		return {success: false, message: "You are not in a room."};
 	}
-	if (theRoom.gameState != GAME_BETWEEN_ARGUMENTS){
+	if (theRoom.gameState != GAME_SOMEONE_ARGUING){
 		return {success: false, message: "It's not time for that."};
 	}
 	var thePlayer = getPlayer(theRoom,playerName);
 	if(thePlayer == null){
 		return {success: false, message: "You're not in that room."};
 	}
+	if(thePlayer != theRoom.players[theRoom.whosUp]){
+		return {success: false, message: "It's not your turn."};
+	}
 	//player already voted
 	if(thePlayer.voted){
 		return {success: false, message: "You already said you were done."};
 	}
 	//okay, the vote matters
+	theRoom.gameState = GAME_BETWEEN_ARGUMENTS;
 	thePlayer.voted = true;
 	theRoom.votesReceived++;
+	theRoom.whosUp++;
 	console.log(playerName + " is done defending");
 	return {success:true, roomName:theRoom.name, votesNeeded: (theRoom.players.length - theRoom.votesReceived)};
 }
