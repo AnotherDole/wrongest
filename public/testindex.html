@@ -56,6 +56,10 @@
 	</div>
 </div>
 
+<div id='timerDiv' style='display:none'>
+	<div id='timeLeftDiv'>Time goes here.</div>
+</div>
+
 <div id='orderDiv' style='display:none'>
 	<div id='player1' style='display:none'></div>
 	<div id='player2' style='display:none'></div>
@@ -70,13 +74,9 @@
 	</div>
 </div>
 
-<div id='timerDiv' style='display:none'>
-	<div id='timeLeftDiv'>Time goes here.</div>
-</div>
-
 <div id='defendDiv' style='display:none'>
 	<h1>Defend this Statement</h1>
-	<div id='statementDiv'></div>
+	<h2 id='statementDiv'></h2>
 	<div id='authorDiv'></div>
 	<div id='sourceDiv'></div>
 	<br>
@@ -291,11 +291,12 @@ function makeDefend(){
 }
 
 socket.on('timetodefend',function(player,time){
-	$('#orderDiv').hide();
 	timeLeft = time;
+	timerVar = window.setInterval(function() {timerFunction()},1000);
 	if(player == username){
 		meDefending = true;
 		$('#defendDiv').show();
+		$('#orderDiv').hide();
 		var myStatement = currentStatements[username];
 		$('#statementDiv').empty().text(myStatement.quote);
 		$('#authorDiv').empty().text(myStatement.author);
@@ -305,15 +306,14 @@ socket.on('timetodefend',function(player,time){
 		meDefending = false;
 	}
 	$('#timerDiv').show();
-	$('#timeLeftDiv').text(time);
-	timerVar = window.setInterval(function() {timerFunction()},1000);
+	$('#timeLeftDiv').text(time + ' seconds left.');
 })
 
 function timerFunction(){
 	if(timeLeft > 0){
 		timeLeft--;
 	}
-	$('#timeLeftDiv').text(timeLeft);
+	$('#timeLeftDiv').text(timeLeft + ' seconds left.');
 	if(timeLeft == 0 && meDefending){
 		donedefend();
 	}
