@@ -33,8 +33,24 @@
 	<div id='roommembers'>Not in a room yet.</div>
 	<button id='leaveroom' onclick='leaveroom();'>Leave Current Room</button>
 	<div id='leaderControls'>
-		<select id='deck' onchange='updateDeckDescription();'></select>
+		Deck: <select id='deck' onchange='updateDeckDescription();'></select>
 		<div id='deckdescription'></div>
+		Time Limit: 
+		<select id='timeLimit'>
+			<option value='30'>30 seconds</option>
+			<option value='60'>60 seconds</option>
+			<option value='90'>90 seconds</option>
+		</select><br>
+		Should players get the same card twice in a game?
+		<select id='allowRedraw'>
+			<option value='no'>No</option>
+			<option value='yes'>Yes</option>
+		</select><br>
+		Does the dealer defend first or last?
+		<select id='dealerSelect'>
+			<option value='last'>Last</option>
+			<option value='first'>First</option>
+		</select><br>
 		<button id='startgamebutton' onclick='startgame();'>Start Game</button>
 		<div id='startresult'></div>
 	</div>
@@ -156,7 +172,7 @@ socket.on('joinresult',function(data){
 		username = data.playerName;
 	}
 	else{
-		$('#roomresult').text(data.message);
+		$('#joinResult').text(data.message);
 	}
 });
 
@@ -207,7 +223,10 @@ socket.on('updatecurrentroom', function(data){
 
 //Request to start the game. Only works if you are the leader of the room
 function startgame(){
-	socket.emit('requeststart',$('#deck').val());
+	socket.emit('requeststart',$('#deck').val(),
+		   		   $('#timeLimit').val(),
+		   		   $('#allowRedraw').val(),
+		   		   $('#dealerSelect').val());
 }
 
 socket.on('startresult', function(data){

@@ -43,6 +43,7 @@ function gamePlayer(name, UID){
 	this.score = 0;
 	this.card = null;
 	this.voted = false;
+	this.previousCards = [];
 }
 
 function gameRoom(name, leaderName,UID,password){
@@ -50,10 +51,14 @@ function gameRoom(name, leaderName,UID,password){
 	this.leader = new gamePlayer(leaderName,UID);
 	this.password = password;
 	this.players = [this.leader];
+	this.dealer = this.leader;
 	this.gameState = GAME_NOT_STARTED;
 	this.votesReceived = 0;
 	this.masterDeck = null;
 	this.deck = [];
+	this.timeLimit = 60;
+	this.allowRedraw = false;
+	this.dealerFirst = false;
 	this.round = 1;
 }
 
@@ -86,6 +91,7 @@ function initializeGame(gameRoom,deckName) {
 		gameRoom.players[i].score=0;
 		gameRoom.players[i].cardNum=0;
 		gameRoom.players[i].voted = false;
+		gameRoom.players[i].previousCards = [];
 	}
 	var theDeck = decks[deckName];
 	gameRoom.masterDeck = theDeck;
@@ -250,7 +256,7 @@ exports.leaveRequest = function(playerName,roomName){
 	return toReturn;
 }
 
-//playerID requests to start the room they are leading
+//playerName requests to start roomName with given options
 exports.startRequest = function(playerName,roomName,options){
 	var theRoom = rooms[roomName];
 	if(theRoom == null){
@@ -270,8 +276,22 @@ exports.startRequest = function(playerName,roomName,options){
 	if(theRoom.gameState != GAME_NOT_STARTED){
 		return {success: false, message: "The game is already in progress."};
 	}
-	if(decks[options["deckName"]] == null){
+
+	//Deal with the options
+	if(decks[options['deckName']] == null){
 		return {success: false, message: "That deck doesn't exist"};
+	}
+	if(options['time'] == '30'){
+		theRoom.timeLimit = 30;
+	}
+	else if(options['time'] == '90'){
+		theRoom.timeLimit = 90;
+	}
+	if(options['allowRedraw'] == 'yes'){
+		theRoom.allowRedraw = true;
+	}
+	if(options['dealerFirstOrLast'] == 'first'){
+		theRoom.dealerFirst = true;
 	}
 	//everything's fine, start the game
 	console.log(theRoom.name + " has started playing with deck "+ options["deckName"]);
@@ -296,7 +316,9 @@ exports.getStatements = function(roomName){
 	       	for(var j = 0; j < theRoom.deck.length; j++){
 			theCard = theRoom.deck[j];
 			if(!theCard.inplay && !theCard.discarded){
-				possible.push(theCard);
+				if(theRoom.allowRedraw || (thePlayer.previousCards.indexOf(theCard) == -1)){
+					possible.push(theCard);
+				}
 			}
 		}
 		if (possible.length == 0){
@@ -306,6 +328,7 @@ exports.getStatements = function(roomName){
 		theCard.mostVotes = 0;
 		theCard.leastvotes = 0;
 		thePlayer.card = theCard;
+		thePlayer.previousCards.push(theCard);
 		theCard.inplay = true;
 		result[thePlayer.name] = {quote: theCard.masterCard.quote,
 					  author: theCard.masterCard.author,
