@@ -6,6 +6,17 @@ var logic = require('./logic.js');
 var port = process.env.OPENSHIFT_NODEJS_PORT || 3000;
 var server_ip_address = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1';
 
+/************** Variables for testing **********/
+var connected = 0,playing=0;
+var testRoom = 'Test Room';
+var testing = false;
+if(process.argv[2] == 'test'){
+	testing = true;
+	console.log('Server started in test mode.');
+}
+/************** End testing variables *********/
+
+
 server.listen(port,server_ip_address, function(){
 	console.log('Server listening on ' + server_ip_address + ' on port ' + port);
 });
@@ -152,5 +163,29 @@ io.on('connection', function (socket){
 			io.to(result.theRoom).emit('updatecurrentroom',logic.getPlayersIn(result.theRoom));
 			leaveOrDisconnect(result);
 		}
+		if(testing) playing--;
 	});
+
+/****************** Begin code for testing *************/
+	if(testing){
+		connected++;
+		playing++;
+		if(playing == 1){
+			socket.emit('createresult',logic.createRoom('Player1',socket.id,testRoom,''));
+			socket.username = 'Player1';
+			socket.roomName = testRoom;
+			socket.emit('deckdata',logic.getDeckData());
+			socket.join(testRoom);
+			io.to(testRoom).emit('updatecurrentroom',logic.getPlayersIn(testRoom));
+		}	
+		else{
+			socket.emit('joinresult',logic.joinRequest('Player'+connected,socket.id,testRoom,''));
+			socket.username='Player'+connected;
+			socket.roomName = testRoom;
+			socket.emit('deckdata',logic.getDeckData());
+			socket.join(testRoom);
+			io.to(testRoom).emit('updatecurrentroom',logic.getPlayersIn(testRoom));
+		}
+	}
+/***************** End code for testing ***************/
 });

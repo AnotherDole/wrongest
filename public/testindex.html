@@ -152,6 +152,7 @@ socket.on('createresult',function(data){
 		username = data.playerName;
 		$('#createDiv').hide();
 		$('#roomDiv').show();
+		$('#startDiv').hide();
 	}
 	else{
 		$('#createResult').text(data.message);
@@ -188,6 +189,7 @@ socket.on('joinresult',function(data){
 		$('#roomresult').text('Successfully joined room');
 		$('#joinDiv').hide();
 		$('#roomDiv').show();
+		$('#startDiv').hide();
 		username = data.playerName;
 	}
 	else{
