@@ -79,6 +79,7 @@
 	<h2 id='statementDiv'></h2>
 	<div id='authorDiv'></div>
 	<div id='sourceDiv'></div>
+	<div id='cardScoreDiv'></div>
 	<br>
 	<button onclick='donedefend()'>I'm done early.</button>
 </div>
@@ -301,6 +302,7 @@ socket.on('timetodefend',function(player,time){
 		$('#statementDiv').empty().text(myStatement.quote);
 		$('#authorDiv').empty().text(myStatement.author);
 		$('#sourceDiv').empty().text(myStatement.source);
+		$('#cardScoreDiv').empty().text('Score: ' + myStatement.score);
 	}	
 	else{
 		meDefending = false;
