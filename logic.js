@@ -126,6 +126,9 @@ exports.getDeckData = function(){
 
 //Create a new room. playerID is the requestor, name is requested name
 exports.createRoom = function(playerName,UID,roomName,password){
+	if(playerName == null || roomName == null){
+		return {success: false, message: "Please enter some names."};
+	}
 	trimRoom = roomName.trim();
 	trimPlayer = playerName.trim();
 	//no really short names
@@ -193,7 +196,9 @@ exports.joinRequest = function(playerName,UID, roomName,password){
 	if(theRoom.gameState != GAME_NOT_STARTED){
 		return {success: false, message:"You cannot join a game in progress."};
 	}
-
+	if(playerName == null){
+		return {success: false, message: "Please enter a name."};
+	}
 	var trimPlayer = playerName.trim();
 	if(/[^A-Za-z0-9 ]/.test(trimPlayer)){
 		return {success: false, message: "Names can only contain letters, numbers, and spaces."};
