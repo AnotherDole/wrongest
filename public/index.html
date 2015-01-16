@@ -4,31 +4,111 @@
   <link href='http://fonts.googleapis.com/css?family=Roboto+Slab:400,100,700' rel='stylesheet' type='text/css'>
   <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
   <link href="css/wrongest.css" rel="stylesheet" />
-  
+
   <body>
-    
+
     <div id="NameDisplay"></div>
 
     <section id="PlayerSetup">
-      <h1>The Wrongest Words</h1>
-      <div id="NameSetup" class="slideblock rtl">
-        <label class="name-label" for="usernameinput">Your name?</label>
-        <div class="name-wrapper">
-          <input class="name-input" type="text" id='usernameinput' maxlength="15">
-          <button class="name-button" onclick="sendusername();"><i class="fa fa-check"></i></button>
+
+      <div id="RoomSetup" class="slideblock rtl">
+        <img src="svg/logo-temp.svg" class="game-logo" />
+        <div class="lead-in">
+          <p>Some text should go here with a link to tutorial.</p>
         </div>
-        <div id="logonresult"></div>
-      </div>
-      
-      <div id="RoomSetup" class="slideblock rtl hidden">
-        <dl class="room-choices">
+        <div class="create-or-join">
+          <button class="create-room" id="CreateRoomButton">
+            <span class="big">CREATE</span>
+            <span class="small">room</span>
+          </button>
+          <button class="join-room" id="JoinRoomButton">
+            <span class="big">JOIN</span>
+            <span class="small">room</span>
+          </button>
+        </div>
+
+        <div class="create-screen hidden">
+          <form>
+            <div class="inputs">
+              <div class="username row">
+                <div class="input-holder">
+                  <input type="text" id='createUsernameInput' maxlength="50" placeholder="Your Name">
+                </div>
+                <div class="icon">
+                  <i class="fa fa-user"></i>
+                </div>
+              </div>
+              <div class="roomname row">
+                <div class="input-holder">
+                  <input type='text' id='createRoomNameInput' maxlength='50' placeholder="Room Name">
+                </div>
+                <div class="icon">
+                  <i class="fa fa-home"></i>
+                </div>
+              </div>
+              <div class="password row">
+                <div class="input-holder">
+                  <input type='text' id='createPasswordInput' maxlength='50' placeholder="(no password)">
+                </div>
+                <div class="icon">
+                  <i class="fa fa-unlock"></i>
+                </div>
+              </div>
+            </div>
+            <div class="button-holder">
+              <button type="submit" id='createroombutton' onclick='createroom();'>START!</button>
+            </div>
+          </form>
+        </div>
+        <div class="join-screen hidden">
+          <form>
+            <div class="inputs">
+              <div class="username row">
+                <div class="input-holder">
+                  <input type='text' id='joinUsernameInput' maxlength='50' placeholder="Your Name">
+                </div>
+                <div class="icon">
+                  <i class="fa fa-user"></i>
+                </div>
+              </div>
+              <div class="roomname row">
+                <div class="input-holder">
+                  <select id='roomselector'>
+                    <option disabled selected="selected">Select Room</option>
+                    <option value="refresh-rooms">---update rooms---</option>
+                  </select>
+                </div>
+                <div class="icon">
+                  <i class="fa fa-home"></i>
+                </div>
+              </div>
+              <div class="password row">
+                <div class="input-holder">
+                  <input type="text" id='joinPasswordInput' maxlength="50" placeholder="(no password)">
+                </div>
+                <div class="icon">
+                  <i class="fa fa-key"></i>
+                </div>
+              </div>
+            </div>
+            <div class="button-holder">
+              <button type="submit" id='joinroombutton' onclick='joinroom();'>JOIN!</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="active-rooms">
+          XXX active rooms right now.
+        </div>
+        <dl class="room-choices hidden">
           <dt>create</dt>
           <dd class="create-wrapper">
             <input type="text" class="create-input" id='roomnamer' maxlength="15" placeholder="Room Name">
             <button id='createroombutton' class="create-button" onclick='createroom();'><i class="fa fa-plus"></i></button>
+            <button id="SetPassword" class="password-button" onclick="ShowPasswordInput"><i class="fa fa-lock"></i></button>
           </dd>
           <dt>or join</dt>
-          <dd class="join-wrapper">
+          <dd class="join-wrapper hidden">
             <select class="join-select" id='roomselector'>
             </select>
             <button class="join-button" id='joinroombutton' onclick='joinroom();'><i class="fa fa-check"></i></button>
@@ -39,7 +119,7 @@
         <!-- <div id='roommembers'> </div> -->
       </div>
     </section>
-    
+
     <section id="GameScreen" class="below">
       <div id="PreGame" class="slideblock">
         <h3 id="RoomStatusHeadline"></h1>
@@ -86,18 +166,19 @@
         <button id="SendVotes" onclick='sendvotes();'><i class="fa fa-check fa-2x"></i></button>
         <div id='voteresult' style="display:none;"></div>
       </div>
-      
+
     </section>
 
     <script src="https://cdn.socket.io/socket.io-1.2.1.js"></script>
     <script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
+    <script src="js/min/wrongest.min.js"></script>
     <script>
       var socket;
       if(location.hostname.indexOf('rhcloud.com') > -1){
-	socket = io(location.hostname + ':8000');
+        socket = io(location.hostname + ':8000');
       }
       else{
-	socket = io();
+        socket = io();
       }
       var username = "";
 
@@ -196,7 +277,7 @@
         $('#PlayerSetup').addClass('above');
         $('#GameScreen').removeClass('below').addClass('above');
         for (var i = 0; i < data.players.length; i++){
-          
+
           if(data.players[i] == data.leader){
             $toChange.append('<li>'+data.players[i]+' (leader)</li>');
           } else {
@@ -218,7 +299,7 @@
           $('#startresult').text(data.message);
         }
       });
-      
+
       $('select#least').change(function() {
         if ( $(this).val() == "" ) {
           $(this).parent('.inner').parent('.wrong-wrapper').removeClass('selected');
