@@ -1,6 +1,5 @@
 /* jshint -W117 */
 $('#CreateRoomButton').click(function() {
-  $('.lead-in').hide();
   $('.create-or-join').addClass('hidden');
   $('.create-screen').removeClass('hidden');
 });
