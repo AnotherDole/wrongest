@@ -5,3 +5,5 @@ button { cursor: pointer; background-color:$yellow; border:none; outline: none;
   }
   &:disabled { background-color:$grey; cursor: not-allowed; }
 }
+
+button, select, input[type=text], input[type=password] { font-family: $font; }

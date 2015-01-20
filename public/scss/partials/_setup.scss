@@ -1,0 +1,30 @@
+.setup { background-color:$black; color: $white; }
+.create-or-join { display: table; width:100%; margin-top: 2em;
+  button { width:50%; display: table-cell; height:40vh; font-size:4vw;
+    > span { display: block; }
+    .big { font-size:6vw; font-weight: $bold; }
+    .small { font-size:4vw; font-weight: 400; }
+  }
+}
+.create-screen { margin-top: 10vh; }
+.inputs { display: table; width: 100%; font-size:4vw;
+  .row { display: table-row; }
+  .input-holder { display: table-cell; padding-bottom:3vh;
+    input, select { width: 100%; padding:0.25em 0.75em; font-size:5vw; }
+  }
+  .icon { display: table-cell; padding-left: 1em; font-size:5vw;  padding-bottom:3vh; }
+}
+
+.button-holder { text-align: center;
+  button { padding: 0.25em 0.75em; font-size: 2em; }
+}
+
+.room-details { margin-top: 5vh;
+  .lobby-box { margin-bottom: 5vh; }
+}
+
+.admin-options {
+  li { padding-bottom: 0.5em; }
+  label { display: block; }
+  select { display: block; width: 100%; }
+}

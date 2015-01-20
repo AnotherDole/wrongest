@@ -4,173 +4,175 @@
   <link href='http://fonts.googleapis.com/css?family=Roboto+Slab:400,100,700' rel='stylesheet' type='text/css'>
   <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
   <link href="css/wrongest.css" rel="stylesheet" />
-
   <body>
 
-    <div id="NameDisplay"></div>
-
-    <section id="PlayerSetup">
-
-      <div id="RoomSetup" class="slideblock rtl">
-        <img src="svg/logo-temp.svg" class="game-logo" />
-        <div class="lead-in">
-          <p>Some text should go here with a link to tutorial.</p>
-        </div>
-        <div class="create-or-join">
-          <button class="create-room" id="CreateRoomButton">
-            <span class="big">CREATE</span>
-            <span class="small">room</span>
-          </button>
-          <button class="join-room" id="JoinRoomButton">
-            <span class="big">JOIN</span>
-            <span class="small">room</span>
-          </button>
-        </div>
-
-        <div class="create-screen hidden">
-          <form>
-            <div class="inputs">
-              <div class="username row">
-                <div class="input-holder">
-                  <input type="text" id='createUsernameInput' maxlength="50" placeholder="Your Name">
-                </div>
-                <div class="icon">
-                  <i class="fa fa-user"></i>
-                </div>
-              </div>
-              <div class="roomname row">
-                <div class="input-holder">
-                  <input type='text' id='createRoomNameInput' maxlength='50' placeholder="Room Name">
-                </div>
-                <div class="icon">
-                  <i class="fa fa-home"></i>
-                </div>
-              </div>
-              <div class="password row">
-                <div class="input-holder">
-                  <input type='text' id='createPasswordInput' maxlength='50' placeholder="(no password)">
-                </div>
-                <div class="icon">
-                  <i class="fa fa-unlock"></i>
-                </div>
-              </div>
-            </div>
-            <div class="button-holder">
-              <button type="submit" id='createroombutton' onclick='createroom();'>START!</button>
-            </div>
-          </form>
-        </div>
-        <div class="join-screen hidden">
-          <form>
-            <div class="inputs">
-              <div class="username row">
-                <div class="input-holder">
-                  <input type='text' id='joinUsernameInput' maxlength='50' placeholder="Your Name">
-                </div>
-                <div class="icon">
-                  <i class="fa fa-user"></i>
-                </div>
-              </div>
-              <div class="roomname row">
-                <div class="input-holder">
-                  <select id='roomselector'>
-                    <option disabled selected="selected">Select Room</option>
-                    <option value="refresh-rooms">---update rooms---</option>
-                  </select>
-                </div>
-                <div class="icon">
-                  <i class="fa fa-home"></i>
-                </div>
-              </div>
-              <div class="password row">
-                <div class="input-holder">
-                  <input type="text" id='joinPasswordInput' maxlength="50" placeholder="(no password)">
-                </div>
-                <div class="icon">
-                  <i class="fa fa-key"></i>
-                </div>
-              </div>
-            </div>
-            <div class="button-holder">
-              <button type="submit" id='joinroombutton' onclick='joinroom();'>JOIN!</button>
-            </div>
-          </form>
-        </div>
-
-        <div class="active-rooms">
-          XXX active rooms right now.
-        </div>
-        <dl class="room-choices hidden">
-          <dt>create</dt>
-          <dd class="create-wrapper">
-            <input type="text" class="create-input" id='roomnamer' maxlength="15" placeholder="Room Name">
-            <button id='createroombutton' class="create-button" onclick='createroom();'><i class="fa fa-plus"></i></button>
-            <button id="SetPassword" class="password-button" onclick="ShowPasswordInput"><i class="fa fa-lock"></i></button>
-          </dd>
-          <dt>or join</dt>
-          <dd class="join-wrapper hidden">
-            <select class="join-select" id='roomselector'>
-            </select>
-            <button class="join-button" id='joinroombutton' onclick='joinroom();'><i class="fa fa-check"></i></button>
-            <button class="join-button" id='updaterooms' onclick='updaterooms();'><i class="fa fa-refresh"></i></button>
-          </dd>
-        </dl>
-        <div id='roomresult'> </div>
-        <!-- <div id='roommembers'> </div> -->
+    <section id="RoomSetup" class="setup screen">
+      
+      <img src="svg/logo-temp.svg" class="game-logo" />
+      
+      <div class="create-or-join" id='startDiv'>
+        <button id='pickCreate' onclick='showCreate();'>
+          <span class="big">CREATE</span>
+          <span class="small">room</span>
+        </button>
+        <button id='pickJoin' onclick='showJoin();'>
+          <span class="big">JOIN</span>
+          <span class="small">room</span>
+        </button>
       </div>
+
+      <div class="create-screen hidden" id = 'createDiv'>
+        <div class="inputs">
+          <div class="username row">
+            <div class="input-holder">
+              <input type="text" id='createUsernameInput' maxlength="50" placeholder="Your Name">
+            </div>
+            <div class="icon">
+              <i class="fa fa-user"></i>
+            </div>
+          </div>
+          <div class="roomname row">
+            <div class="input-holder">
+              <input type='text' id='createRoomNameInput' maxlength='50' placeholder="Room Name">
+            </div>
+            <div class="icon">
+              <i class="fa fa-home"></i>
+            </div>
+          </div>
+          <div class="password row">
+            <div class="input-holder">
+              <input type='text' id='createPasswordInput' maxlength='50' placeholder="(no password)">
+            </div>
+            <div class="icon">
+              <i class="fa fa-unlock"></i>
+            </div>
+          </div>
+          <div class="button-holder">
+            <button id='createroombutton' onclick='createroom();'>Create New Room</button>
+          </div>
+          <div id='createResult'></div>
+        </div>
+      </div>
+
+      <div class="join-screen hidden" id="joinDiv">
+        <div class="inputs">
+          <div class="username row">
+            <div class="input-holder">
+              <input type='text' id='joinUsernameInput' maxlength='50' placeholder="Your Name">
+            </div>
+            <div class="icon">
+              <i class="fa fa-user"></i>
+            </div>
+          </div>
+          <div class="roomname row">
+            <div class="input-holder">
+              <select id='roomselector'>
+                <option disabled selected="selected">Select Room</option>
+                <option value="refresh-rooms">---update rooms---</option>
+              </select>
+            </div>
+            <div class="icon">
+              <i class="fa fa-home"></i>
+            </div>
+          </div>
+          <div class="password row">
+            <div class="input-holder">
+              <input type="text" id='joinPasswordInput' maxlength="50" placeholder="(no password)">
+            </div>
+            <div class="icon">
+              <i class="fa fa-key"></i>
+            </div>
+          </div>
+        </div>
+        <div class="button-holder">
+          <button type="submit" id='joinroombutton' onclick='joinroom();'>JOIN!</button>
+        </div>
+      </div>
+      
+      <div class="room-details hidden" id="roomDiv">
+        <div class="lobby-box">
+          <div id='roommembers'>Not in a room yet.</div>
+          <button id='leaveroom' onclick='leaveroom();'>Leave Current Room</button>
+        </div>
+        
+        <ul class="admin-options" id="leaderControls">
+          <li class="option">
+            <label for="deck"><span>Deck:</span></label>
+            <select id='deck' onchange='updateDeckDescription();'></select>
+            <summary id='deckdescription'></summary>
+          </li>
+          <li class="option">
+            <label for="timeLimit">Time Limit:</label>
+            <select id='timeLimit'>
+              <option value='30'>30 seconds</option>
+              <option value='60'>60 seconds</option>
+              <option value='90'>90 seconds</option>
+            </select>
+          </li>
+          <li class="option">
+            <label for="allowRedraw">Redraw same card?</label>
+            <select id='allowRedraw'>
+              <option value='no'>No</option>
+              <option value='yes'>Yes</option>
+            </select>
+          </li>
+          <li class="option">
+            <label for="dealerSelect">Dealer defends...</label>
+            <select id="dealerSelect">
+              <option value='last'>Last</option>
+              <option value='first'>First</option>
+            </select>
+          </li>
+          <li class="button-holder">
+            <button id='startgamebutton' onclick='startgame();'>Start Game</button>
+          </li>
+          <li id='startresult'></li>
+        </ul>
+      </div>
+      
     </section>
 
-    <section id="GameScreen" class="below">
-      <div id="PreGame" class="slideblock">
-        <h3 id="RoomStatusHeadline"></h1>
-        <ol id='roommembers'></ol>
-        <button id="StartGameButton" id='startgamebutton' disabled onclick='startgame();'>Start Game</button>
-        <div id='startresult'></div>
-      </div>
-      <div id="CardDisplay" class="slideblock hidden">
-        <!-- <h3>Defend this Statement:</h1> -->
-        <div class="flip-container">
-          <div class="flipper">
-            <div class="front">
-              <div class="inner">
-                <blockquote id="statement"></blockquote>
-                <i class="fa fa-share fa-2x" onclick='donedefend();'></i>
-              </div>
-            </div>
-            <div class="back">
-              <div class="inner">
-                <div id='votestatus'>It is not time to vote yet.</div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <!-- <button id="DoneDefendingButton" onclick='donedefend();'>I am done defending my point.</button> -->
-      </div>
-      <div id="VotingBooth" class="slideblock hidden">
-        <div class="wrong-wrapper least-wrong">
-          <div class="inner">
-            <label for="least">Least Wrong</label>
-            <select id='least'>
-              <option value=""></option>
-            </select>
-          </div>
-        </div>
-        <div class="wrong-wrapper most-wrong">
-          <div class="inner">
-            <label for="most">Most Wrong</label>
-            <select id='most'>
-              <option value=""></option>
-            </select> 
-          </div>
-        </div>
-        <button id="SendVotes" onclick='sendvotes();'><i class="fa fa-check fa-2x"></i></button>
-        <div id='voteresult' style="display:none;"></div>
-      </div>
+    <div id='timerDiv' style='display:none'>
+      <div id='timeLeftDiv'>Time goes here.</div>
+    </div>
 
-    </section>
+    <div id='orderDiv' style='display:none'>
+      <div id='player1' style='display:none'></div>
+      <div id='player2' style='display:none'></div>
+      <div id='player3' style='display:none'></div>
+      <div id='player4' style='display:none'></div>
+      <div id='player5' style='display:none'></div>
+      <div id='player6' style='display:none'></div>
+      <div id='player7' style='display:none'></div>
+      <div id='player8' style='display:none'></div>
+      <div id='dealerControls' style='display:none'>
+        <button onclick='makeDefend();'>Deal a Card</button>
+      </div>
+    </div>
+
+    <div id='defendDiv' style='display:none'>
+      <h1>Defend this Statement</h1>
+      <h2 id='statementDiv'></h2>
+      <div id='authorDiv'></div>
+      <div id='sourceDiv'></div>
+      <div id='cardScoreDiv'></div>
+      <br>
+      <button onclick='donedefend()'>I'm done early.</button>
+    </div>
+
+    <div id='voteDiv' style='display:none'>
+      Least Wrong: <select id='least'></select> Most Wrong: <select id='most'></select> 
+      <button onclick='sendvotes();'>Send my votes.</button>
+      <div id='voteResult'></div>
+    </div>
+
+    <div id='scoreDiv' style='display:none'>
+      <div id='roundText'></div>
+      <button onclick='$("#scoreDiv").hide();'>Got it, thanks.</button>
+    </div>
 
     <script src="https://cdn.socket.io/socket.io-1.2.1.js"></script>
-    <script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
+    <script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
     <script src="js/min/wrongest.min.js"></script>
     <script>
       var socket;
@@ -181,39 +183,57 @@
         socket = io();
       }
       var username = "";
+      var deckData;
+      var currentStatements;
+      var playerList;
+      var timeLeft;
+      var timerVar;
+      var meDefending = false;
 
-      //send username string
-      function sendusername(){
-        socket.emit('logon', $('#usernameinput').val());
+      function showCreate(){
+        $('#startDiv').hide();
+        $('#createDiv').show();
       }
 
-      //received after emitting logon
-      socket.on('logonresult',function(data){
-        if(data.success){
-          $('#NameSetup').addClass('hidden');
-          $('#RoomSetup').removeClass('hidden');
-          $('#RoomSetup').removeClass('hidden');
-          username = data.name;
-          $('#NameDisplay').text(data.name);
-          updaterooms();
+      function showJoin(){
+        $('#startDiv').hide();
+        $('#joinDiv').show();
+        updaterooms();
+      }
+
+      //received after creating or joining a room
+      socket.on('deckdata',function(data){
+        deckData = data;
+        $('#deck').empty();
+        for(var deck in data){
+          $('#deck').append($('<option/>', {text: deck, value: deck}));
         }
-        else{
-          $('#logonresult').text(data.message);
-        }
+        updateDeckDescription();
       });
 
-      //send roomname string
+      function updateDeckDescription(){
+        var theDeck = deckData[$('#deck').val()];
+        $('#deckdescription').empty().append(theDeck.description + ' Cards: ' + theDeck.numCards);
+      }
+
+      //send username, room name, password 
       function createroom(){
-        socket.emit('createroom',$('#roomnamer').val());
+        socket.emit('createroom',$('#createUsernameInput').val(),
+                    $('#createRoomNameInput').val(),
+                    $('#createPasswordInput').val());
       }
 
       //received after emitting createroom
       socket.on('createresult',function(data){
         if(data.success){
           $('#roomresult').text('Room created!');
+          username = data.playerName;
+          $('#createDiv').hide();
+          $('#roomDiv').show();
+          $('#startDiv').hide();
         }
         else{
-          $('#roomresult').text(data.message);
+          $('#createResult').text(data.message);
         }	
       });
 
@@ -225,7 +245,7 @@
       //recieved after emitting request for name and player count of all rooms
       socket.on('roomdata',function(data){
         $('#roomselector').empty();
-        for(room in data){
+        for(var room in data){
           var name = data[room].name;
           var toAppend = '<option value="'+name+ '">' + name + ' (' + data[room].playerCount;
           toAppend = toAppend +'/8) </option>';
@@ -234,18 +254,24 @@
       });
 
 
-      //send name of room to join
+      //send username, room name, password 
       function joinroom(){
-        socket.emit('requestjoin',$('#roomselector').val());
+        socket.emit('requestjoin',$('#joinUsernameInput').val(),
+                    $('#roomselector').val(),
+                    $('#joinPasswordInput').val());
       }
 
       //received after emitting requestjoin
       socket.on('joinresult',function(data){
         if(data.success){
           $('#roomresult').text('Successfully joined room');
+          $('#joinDiv').hide();
+          $('#roomDiv').show();
+          $('#startDiv').hide();
+          username = data.playerName;
         }
         else{
-          $('#roomresult').text(data.message);
+          $('#joinResult').text(data.message);
         }
       });
 
@@ -257,8 +283,15 @@
       //received after leaving a room
       socket.on('leaveresult',function(data){
         if(data.success){
+          username = false;
           $('#roommembers').empty();
           $('#roommembers').text('Not in a room yet');
+          $('#roomDiv').hide();
+          $('#orderDiv').hide();
+          $('#statementsDiv').hide();
+          $('#voteDiv').hide();
+          $('#voteResult').hide();
+          $('#startDiv').show();
         }	
       });
 
@@ -266,105 +299,142 @@
       socket.on('updatecurrentroom', function(data){
         var $toChange = $('#roommembers');
         $toChange.empty();
-        if (data.players.length > 2) {
-          $('#StartGameButton').attr('disabled',false);
-        } else {
-          $('#StartGameButton').attr('disabled',true);
-        }
+        playerList = data.players;
 
-        //$toChange.append('Currently in ' + data.roomName + ':<br>');
-        $('#RoomStatusHeadline').text('Currently in '+data.roomName+':');
-        $('#PlayerSetup').addClass('above');
-        $('#GameScreen').removeClass('below').addClass('above');
+        $toChange.append('Currently in ' + data.roomName + ':<br>');
         for (var i = 0; i < data.players.length; i++){
-
+          $toChange.append(data.players[i]);
           if(data.players[i] == data.leader){
-            $toChange.append('<li>'+data.players[i]+' (leader)</li>');
-          } else {
-            $toChange.append('<li>'+data.players[i]+'</li>');
+            $toChange.append(" (leader)");
           }
+          $toChange.append("<br>");
+        }
+        if(data.leader == username){
+          $('#leaderControls').show();
+        }
+        else{
+          $('#leaderControls').hide();
         }
       });
 
       //Request to start the game. Only works if you are the leader of the room
       function startgame(){
-        socket.emit('requeststart','Mini Deck');
+        socket.emit('requeststart',$('#deck').val(),
+                    $('#timeLimit').val(),
+                    $('#allowRedraw').val(),
+                    $('#dealerSelect').val());
       }
 
       socket.on('startresult', function(data){
         if(data.success){
-          $('#startresult').text('Game Started');
+          $('#startresult').text('Game Started');		
         }
         else{
           $('#startresult').text(data.message);
         }
       });
 
-      $('select#least').change(function() {
-        if ( $(this).val() == "" ) {
-          $(this).parent('.inner').parent('.wrong-wrapper').removeClass('selected');
-        } else {
-          $(this).parent('.inner').parent('.wrong-wrapper').addClass('selected');
-          if ( $(this).parent('.inner').parent('.wrong-wrapper').siblings('.most-wrong').hasClass('selected') ) {
-            $('#SendVotes').addClass('visible');
+      //Receive the statments that everyone will be defending this round.
+      //Automatically sent out at the start of a new round
+      socket.on('getstatements', function(data){	
+        $('#roomDiv').hide();
+        $('#voteDiv').hide();
+        $('#orderDiv').show();
+        currentStatements = data;
+      });
+
+      //Received at the start of a round
+      //Includes the order for the current round and the dealer
+      socket.on('roundorder', function(list,dealer){
+        if(dealer == username){
+          $('#dealerControls').show();
+        }
+        else{
+          $('#dealerControls').hide();
+        }
+        for (var i = 0; i < list.length; i++){
+          var $theDiv = $('#player' + (i+1)).show();
+          $theDiv.empty().append(list[i]);
+          if(list[i] == dealer){
+            $theDiv.append(' (dealer)');
           }
         }
-      });
-      $('select#most').change(function() {
-        if ( $(this).val() == "" ) {
-          $(this).parent('.inner').parent('.wrong-wrapper').removeClass('selected');
-        } else {
-          $(this).parent('.inner').parent('.wrong-wrapper').addClass('selected');
-          if ( $(this).parent('.inner').parent('.wrong-wrapper').siblings('.least-wrong').hasClass('selected') ) {
-            $('#SendVotes').addClass('visible');
-          }
+        for(var i = list.length+1; i <= 8; i++){
+          $('#player' + i).hide();
         }
       });
 
-      //Receive the statments that everyone will be defending this round.
-      //Automatically sent out at the start of a new round
-      socket.on('getstatements', function(data){
-        $('#PreGame').addClass('hidden');
-        $('#CardDisplay').removeClass('hidden');
-        var $thediv = $('#statementsdiv').empty();
-        var $leastselect = $('#least').empty().append('<option val=""></option>');
-        var $mostselect = $('#most').empty().append('<option val=""></option>');
-        for(var player in data){
-          var quote = data[player].quote;
-          var author = data[player].author;
-          var episode = data[player].episode;
-          var score = data[player].score;
-          if(player == username){
-            $('#statement').empty().append(quote);
-          }
-          else{
-            $thediv.append(player + ": " + quote + "<br>");
-            $leastselect.append($('<option/>', {text: player, value: player}));
-            $mostselect.append($('<option/>', {text: player, value: player}));
-          }
+      function makeDefend(){
+        socket.emit('makedefend');
+      }
+
+      socket.on('timetodefend',function(player,time){
+        timeLeft = time;
+        timerVar = window.setInterval(function() {timerFunction()},1000);
+        if(player == username){
+          meDefending = true;
+          $('#defendDiv').show();
+          $('#orderDiv').hide();
+          var myStatement = currentStatements[username];
+          $('#statementDiv').empty().text(myStatement.quote);
+          $('#authorDiv').empty().text(myStatement.author);
+          $('#sourceDiv').empty().text(myStatement.source);
+          $('#cardScoreDiv').empty().text('Score: ' + myStatement.score);
         }	
-      });
+        else{
+          meDefending = false;
+        }
+        $('#timerDiv').show();
+        $('#timeLeftDiv').text(time + ' seconds left.');
+      })
+
+      function timerFunction(){
+        if(timeLeft > 0){
+          timeLeft--;
+        }
+        $('#timeLeftDiv').text(timeLeft + ' seconds left.');
+        if(timeLeft == 0 && meDefending){
+          donedefend();
+        }
+      }
+
 
       //Tell server you are done defending your statement
       function donedefend(){
-        $('.flip-container').toggleClass('hover');
+        $('#defendDiv').hide();
         socket.emit('donedefending');
       }
 
       //received when anyone in the room says they are done defending
       //data is the # of people who are not done
       socket.on('newdefendcount',function(data){
+        $('#timerDiv').hide();
+        $('#orderDiv').show();
+        window.clearInterval(timerVar);
         if(data > 0){
-          $('#votestatus').text('Dones needed to continue:' + data);	
+          var playersDone = playerList.length - data;
+          for(var i = 1; i <= playersDone; i++){
+            $('#player' + i).css('background-color','green');
+          }
         }
         else{
-          $('#votestatus').text('Time to vote!');
-          $('#CardDisplay').addClass('hidden');
-          $('#VotingBooth').removeClass('hidden');
-          $('.wrong-wrapper').removeClass('selected');
-          $('#SendVotes').removeClass('visible');
+          $('#orderDiv').hide();
+          $('#voteDiv').show();
+          $('#voteResult').empty();
+          updateVoteSelectors();
         }
       });
+
+      function updateVoteSelectors(){
+        $mostSelect = $('#most').empty();
+        $leastSelect = $('#least').empty();
+        for(var i = 0; i < playerList.length; i++){
+          if (playerList[i] == username) continue;
+          var theStatement = currentStatements[playerList[i]];
+          $mostSelect.append($('<option/>').val(playerList[i]).text(theStatement.quote));
+          $leastSelect.append($('<option/>').val(playerList[i]).text(theStatement.quote));
+        }
+      }
 
       //received if your attempt to say you are done voting failed for some reason
       socket.on('donefailed',function(data){
@@ -372,27 +442,54 @@
       });
 
       //send votes for most/least wrong
-      //most and least should be the ID of the player
+      //most and least should be the name of the player
       function sendvotes(){
         var mostWrong = $('#most').val();
         var leastWrong = $('#least').val();
-        socket.emit('playervotes',{most: mostWrong, least: leastWrong});
-        $('#VotingBooth').addClass('hidden');
-        $('.flip-container').removeClass('hover');
+        socket.emit('playervotes',mostWrong,leastWrong);
       }
 
       //received if the submitted votes were invalid
       socket.on('votefailed', function(data){
-        $('#voteresult').append(data + "<br>");	
+        $('#voteResult').append(data + "<br>");	
       });
 
       //received when someone else in the same room has voted
       socket.on('receivevote', function(data){
+        $('#voteResult').show();
         var whoVoted = data.voter;
         var most = data.mostName;
         var least = data.leastName;
-        $('#voteresult').append(whoVoted + " says that " + least + " is least wrong and " + most + " is most wrong.<br>");
+        $('#voteResult').append(whoVoted + " says that " + least + " is least wrong and " + most + " is most wrong.<br>");
       });
+
+      //received at the end of a round
+      socket.on('roundend', function(data){
+        $('#scoreDiv').show();
+        var $resultDiv = $('#roundText');
+        var gameData = data.gameData;
+        var playerData = data.playerData;
+
+        $resultDiv.empty();
+        $resultDiv.append('<b>End of round ' + gameData.round + '</b>');
+        for(var player in playerData){
+          $resultDiv.append('<br>' + player + ' gains ' + playerData[player].scoreChange + ' points. Current Score: ' + playerData[player].newScore);
+        }
+        $resultDiv.append('<br>Cards left: ' + gameData.cardsLeft + '<br><b> Defend your next point. </b>');
+
+        //reset player div colors
+        for(var i = 1; i <= playerList.length; i++){
+          $('#player' + i).css('background-color','white');
+        }
+      });
+
+      socket.on('gameover', function(data){
+        var $resultDiv = $('#voteResult');
+        $resultDiv.empty().append('<b>Game Over!</b><br>');
+        $resultDiv.append('Winner: ' + data.player + ' with a score of ' + data.playerScore + '.<br>');
+        $resultDiv.append('Wrongest Words: ' + data.card + ' with a score of ' + data.cardScore);
+      });
+
     </script>
   </body>
 </html>
