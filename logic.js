@@ -26,13 +26,19 @@ fs.readdir('./decks/',function(err, list){
 
 function makeDecks(list){
 	for(var i = 0; i < list.length; i++){
-		var theFile = fs.readFileSync('./decks/'+list[i]);
-		theFile = theFile.toString().split('\n');
-		var theName = theFile[0].trim();
-		decks[theName] = new masterDeck(theName,theFile[1].trim());
-		for(var j = 3; j < theFile.length; j+=4){
-			decks[theName].cards.push(new masterCard(theFile[j].trim(),
+		try{
+			var theFile = fs.readFileSync('./decks/'+list[i]);
+			theFile = theFile.toString().split('\n');
+			var theName = theFile[0].trim();
+			decks[theName] = new masterDeck(theName,theFile[1].trim());
+			for(var j = 3; j < theFile.length; j+=4){
+				decks[theName].cards.push(new masterCard(theFile[j].trim(),
 						theFile[j+1].trim(),theFile[j+2].trim()));
+			}
+		}
+		catch(err){
+			console.log("Error parsing " + list[i]);
+			console.log(err);
 		}
 	}
 	for (var deck in decks){
