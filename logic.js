@@ -87,7 +87,7 @@ function masterCard(quote, author, source){
 
 function gameCard(number,masterCard) {
         this.number=number;
-        this.inplay=false;
+        this.inPlay=false;
         this.discarded=false;
 	this.mostVotes = 0;
 	this.leastVotes = 0;
@@ -100,7 +100,7 @@ function initializeGame(gameRoom,deckName) {
 	//reset player data
 	for (i=0; i < gameRoom.players.length; i++){
 		gameRoom.players[i].score=0;
-		gameRoom.players[i].cardNum=0;
+		gameRoom.players[i].card=null;
 		gameRoom.players[i].voted = false;
 		gameRoom.players[i].previousCards = [];
 	}
@@ -232,14 +232,14 @@ exports.leaveRequest = function(playerName,roomName){
 	//to be safe
 	var theRoom = rooms[roomName];
 	if(theRoom == null){
-		return {success: false, message: "That room doesn't exist."};
+		return false;
 	}
 	var thePlayer = getPlayer(theRoom,playerName);
 	if(thePlayer == null){
-		return {success: false, message: "You aren't in a room."};
+		return false;
 	}
-
-	theRoom.players.splice(theRoom.players.indexOf(thePlayer),1);
+	var index = theRoom.players.indexOf(thePlayer);
+	theRoom.players.splice(index,1);
 	console.log(playerName + " left room " + theRoom.name);
 	//no one left in room, so delete it
 	if(theRoom.players.length == 0){
@@ -252,17 +252,32 @@ exports.leaveRequest = function(playerName,roomName){
 		theRoom.leader = theRoom.players[Math.floor(Math.random() * theRoom.players.length)];
 		console.log(theRoom.leader.name + " is the new leader");
 	}
-	var toReturn = {success: true, roomDeleted: false, theRoom:theRoom.name, whoLeft: playerName, duringArg: false, newNeeded: 0, duringVote: false};
-	if(theRoom.gameState == GAME_BETWEEN_ARGUMENTS){
-		theRoom.deck[thePlayer.cardNum].inplay = false;
-		toReturn.duringArg = true;
+	if(theRoom.dealer == thePlayer){
+		if(theRoom.dealerFirst){
+			theRoom.dealer = theRoom.players[0];
+		}
+		else{
+			theRoom.dealer = theRoom.players[theRoom.players.length-1];
+		}
+	}
+	var toReturn = {success: true, roomDeleted: false, theRoom:theRoom.name, whoLeft: playerName, 
+		duringArg: false, newNeeded: 0, duringVote: false, duringGame:false};
+	if(theRoom.gameState == GAME_BETWEEN_ARGUMENTS || theRoom.gameState == GAME_SOMEONE_ARGUING){
+		toReturn.duringGame = true;
+		thePlayer.card.inPlay = false;
 		if(thePlayer.voted){
 			theRoom.votesReceived--;
 		}
 		toReturn.newNeeded = theRoom.players.length - theRoom.votesReceived;
+		//the player who left was defending
+		if(theRoom.gameState == GAME_SOMEONE_ARGUING && theRoom.whosUp == index){
+			toReturn.duringArg = true;
+			theRoom.gameState = GAME_BETWEEN_ARGUMENTS;
+		}
 	}
 	else if (theRoom.gameState == GAME_WAITING_VOTES){
-		theRoom.deck[thePlayer.cardNum].inplay = false;
+		toReturn.duringGame = true;
+		thePlayer.card.inPlay = false;
 		toReturn.duringVote = true;
 	}
 	return toReturn;
@@ -327,7 +342,7 @@ exports.getStatements = function(roomName){
 		possible = [];
 	       	for(var j = 0; j < theRoom.deck.length; j++){
 			theCard = theRoom.deck[j];
-			if(!theCard.inplay && !theCard.discarded){
+			if(!theCard.inPlay && !theCard.discarded){
 				if(theRoom.allowRedraw || (thePlayer.previousCards.indexOf(theCard) == -1)){
 					possible.push(theCard);
 				}
@@ -341,13 +356,23 @@ exports.getStatements = function(roomName){
 		theCard.leastvotes = 0;
 		thePlayer.card = theCard;
 		thePlayer.previousCards.push(theCard);
-		theCard.inplay = true;
+		theCard.inPlay = true;
 		result[thePlayer.name] = {quote: theCard.masterCard.quote,
 					  author: theCard.masterCard.author,
 	       				  source: theCard.masterCard.source,
 					  score: theCard.score};
 	}
 	console.log("Sent statements to " + theRoom.name);
+	return result;
+}
+
+function generateOrder(theRoom){
+	var result = {};
+	result["dealer"] = theRoom.dealer.name;
+	result["order"] = [];
+	for(var i = 0; i < theRoom.players.length; i++){
+		result["order"].push(theRoom.players[i].name);
+	}
 	return result;
 }
 
@@ -383,13 +408,12 @@ exports.adjustOrder = function(roomName){
 	}
 	theRoom.whosUp = 0;
 	//adjustments done, return the list;
-	var result = {};
-	result["dealer"] = theRoom.dealer.name;
-	result["order"] = [];
-	for(var i = 0; i < playerList.length; i++){
-		result["order"].push(playerList[i].name);
-	}
-	return result;
+	return generateOrder(theRoom);
+}
+
+//just get the order for a room
+exports.getOrder = function(roomName){
+	return generateOrder(rooms[roomName]);
 }
 
 //only called when there is a request to make someone defend
@@ -400,6 +424,9 @@ exports.getWhosUp = function(roomName,playerName){
 		return false;
 	}
 	if(theRoom.gameState != GAME_BETWEEN_ARGUMENTS){
+		return false;
+	}
+	if(theRoom.players[theRoom.whosUp] == null){
 		return false;
 	}
 	theRoom.gameState = GAME_SOMEONE_ARGUING;
@@ -536,11 +563,11 @@ exports.endRound = function(roomName){
 			}
 			//put card back in play
 			else{
-				theCard.inplay = false;
+				theCard.inPlay = false;
 			}
 		}
 		else{
-			theCard.inplay = false;
+			theCard.inPlay = false;
 		}
 	}
 	theRoom.gameState = GAME_BETWEEN_ARGUMENTS;

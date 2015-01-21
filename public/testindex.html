@@ -205,17 +205,15 @@ function leaveroom(){
 
 //received after leaving a room
 socket.on('leaveresult',function(data){
-	if(data.success){
-		username = false;
-		$('#roommembers').empty();
-		$('#roommembers').text('Not in a room yet');
-		$('#roomDiv').hide();
-		$('#orderDiv').hide();
-		$('#statementsDiv').hide();
-		$('#voteDiv').hide();
-		$('#voteResult').hide();
-		$('#startDiv').show();
-	}	
+	username = false;
+	$('#roommembers').empty();
+	$('#roommembers').text('Not in a room yet');
+	$('#roomDiv').hide();
+	$('#orderDiv').hide();
+	$('#statementsDiv').hide();
+	$('#voteDiv').hide();
+	$('#voteResult').hide();
+	$('#startDiv').show();
 });
 
 //received whenever someone in the current room leaves or joins

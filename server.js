@@ -39,17 +39,18 @@ function getAndSendStatements(roomName){
 
 //Common code for when a player leaves or disconnects
 function leaveOrDisconnect(result){
-	//tell everyone else in room to update list
-	if(!result.roomDeleted){
-		io.to(result.theRoom).emit('updatecurrentroom',logic.getPlayersIn(result.theRoom));
+	if(result.roomDeleted) return;
+
+	io.to(result.theRoom).emit('updatecurrentroom',logic.getPlayersIn(result.theRoom));
+	if(result.duringGame){
+		var newOrder = logic.getOrder(result.theRoom);
+		io.to(result.theRoom).emit('roundorder',newOrder.order,newOrder.dealer);
 	}
-	if(result.duringArg){
-		if(result.newNeeded == 0){
-			logic.prepareForVotes(result.theRoom);
-		}
-		io.to(result.theRoom).emit('newdefendcount',result.newNeeded);
+	if(result.newNeeded == 0){
+		logic.prepareForVotes(result.theRoom);
 	}
-	else if(result.duringVote){
+	io.to(result.theRoom).emit('newdefendcount',result.newNeeded);
+	if(result.duringVote){
 		//For now, just call for a new vote
 		logic.prepareForVotes(result.theRoom);
 		io.to(result.theRoom).emit('newdefendcount',0);
@@ -95,7 +96,7 @@ io.on('connection', function (socket){
 	//data isn't necessary 
 	socket.on('requestleave', function(data){
 		var result = logic.leaveRequest(socket.username,socket.roomName);
-		if (result.success){
+		if (result){
 			socket.leave(socket.roomName);
 			delete socket.username;
 			delete socket.roomName;
@@ -159,7 +160,7 @@ io.on('connection', function (socket){
 
 	socket.on('disconnect', function(data){
 		var result = logic.leaveRequest(socket.username,socket.roomName);
-		if(result.success && !result.roomDeleted){
+		if(result && !result.roomDeleted){
 			io.to(result.theRoom).emit('updatecurrentroom',logic.getPlayersIn(result.theRoom));
 			leaveOrDisconnect(result);
 		}
