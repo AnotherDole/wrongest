@@ -5,7 +5,7 @@
 var fs = require('fs');
 var path = require('path');
 
-var rooms = {}, decks = {};
+var rooms = {}, decks = {}, deckData = {};
 
 var MIN_PLAYERS = 3;
 var MAX_PLAYERS = 8;
@@ -34,6 +34,10 @@ function makeDecks(list){
 			decks[theName].cards.push(new masterCard(theFile[j].trim(),
 						theFile[j+1].trim(),theFile[j+2].trim()));
 		}
+	}
+	for (var deck in decks){
+		deckData[deck] = {name: deck, description: decks[deck].description, 
+			numCards: decks[deck].cards.length};
 	}
 }
 /************************ End deck loading logic **********************/
@@ -110,18 +114,14 @@ function getPlayer(theRoom,playerName){
 	for(var i = 0; i < theRoom.players.length; i++){
 		if(theRoom.players[i].name == playerName){
 			answer = theRoom.players[i];
+			break;
 		}
 	}
 	return answer;
 }
 
 exports.getDeckData = function(){
-	var theAnswer = {};
-	for (var deck in decks){
-		theAnswer[deck] = {name: deck, description: decks[deck].description, 
-			numCards: decks[deck].cards.length};
-	}
-	return theAnswer;
+	return deckData;
 }
 
 //Create a new room. playerID is the requestor, name is requested name
