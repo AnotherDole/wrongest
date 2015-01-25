@@ -131,24 +131,27 @@
       </div>
       
     </section>
-
-    <div id='timerDiv' style='display:none'>
-      <div id='timeLeftDiv'>Time goes here.</div>
-    </div>
-
-    <div id='orderDiv' style='display:none'>
-      <div id='player1' style='display:none'></div>
-      <div id='player2' style='display:none'></div>
-      <div id='player3' style='display:none'></div>
-      <div id='player4' style='display:none'></div>
-      <div id='player5' style='display:none'></div>
-      <div id='player6' style='display:none'></div>
-      <div id='player7' style='display:none'></div>
-      <div id='player8' style='display:none'></div>
-      <div id='dealerControls' style='display:none'>
-        <button onclick='makeDefend();'>Deal a Card</button>
+    
+    <section id="GameView" class="order screen">
+      <div id='timerDiv' style='display:none'>
+        <div id='timeLeftDiv'>Time goes here.</div>
       </div>
-    </div>
+      <div id='orderDiv'>
+        <ol class="player-order">
+          <li id="player1"></li>
+          <li id="player2"></li>
+          <li id="player3"></li>
+          <li id="player4"></li>
+          <li id="player5"></li>
+          <li id="player6"></li>
+          <li id="player7"></li>
+          <li id="player8"></li>
+        </ol>
+        <div id='dealerControls' style='display:none'>
+          <button onclick='makeDefend();'>Deal a Card</button>
+        </div>
+      </div>
+    </section>
 
     <div id='defendDiv' style='display:none'>
       <h1>Defend this Statement</h1>
@@ -327,7 +330,9 @@
 
       socket.on('startresult', function(data){
         if(data.success){
-          $('#startresult').text('Game Started');		
+          $('#startresult').text('Game Started');
+          $('#RoomSetup').addClass('hidden');
+          $('#GameView').removeClass('hidden');
         }
         else{
           $('#startresult').text(data.message);
@@ -336,11 +341,15 @@
 
       //Receive the statments that everyone will be defending this round.
       //Automatically sent out at the start of a new round
-      socket.on('getstatements', function(data){	
+      socket.on('getstatements', function(data){
+        //alert('hello!');
         $('#roomDiv').hide();
         $('#voteDiv').hide();
-        $('#orderDiv').show();
         currentStatements = data;
+        // getStatements();
+        $('#RoomSetup').addClass('hidden');
+        $('#GameView').removeClass('hidden');
+        $('#orderDiv').show();
       });
 
       //Received at the start of a round
@@ -356,11 +365,11 @@
           var $theDiv = $('#player' + (i+1)).show();
           $theDiv.empty().append(list[i]);
           if(list[i] == dealer){
-            $theDiv.append(' (dealer)');
+            $theDiv.addClass('dealer');
           }
         }
         for(var i = list.length+1; i <= 8; i++){
-          $('#player' + i).hide();
+          $('#player' + i).addClass('hidden');
         }
       });
 
@@ -414,7 +423,7 @@
         if(data > 0){
           var playersDone = playerList.length - data;
           for(var i = 1; i <= playersDone; i++){
-            $('#player' + i).css('background-color','green');
+            $('#player' + i).addClass('completed');
           }
         }
         else{
