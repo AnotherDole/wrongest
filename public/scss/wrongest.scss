@@ -5,6 +5,7 @@
 
 // UTILITIES
 @import "partials/_forms";
+@import "partials/_timer";
 @import "partials/_persistent";
 @import "partials/_playing-card";
 
@@ -13,3 +14,7 @@
 @import "partials/_setup";
 @import "partials/_order";
 @import "partials/_game-screen";
+
+
+// PLUGINS
+@import "partials/vendor/_flipclock";

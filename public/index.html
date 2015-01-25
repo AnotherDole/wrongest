@@ -133,9 +133,15 @@
     </section>
     
     <section id="GameView" class="order screen">
+      
       <div id='timerDiv' style='display:none'>
         <div id='timeLeftDiv'>Time goes here.</div>
       </div>
+      
+      <div class="clock-holder hidden">
+        <div class="your-clock" id="GameClock"></div>
+      </div>
+      
       <div id='orderDiv'>
         <ol class="player-order">
           <li id="player1"></li>
@@ -151,6 +157,7 @@
           <button onclick='makeDefend();'>Deal a Card</button>
         </div>
       </div>
+      
     </section>
 
     <div id='defendDiv' style='display:none'>
@@ -176,6 +183,7 @@
 
     <script src="https://cdn.socket.io/socket.io-1.2.1.js"></script>
     <script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
+    <script src="http://flipclockjs.com/_themes/flipclockjs/js/flipclock/flipclock.js"></script>
     <script src="js/min/wrongest.min.js"></script>
     <script>
       var socket;
@@ -192,6 +200,19 @@
       var timeLeft;
       var timerVar;
       var meDefending = false;
+      
+      var clock = $('.your-clock').FlipClock(10, {
+        clockFace: 'MinuteCounter',
+        countdown: true,
+        autoStart: false,
+        callbacks: {
+          stop: function() {
+            $('.clock-holder').addClass('hidden');
+            $('.button-holder').removeClass('hidden')
+            nextPlayer();
+          }
+        }
+      });
 
       function showCreate(){
         $('#startDiv').hide();
