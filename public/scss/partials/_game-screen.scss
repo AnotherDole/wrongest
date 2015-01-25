@@ -1,6 +1,8 @@
 #GameScreen { background-color:$white; font-size:5vh; padding-top:5vh;
   #roommembers { margin-bottom: 2em; }
-
+  button { background-color:$pink; @include transition(box-shadow,0.3);
+    &:hover { box-shadow: 0 0 0.5em rgba($black,0.7); }
+  }
   
   button { text-align: center; font-size:6vw; font-weight: 400; padding: 0.25em 1em; }
 }
