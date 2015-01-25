@@ -1,4 +1,4 @@
-.clock-holder {
+.clock-holder { position: absolute; right:0; bottom:0; left:0;
   &.hidden { display:none; }
   .your-clock { width:320px; margin-left:auto; margin-right:auto; }
 }

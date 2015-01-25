@@ -153,22 +153,38 @@
           <li id="player7"></li>
           <li id="player8"></li>
         </ol>
-        <div id='dealerControls' style='display:none'>
+        <div id='dealerControls' class="button-holder" style='display:none'>
           <button onclick='makeDefend();'>Deal a Card</button>
         </div>
       </div>
       
+      <div id='defendDiv' class="card" style='display:none'>
+        
+        <div class="flip-container">
+          <div class="flipper">
+            <div class="front">
+              <div class="inner">
+                <blockquote id='statementDiv'></blockquote>
+                <!--<cite id='authorDiv'></cite>
+                <div id='sourceDiv'></div>
+                <div id='cardScoreDiv'></div> -->
+                <div class="button-holder">
+                  <button onclick='donedefend()'>I'm done early.</button>
+                </div>
+              </div>
+            </div>
+            <div class="back">
+              <div class="inner">
+                <div id='votestatus'>It is not time to vote yet.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+      
     </section>
 
-    <div id='defendDiv' style='display:none'>
-      <h1>Defend this Statement</h1>
-      <h2 id='statementDiv'></h2>
-      <div id='authorDiv'></div>
-      <div id='sourceDiv'></div>
-      <div id='cardScoreDiv'></div>
-      <br>
-      <button onclick='donedefend()'>I'm done early.</button>
-    </div>
 
     <div id='voteDiv' style='display:none'>
       Least Wrong: <select id='least'></select> Most Wrong: <select id='most'></select> 
@@ -416,6 +432,12 @@
         }
         $('#timerDiv').show();
         $('#timeLeftDiv').text(time + ' seconds left.');
+        //alert(time);
+        clock.setTime(time);
+        $('.clock-holder').removeClass('hidden');
+        clock.start(function () {
+    
+        });
       })
 
       function timerFunction(){
