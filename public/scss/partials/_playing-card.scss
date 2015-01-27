@@ -1,3 +1,4 @@
+/**
 .playing-card { padding:4vw; border-radius:$radius; background-color:#fff; border:1px solid darken($white, 10%); box-shadow: 2px 2px 0 darken($white, 25%);  
   height:90vh; display: table;
   article { display: table-cell; vertical-align: middle; text-align: center;
@@ -8,12 +9,20 @@
     button { font-size:1.35em; }
   }
 }
-.flip-container { perspective: 1000;
-  /* &:hover .flipper, */ &.hover .flipper { @include rotateY(-180deg); }
+*/
+
+.card {
   blockquote { font-size:9vw;
     &:before { content:"\201C"; }
     &:after { content:"\201D"; }
   }
+  .button-holder { padding-top: 2.5em;
+    button { font-size:1.35em; }
+  }
+}
+
+.flip-container { perspective: 1000;
+  &.hover .flipper { @include rotateY(-180deg); }
 }
 .flip-container, .front, .back { width: 100%; height: 78vh; }
 

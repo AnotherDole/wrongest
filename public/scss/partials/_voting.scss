@@ -1,0 +1,23 @@
+section.vote { padding: 0;
+  
+  .least-wrong-holder, .most-wrong-holder { height:50vh; padding:15vh 10px 0 10px; @include transition(background-color,1s);
+    label { color:$white; font-weight: $bold; text-align: center; display: block; font-size:10vw; padding-bottom: 2vh; }
+  }
+  .least-wrong-holder { background-color: $green;
+    select { color:darken($green,28%); }
+    &.chosen { background-color:darken($green,15%); } 
+  }
+  .most-wrong-holder { background-color: $red;
+    select { color:darken($red,28%); }
+    &.chosen { background-color:darken($red,15%); } 
+  }
+  
+  
+  .button-holder { position: absolute; top:46%; width: 100%;
+    button { background-color: $black; color:$white;
+      &.hidden { display: none; }
+    }
+  }
+  select { max-width: 100%; font-size: 1.5em; padding: 0.5em; }
+  
+}

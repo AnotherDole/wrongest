@@ -184,18 +184,27 @@
       </div>
       
     </section>
-
-
-    <div id='voteDiv' style='display:none'>
-      Least Wrong: <select id='least'></select> Most Wrong: <select id='most'></select> 
-      <button onclick='sendvotes();'>Send my votes.</button>
-      <div id='voteResult'></div>
-    </div>
-
-    <div id='scoreDiv' style='display:none'>
+    
+    <section id="VotingBooth" class="vote screen hidden">
+      <div class="least-wrong-holder">
+        <label>Least Wrong</label>
+        <select id='least'></select>
+      </div>
+      <div class="most-wrong-holder">
+        <label>Most Wrong</label>
+        <select id='most'></select> 
+      </div>
+      <div class="button-holder">
+        <button id="SendVotesButton" class="hidden" onclick='sendvotes();'>Send my votes.</button>
+      </div>
+    </section>
+    
+    <section id="ScoreSheet" class="score screen hidden">
       <div id='roundText'></div>
-      <button onclick='$("#scoreDiv").hide();'>Got it, thanks.</button>
-    </div>
+      <div class="button-holder">
+        <button onclick='$("#ScoreSheet").addClass("hidden");'>Got it, thanks.</button>
+      </div>
+    </section>
 
     <script src="https://cdn.socket.io/socket.io-1.2.1.js"></script>
     <script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
@@ -454,6 +463,7 @@
       //Tell server you are done defending your statement
       function donedefend(){
         $('#defendDiv').hide();
+        $('.clock-holder').addClass('hidden');
         socket.emit('donedefending');
       }
 
@@ -470,16 +480,20 @@
           }
         }
         else{
-          $('#orderDiv').hide();
-          $('#voteDiv').show();
+          //$('#orderDiv').hide();
+          //$('#voteDiv').show();
+          $('#GameView').addClass('hidden');
+          $('#VotingBooth').removeClass('hidden');
+          $('#VotingBooth').children().removeClass('chosen');
+          $('#SendVotesButton').addClass('hidden');
           $('#voteResult').empty();
           updateVoteSelectors();
         }
       });
 
       function updateVoteSelectors(){
-        $mostSelect = $('#most').empty();
-        $leastSelect = $('#least').empty();
+        $mostSelect = $('#most').empty().append('<option value="" selected disabled>choose</option>');
+        $leastSelect = $('#least').empty().append('<option value="" selected disabled>choose</option>');
         for(var i = 0; i < playerList.length; i++){
           if (playerList[i] == username) continue;
           var theStatement = currentStatements[playerList[i]];
@@ -491,6 +505,16 @@
       //received if your attempt to say you are done voting failed for some reason
       socket.on('donefailed',function(data){
         $('#votestatus').text(data);
+      });
+      
+      // Change function for the vote select...
+      $('#VotingBooth select').change(function() {
+        $(this).parent().addClass('chosen');
+        if ($('#least').val() != null && $('#most').val() != null) {
+          $('#SendVotesButton').removeClass('hidden');
+        } else {
+          $('#SendVotesButton').addClass('hidden');
+        }
       });
 
       //send votes for most/least wrong
@@ -517,7 +541,9 @@
 
       //received at the end of a round
       socket.on('roundend', function(data){
-        $('#scoreDiv').show();
+        $('#VotingBooth').addClass('hidden');
+        $('#ScoreSheet').removeClass('hidden');
+        //$('#scoreDiv').show();
         var $resultDiv = $('#roundText');
         var gameData = data.gameData;
         var playerData = data.playerData;
