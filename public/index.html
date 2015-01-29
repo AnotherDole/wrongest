@@ -186,16 +186,132 @@
     </section>
     
     <section id="VotingBooth" class="vote screen hidden">
-      <div class="least-wrong-holder">
-        <label>Least Wrong</label>
-        <select id='least'></select>
+      <div class="statement-holder">
+	<table>
+	  <tr id="voterow1">
+	    <td class="votebutton">
+	      <label>
+		<i class="fa fa-thumbs-up"></i>
+		<input id='mostwrong1' type="radio" name="player1" value="LeastWrong" />
+	      </label>
+	    </td>
+	    <td>
+	      <blockquote id='votequote1'></blockquote>
+	    </td>
+	    <td class="votebutton">
+	      <label>
+		<i class="fa fa-thumbs-down"></i>
+		<input id='leastwrong1' type="radio" name="player1" value="MostWrong" />
+	      </label>
+	    </td>
+	  </tr>
+	  <tr id="voterow2">
+	    <td class="votebutton">
+	      <label>
+		<i class="fa fa-thumbs-up"></i>
+		<input id='mostwrong2' type="radio" name="player2" value="LeastWrong" />
+	      </label>
+	    </td>
+	    <td>
+	      <blockquote id='votequote2'></blockquote>
+	    </td>
+	    <td class="votebutton">
+	      <label>
+		<i class="fa fa-thumbs-down"></i>
+		<input id='leastwrong2' type="radio" name="player2" value="MostWrong" />
+	      </label>
+	    </td>
+	  </tr>
+	  <tr id="voterow3">
+	    <td class="votebutton">
+	      <label>
+		<i class="fa fa-thumbs-up"></i>
+		<input id='mostwrong3' type="radio" name="player3" value="LeastWrong" />
+	      </label>
+	    </td>
+	    <td>
+	      <blockquote id='votequote3'></blockquote>
+	    </td>
+	    <td class="votebutton">
+	      <label>
+		<i class="fa fa-thumbs-down"></i>
+		<input id='leastwrong3' type="radio" name="player3" value="MostWrong" />
+	      </label>
+	    </td>
+	  </tr>
+	  <tr id="voterow4">
+	    <td class="votebutton">
+	      <label>
+		<i class="fa fa-thumbs-up"></i>
+		<input id='mostwrong4' type="radio" name="player4" value="LeastWrong" />
+	      </label>
+	    </td>
+	    <td>
+	      <blockquote id='votequote4'></blockquote>
+	    </td>
+	    <td class="votebutton">
+	      <label>
+		<i class="fa fa-thumbs-down"></i>
+		<input id='leastwrong4' type="radio" name="player4" value="MostWrong" />
+	      </label>
+	    </td>
+	  </tr>
+	  <tr id="voterow5">
+	    <td class="votebutton">
+	      <label>
+		<i class="fa fa-thumbs-up"></i>
+		<input id='mostwrong5' type="radio" name="player5" value="LeastWrong" />
+	      </label>
+	    </td>
+	    <td>
+	      <blockquote id='votequote5'></blockquote>
+	    </td>
+	    <td class="votebutton">
+	      <label>
+		<i class="fa fa-thumbs-down"></i>
+		<input id='leastwrong5' type="radio" name="player5" value="MostWrong" />
+	      </label>
+	    </td>
+	  </tr>
+	  <tr id="voterow6">
+	    <td class="votebutton">
+	      <label>
+		<i class="fa fa-thumbs-up"></i>
+		<input id='mostwrong6' type="radio" name="player6" value="LeastWrong" />
+	      </label>
+	    </td>
+	    <td>
+	      <blockquote id='votequote6'></blockquote>
+	    </td>
+	    <td class="votebutton">
+	      <label>
+		<i class="fa fa-thumbs-down"></i>
+		<input id='leastwrong6' type="radio" name="player6" value="MostWrong" />
+	      </label>
+	    </td>
+	  </tr>
+	  <tr id="voterow7">
+	    <td class="votebutton">
+	      <label>
+		<i class="fa fa-thumbs-up"></i>
+		<input id='mostwrong7' type="radio" name="player7" value="LeastWrong" />
+	      </label>
+	    </td>
+	    <td>
+	      <blockquote id='votequote7'></blockquote>
+	    </td>
+	    <td class="votebutton">
+	      <label>
+		<i class="fa fa-thumbs-down"></i>
+		<input id='leastwrong7' type="radio" name="player7" value="MostWrong" />
+	      </label>
+	    </td>
+	  </tr>
+	</table>
       </div>
-      <div class="most-wrong-holder">
-        <label>Most Wrong</label>
-        <select id='most'></select> 
-      </div>
-      <div class="button-holder">
-        <button id="SendVotesButton" class="hidden" onclick='sendvotes();'>Send my votes.</button>
+
+      <div class="button-holder hidden">
+	<button id="SubmitVotes">Submit Votes</button>
       </div>
     </section>
     
@@ -211,6 +327,37 @@
     <script src="http://flipclockjs.com/_themes/flipclockjs/js/flipclock/flipclock.js"></script>
     <script src="js/min/wrongest.min.js"></script>
     <script>
+      $('.fa-thumbs-up').click(function() {
+	  $(this).siblings('input').prop('checked',true);
+	  $(this).parent().parent().parent().addClass('least-wrong');
+	  $(this).parent().parent().parent().siblings().removeClass('least-wrong');
+	  $(this).parent().parent().parent().siblings().find('input[value="LeastWrong"]').prop('checked',false);
+	  showButton();
+      });
+
+      $('.fa-thumbs-down').click(function() {
+	  $(this).siblings('input').prop('checked',true);
+	  $(this).parent().parent().parent().addClass('most-wrong');
+	  $(this).parent().parent().parent().siblings().removeClass('most-wrong');
+	  $(this).parent().parent().parent().siblings().find('input[value="MostWrong"]').prop('checked',false);
+	  showButton();
+      });
+
+      function showButton() {
+	if ( $('input[value="LeastWrong"]:checked').length > 0 && $('input[value="MostWrong"]:checked').length > 0 ) {
+	  $('.button-holder').removeClass('hidden');
+	} else {
+	  $('.button-holder').addClass('hidden');
+	}
+      }
+
+      $('#SubmitVotes').click(function() {
+	  socket.emit('playervotes',
+		      $('input[value="LeastWrong"]:checked').attr('name'),
+		      $('input[value="MostWrong"]:checked').attr('name'));
+      });
+
+    //location.reload();
       var socket;
       if(location.hostname.indexOf('rhcloud.com') > -1){
         socket = io(location.hostname + ':8000');
@@ -492,14 +639,20 @@
       });
 
       function updateVoteSelectors(){
-        $mostSelect = $('#most').empty().append('<option value="" selected disabled>choose</option>');
-        $leastSelect = $('#least').empty().append('<option value="" selected disabled>choose</option>');
+	var row = 0;
         for(var i = 0; i < playerList.length; i++){
           if (playerList[i] == username) continue;
-          var theStatement = currentStatements[playerList[i]];
-          $mostSelect.append($('<option/>').val(playerList[i]).text(theStatement.quote));
-          $leastSelect.append($('<option/>').val(playerList[i]).text(theStatement.quote));
+	  row++;
+          var theStatement = currentStatements[playerList[i]].quote;
+	  $('#voterow' + row).removeClass('hidden');
+	  $('#votequote' + row).empty().text(theStatement);
+	  $('#mostwrong' + row).attr('name',playerList[i]);
+	  $('#leastwrong' + row).attr('name',playerList[i]);
         }
+	//hide rows with no data
+	for(row++; row <= 7; row++){
+	  $('#voterow' + row).addClass('hidden');
+	}
       }
 
       //received if your attempt to say you are done voting failed for some reason
@@ -507,24 +660,6 @@
         $('#votestatus').text(data);
       });
       
-      // Change function for the vote select...
-      $('#VotingBooth select').change(function() {
-        $(this).parent().addClass('chosen');
-        if ($('#least').val() != null && $('#most').val() != null) {
-          $('#SendVotesButton').removeClass('hidden');
-        } else {
-          $('#SendVotesButton').addClass('hidden');
-        }
-      });
-
-      //send votes for most/least wrong
-      //most and least should be the name of the player
-      function sendvotes(){
-        var mostWrong = $('#most').val();
-        var leastWrong = $('#least').val();
-        socket.emit('playervotes',mostWrong,leastWrong);
-      }
-
       //received if the submitted votes were invalid
       socket.on('votefailed', function(data){
         $('#voteResult').append(data + "<br>");	
@@ -542,7 +677,8 @@
       //received at the end of a round
       socket.on('roundend', function(data){
         $('#VotingBooth').addClass('hidden');
-        $('#ScoreSheet').removeClass('hidden');
+	//Next line temporarily commented out by Dole
+        //$('#ScoreSheet').removeClass('hidden');
         //$('#scoreDiv').show();
         var $resultDiv = $('#roundText');
         var gameData = data.gameData;

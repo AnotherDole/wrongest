@@ -156,6 +156,7 @@ io.on('connection', function (socket){
 					}
 					io.to(socket.roomName).emit('updatecurrentroom',logic.getPlayersIn(socket.roomName));
 				}
+				delete result.socketsToAdd;
 				io.to(socket.roomName).emit('roundend',result);
 				getAndSendStatements(socket.roomName);
 				var order = logic.adjustOrder(socket.roomName);
