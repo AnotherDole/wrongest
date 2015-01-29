@@ -4,8 +4,8 @@
   "description": "The Wrongest Words Game",
   "main": "server.js",
   "dependencies": {
-    "express": "^4.10.6",
-    "socket.io": "^1.2.1"
+    "express": "^4.11.1",
+    "socket.io": "^1.3.2"
   },
   "devDependencies": {},
   "scripts": {
