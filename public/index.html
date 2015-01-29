@@ -463,13 +463,13 @@
       //Tell server you are done defending your statement
       function donedefend(){
         $('#defendDiv').hide();
-        $('.clock-holder').addClass('hidden');
         socket.emit('donedefending');
       }
 
       //received when anyone in the room says they are done defending
       //data is the # of people who are not done
       socket.on('newdefendcount',function(data){
+	$('.clock-holder').addClass('hidden');
         $('#timerDiv').hide();
         $('#orderDiv').show();
         window.clearInterval(timerVar);
