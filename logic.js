@@ -61,6 +61,7 @@ function gameRoom(name, leaderName,UID,password){
 	this.leader = new gamePlayer(leaderName,UID);
 	this.password = password;
 	this.players = [this.leader];
+	this.waiting = [];
 	this.dealer = null;
 	this.gameState = GAME_NOT_STARTED;
 	this.votesReceived = 0;
@@ -115,12 +116,21 @@ function initializeGame(gameRoom,deckName) {
 	gameRoom.round = 1;
 }
 
-function getPlayer(theRoom,playerName){
+//return reference to the player
+function getPlayer(theRoom,playerName,includeWaiting){
 	var answer = null;
 	for(var i = 0; i < theRoom.players.length; i++){
 		if(theRoom.players[i].name == playerName){
 			answer = theRoom.players[i];
 			break;
+		}
+	}
+	if(includeWaiting){
+		for (var i = 0; i < theRoom.waiting.length; i++){
+			if(theRoom.waiting[i].name == playerName){
+				answer = theRoom.waiting[i];
+				break;
+			}
 		}
 	}
 	return answer;
@@ -167,7 +177,7 @@ exports.createRoom = function(playerName,UID,roomName,password){
 exports.getAllRoomData = function(){
 	var toReturn = {};
 	for (var room in rooms){
-		toReturn[room]= {name: room, playerCount: rooms[room].players.length};
+		toReturn[room]= {name: room, playerCount: rooms[room].players.length + rooms[room].waiting.length};
 	}
 	return toReturn;
 }
@@ -196,11 +206,8 @@ exports.joinRequest = function(playerName,UID, roomName,password){
 		return {success: false, message:"That room does not exist."};
 	}
 	//full room
-	if (theRoom.players.length >= MAX_PLAYERS){
+	if ((theRoom.players.length + theRoom.waiting.length) >= MAX_PLAYERS){
 		return {success: false, message:"That room is full."};
-	}
-	if(theRoom.gameState != GAME_NOT_STARTED){
-		return {success: false, message:"You cannot join a game in progress."};
 	}
 	if(playerName == null){
 		return {success: false, message: "Please enter a name."};
@@ -209,7 +216,7 @@ exports.joinRequest = function(playerName,UID, roomName,password){
 	if(/[^A-Za-z0-9 ]/.test(trimPlayer)){
 		return {success: false, message: "Names can only contain letters, numbers, and spaces."};
 	}
-	if(getPlayer(theRoom,trimPlayer) != null){
+	if(getPlayer(theRoom,trimPlayer,true) != null){
 		return {success: false, message:"Someone in that room already has that name."};
 	}
 	var givenPass;
@@ -222,9 +229,15 @@ exports.joinRequest = function(playerName,UID, roomName,password){
 	if(givenPass != theRoom.password){
 		return {success: false, message:"Wrong password."}
 	}
-	theRoom.players.push(new gamePlayer(trimPlayer,UID));
-	console.log(playerName + " joined room " + theRoom.name);
-	return {success: true,roomName: roomName, playerName:trimPlayer};
+	if(theRoom.gameState > GAME_NOT_STARTED){
+		theRoom.waiting.push(new gamePlayer(trimPlayer,UID));
+		return {success: true, waiting: true, roomName: roomName, playerName:trimPlayer};
+	}
+	else{
+		theRoom.players.push(new gamePlayer(trimPlayer,UID));
+		console.log(playerName + " joined room " + theRoom.name);
+		return {success: true, waiting: false, roomName: roomName, playerName:trimPlayer};
+	}
 }
 
 //playerID requests to leave their current room
@@ -234,11 +247,18 @@ exports.leaveRequest = function(playerName,roomName){
 	if(theRoom == null){
 		return false;
 	}
-	var thePlayer = getPlayer(theRoom,playerName);
+	var thePlayer = getPlayer(theRoom,playerName,true);
 	if(thePlayer == null){
 		return false;
 	}
 	var index = theRoom.players.indexOf(thePlayer);
+	//if player came from the waiting list
+	if(index < 0){
+		index = theRoom.waiting.indexOf(thePlayer);
+		theRoom.waiting.splice(index,1);
+		//none of the rest is necessary if they were just waiting
+		return {success: true, fromWaiting: true};
+	}
 	theRoom.players.splice(index,1);
 	console.log(playerName + " left room " + theRoom.name);
 	//no one left in room, so delete it
@@ -289,7 +309,7 @@ exports.startRequest = function(playerName,roomName,options){
 	if(theRoom == null){
 		return {success: false, message: "You are not in a room."};
 	}	
-	var thePlayer = getPlayer(theRoom,playerName);
+	var thePlayer = getPlayer(theRoom,playerName,false);
 
 	if(thePlayer == null){
 		return {success: false, message: "You do not exist"};
@@ -419,7 +439,7 @@ exports.getOrder = function(roomName){
 //only called when there is a request to make someone defend
 exports.getWhosUp = function(roomName,playerName){
 	var theRoom = rooms[roomName];
-	var thePlayer = getPlayer(theRoom,playerName);
+	var thePlayer = getPlayer(theRoom,playerName,false);
 	if(thePlayer != theRoom.dealer){
 		return false;
 	}
@@ -465,7 +485,7 @@ exports.doneDefending = function(roomName,playerName){
 	if (theRoom.gameState != GAME_SOMEONE_ARGUING){
 		return {success: false, message: "It's not time for that."};
 	}
-	var thePlayer = getPlayer(theRoom,playerName);
+	var thePlayer = getPlayer(theRoom,playerName,false);
 	if(thePlayer == null){
 		return {success: false, message: "You're not in that room."};
 	}
@@ -502,7 +522,7 @@ exports.processVote = function(roomName,playerName,mostWrong,leastWrong){
 	if(theRoom.gameState != GAME_WAITING_VOTES){
 		return {success:false, message:"It's not time to vote yet!"};
 	}
-	var thePlayer = getPlayer(theRoom,playerName);
+	var thePlayer = getPlayer(theRoom,playerName,false);
 	if(thePlayer == null){
 		return {success: false, message: "You're not in that room."};
 	}
@@ -512,8 +532,8 @@ exports.processVote = function(roomName,playerName,mostWrong,leastWrong){
 	if(mostWrong == leastWrong){
 		return {success: false, message: "You must vote for different players."};
 	}
-	var mostPlayer = getPlayer(theRoom,mostWrong);
-	var leastPlayer = getPlayer(theRoom,leastWrong);
+	var mostPlayer = getPlayer(theRoom,mostWrong,false);
+	var leastPlayer = getPlayer(theRoom,leastWrong,false);
 	if(mostPlayer == null || leastPlayer == null){
 		return {success: false, message: "Invalid player names."};
 	}
@@ -539,6 +559,8 @@ exports.endRound = function(roomName){
 	var i, theCard, thePlayer, toAdd;
 	var result = {};
 	result.playerData = {};
+	result.socketsToAdd = [];
+	//handle scoring, both for players and cards
 	for(i = 0; i < theRoom.players.length; i++){
 		thePlayer = theRoom.players[i];
 		thePlayer.voted = false;
@@ -574,5 +596,15 @@ exports.endRound = function(roomName){
 	result.gameData = {round: theRoom.round, cardsLeft: theRoom.cardsLeft};
 	theRoom.round++;
 	theRoom.votesReceived = 0;
+	//add players from the waiting list to the game
+	while(theRoom.waiting.length > 0){
+		result.socketsToAdd.push(theRoom.waiting[0].ID);
+		if(theRoom.dealerFirst){
+			theRoom.players.push(theRoom.waiting.shift());
+		}
+		else{
+			theRoom.players.unshift(theRoom.waiting.shift());
+		}
+	}
 	return result;
 }

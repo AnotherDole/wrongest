@@ -39,7 +39,7 @@ function getAndSendStatements(roomName){
 
 //Common code for when a player leaves or disconnects
 function leaveOrDisconnect(result){
-	if(result.roomDeleted) return;
+	if(result.roomDeleted || result.fromWaiting) return;
 
 	io.to(result.theRoom).emit('updatecurrentroom',logic.getPlayersIn(result.theRoom));
 	if(result.duringGame){
@@ -82,13 +82,15 @@ io.on('connection', function (socket){
 	socket.on('requestjoin', function(playerName,roomName,password){
 		var result = logic.joinRequest(playerName, socket.id, roomName, password);
 		if (result.success){
-			//join socket.io room
-			socket.join(roomName);
+			if(!result.waiting){
+				//join socket.io room
+				socket.join(roomName);
+				//tell everyone in same room to update display
+				io.to(roomName).emit('updatecurrentroom',logic.getPlayersIn(roomName));
+			}
+			socket.emit('deckdata',logic.getDeckData());
 			socket.username = playerName;
 			socket.roomName = roomName;
-			socket.emit('deckdata',logic.getDeckData());
-			//tell everyone in same room to update display
-			io.to(roomName).emit('updatecurrentroom',logic.getPlayersIn(roomName));
 		}
 		socket.emit('joinresult',result);
 	});
@@ -147,10 +149,17 @@ io.on('connection', function (socket){
 			io.to(socket.roomName).emit('receivevote',result);
 			if(result.votesNeeded == 0){
 				result = logic.endRound(socket.roomName);
+				//add players from the waiting list
+				if(result.socketsToAdd.length > 0){
+					for(var i = 0; i < result.socketsToAdd.length; i++){
+						io.sockets.connected[result.socketsToAdd[i]].join(socket.roomName);
+					}
+					io.to(socket.roomName).emit('updatecurrentroom',logic.getPlayersIn(socket.roomName));
+				}
 				io.to(socket.roomName).emit('roundend',result);
 				getAndSendStatements(socket.roomName);
 				var order = logic.adjustOrder(socket.roomName);
-				io.to(socket.roomName).emit('roundorder',order['order'],order['dealer']);
+				io.to(socket.roomName).emit('roundorder',order.order,order.dealer);
 			}
 		}
 		else{

@@ -6,7 +6,7 @@
 	<button id='pickJoin' onclick='showJoin();'>Join a room</button>
 </div>
 
-<div id = 'createDiv' style='display:none'>
+<div id = 'createDiv' hidden>
 	<h1>Create Room</h1>
 	Name: <input type="text" id='createUsernameInput' maxlength="50">
 	Room Name: <input type='text' id='createRoomNameInput' maxlength='50'>
@@ -16,7 +16,7 @@
 	<div id='createResult'></div>
 </div>
 
-<div id='joinDiv' style='display:none'>
+<div id='joinDiv' hidden>
 	<h1>Join Room</h1>
 	<select id='roomselector'>
 	</select>
@@ -29,7 +29,7 @@
 	<div id='joinResult'></div>
 </div>
 
-<div id='roomDiv' style='display:none'>
+<div id='roomDiv' hidden>
 	<div id='roommembers'>Not in a room yet.</div>
 	<button id='leaveroom' onclick='leaveroom();'>Leave Current Room</button>
 	<div id='leaderControls'>
@@ -56,25 +56,31 @@
 	</div>
 </div>
 
-<div id='timerDiv' style='display:none'>
+<div id='waitingDiv' hidden>
+	<p>You joined a game in progress and are now on it's waiting list.</p>
+	<p>At the end of the current round, you will be added in.</p>
+	<button onclick='leaveroom();'>I'm bored. Leave this room.</button>
+</div>
+
+<div id='timerDiv' hidden>
 	<div id='timeLeftDiv'>Time goes here.</div>
 </div>
 
-<div id='orderDiv' style='display:none'>
-	<div id='player1' style='display:none'></div>
-	<div id='player2' style='display:none'></div>
-	<div id='player3' style='display:none'></div>
-	<div id='player4' style='display:none'></div>
-	<div id='player5' style='display:none'></div>
-	<div id='player6' style='display:none'></div>
-	<div id='player7' style='display:none'></div>
-	<div id='player8' style='display:none'></div>
-	<div id='dealerControls' style='display:none'>
+<div id='orderDiv' hidden>
+	<div id='player1' hidden></div>
+	<div id='player2' hidden></div>
+	<div id='player3' hidden></div>
+	<div id='player4' hidden></div>
+	<div id='player5' hidden></div>
+	<div id='player6' hidden></div>
+	<div id='player7' hidden></div>
+	<div id='player8' hidden></div>
+	<div id='dealerControls' hidden>
 		<button onclick='makeDefend();'>Deal a Card</button>
 	</div>
 </div>
 
-<div id='defendDiv' style='display:none'>
+<div id='defendDiv' hidden>
 	<h1>Defend this Statement</h1>
 	<h2 id='statementDiv'></h2>
 	<div id='authorDiv'></div>
@@ -84,13 +90,13 @@
 	<button onclick='donedefend()'>I'm done early.</button>
 </div>
 
-<div id='voteDiv' style='display:none'>
+<div id='voteDiv' hidden>
 	Least Wrong: <select id='least'></select> Most Wrong: <select id='most'></select> 
 	<button onclick='sendvotes();'>Send my votes.</button>
 	<div id='voteResult'></div>
 </div>
 
-<div id='scoreDiv' style='display:none'>
+<div id='scoreDiv' hidden>
 	<div id='roundText'></div>
 	<button onclick='$("#scoreDiv").hide();'>Got it, thanks.</button>
 </div>
@@ -187,10 +193,14 @@ function joinroom(){
 //received after emitting requestjoin
 socket.on('joinresult',function(data){
 	if(data.success){
-		$('#roomresult').text('Successfully joined room');
-		$('#joinDiv').hide();
-		$('#roomDiv').show();
 		$('#startDiv').hide();
+		$('#joinDiv').hide();
+		if(data.waiting){
+			$('#waitingDiv').show();
+		}
+		else{
+			$('#roomDiv').show();
+		}
 		username = data.playerName;
 	}
 	else{
@@ -213,6 +223,7 @@ socket.on('leaveresult',function(data){
 	$('#statementsDiv').hide();
 	$('#voteDiv').hide();
 	$('#voteResult').hide();
+	$('#waitingDiv').hide();
 	$('#startDiv').show();
 });
 
@@ -258,6 +269,7 @@ socket.on('startresult', function(data){
 //Receive the statments that everyone will be defending this round.
 //Automatically sent out at the start of a new round
 socket.on('getstatements', function(data){	
+	$('#waitingDiv').hide();
 	$('#roomDiv').hide();
 	$('#voteDiv').hide();
 	$('#orderDiv').show();
