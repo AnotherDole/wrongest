@@ -101,6 +101,7 @@ io.on('connection', function (socket){
 			//socket.emit('deckdata',logic.getDeckData());
 			socket.username = playerName;
 			socket.roomName = roomName;
+			result.link = 'http://' + server_address + '/' + result.roomName;
 		}
 		socket.emit('joinresult',result);
 	});
