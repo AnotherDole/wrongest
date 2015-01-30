@@ -4,6 +4,8 @@
 
 var fs = require('fs');
 var path = require('path');
+var Hashids = require('hashids');
+var hashids = new Hashids(Math.random().toString());
 
 var rooms = {}, decks = {}, deckData = {};
 
@@ -56,10 +58,9 @@ function gamePlayer(name, UID){
 	this.previousCards = [];
 }
 
-function gameRoom(name, leaderName,UID,password){
+function gameRoom(name, leaderName,UID){
 	this.name = name;
 	this.leader = new gamePlayer(leaderName,UID);
-	this.password = password;
 	this.players = [this.leader];
 	this.waiting = [];
 	this.dealer = null;
@@ -140,40 +141,39 @@ exports.getDeckData = function(){
 	return deckData;
 }
 
+exports.roomExists = function(roomName){
+	return (rooms[roomName] != null);
+}
+
 //Create a new room. playerID is the requestor, name is requested name
-exports.createRoom = function(playerName,UID,roomName,password){
-	if(playerName == null || roomName == null){
-		return {success: false, message: "Please enter some names."};
+exports.createRoom = function(playerName,UID){
+	if(playerName == null){
+		return {success: false, message: "Please enter a name."};
 	}
-	trimRoom = roomName.trim();
 	trimPlayer = playerName.trim();
-	//no really short names
-	if (trimRoom.length < 1){
-		return {success: false, message: "Please enter a room name."};
+	if (trimPlayer.length < 1 || trimPlayer.length > 50){
+		return {success: false, message: "User names must be between 1 and 50 characters."};
 	}
-	if (trimPlayer.length < 1){
-		return {success: false, message: "Please enter a username."};
-	}
-	if(/[^A-Za-z0-9 ]/.test(trimRoom) || /[^A-Za-z0-9 ]/.test(trimPlayer)){
+	if(/[^A-Za-z0-9 ]/.test(trimPlayer)){
 		return {success: false, message: "Names can only contain letters, numbers, and spaces."}
 	}
 	//check if room name already exists
-	if(rooms[trimRoom] != null){
-		return {success: false, message:"A room with that name already exists"};
+	var trimRoom, keep = true;
+	while(keep){
+		trimRoom = hashids.encode(Math.floor(Math.random() * 1000000000) + 1000000000);
+		if(rooms[trimRoom] == null){
+			//if a miracle occurs, get another id
+			keep = false;
+		}
 	}
-	var reqPass;
-	if(password == null){
-		reqPass = "";
-	}
-	else{
-		reqPass = password.trim();
-	}
-	rooms[trimRoom] = new gameRoom(trimRoom,trimPlayer,UID,reqPass);
+	rooms[trimRoom] = new gameRoom(trimRoom,trimPlayer,UID);
 	console.log("Created room " + trimRoom + " with leader " + trimPlayer);
 	return {success: true, roomName:trimRoom, playerName: trimPlayer};
 }
 
 //Returns object describing current rooms
+//currently not necessary
+/*
 exports.getAllRoomData = function(){
 	var toReturn = {};
 	for (var room in rooms){
@@ -181,6 +181,7 @@ exports.getAllRoomData = function(){
 	}
 	return toReturn;
 }
+*/
 
 //Returns object with array of player names and the leader
 exports.getPlayersIn = function(roomName){
@@ -199,7 +200,7 @@ exports.getPlayersIn = function(roomName){
 }
 
 //playerName requests to join roomName
-exports.joinRequest = function(playerName,UID, roomName,password){
+exports.joinRequest = function(playerName,UID, roomName){
 	var theRoom = rooms[roomName];
 	//check if room exits. this should just be for safety.
 	if (theRoom == null){
@@ -216,18 +217,11 @@ exports.joinRequest = function(playerName,UID, roomName,password){
 	if(/[^A-Za-z0-9 ]/.test(trimPlayer)){
 		return {success: false, message: "Names can only contain letters, numbers, and spaces."};
 	}
+	if(trimPlayer.length < 1 || trimPlayer.length > 50){
+		return {success: false, message: "Names must be between 1 and 50 characters."};
+	}
 	if(getPlayer(theRoom,trimPlayer,true) != null){
 		return {success: false, message:"Someone in that room already has that name."};
-	}
-	var givenPass;
-	if(password == null){
-		givenPass = "";
-	}
-	else{
-		givenPass = password.trim();
-	}
-	if(givenPass != theRoom.password){
-		return {success: false, message:"Wrong password."}
 	}
 	if(theRoom.gameState > GAME_NOT_STARTED){
 		theRoom.waiting.push(new gamePlayer(trimPlayer,UID));
@@ -281,7 +275,7 @@ exports.leaveRequest = function(playerName,roomName){
 		}
 	}
 	var toReturn = {success: true, roomDeleted: false, theRoom:theRoom.name, whoLeft: playerName, 
-		duringArg: false, newNeeded: 0, duringVote: false, duringGame:false};
+		duringArg: false, newNeeded: -1, duringVote: false, duringGame:false};
 	if(theRoom.gameState == GAME_BETWEEN_ARGUMENTS || theRoom.gameState == GAME_SOMEONE_ARGUING){
 		toReturn.duringGame = true;
 		thePlayer.card.inPlay = false;

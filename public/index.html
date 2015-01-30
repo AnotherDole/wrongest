@@ -15,10 +15,12 @@
           <span class="big">CREATE</span>
           <span class="small">room</span>
         </button>
+	<!--
         <button id='pickJoin' onclick='showJoin();'>
           <span class="big">JOIN</span>
           <span class="small">room</span>
         </button>
+	-->
       </div>
 
       <div class="create-screen hidden" id = 'createDiv'>
@@ -31,6 +33,7 @@
               <i class="fa fa-user"></i>
             </div>
           </div>
+	  <!--
           <div class="roomname row">
             <div class="input-holder">
               <input type='text' id='createRoomNameInput' maxlength='50' placeholder="Room Name">
@@ -47,6 +50,7 @@
               <i class="fa fa-unlock"></i>
             </div>
           </div>
+	  -->
           <div class="button-holder">
             <button id='createroombutton' onclick='createroom();'>Create New Room</button>
           </div>
@@ -55,15 +59,21 @@
       </div>
 
       <div class="join-screen hidden" id="joinDiv">
+        <div class="lobby-box">
+          <div id='joinRoomMembers'>Not in a room yet.</div>
+          <button id='leaveroom' onclick='leaveroom();'>Leave Current Room</button>
+        </div>
         <div class="inputs">
           <div class="username row">
             <div class="input-holder">
               <input type='text' id='joinUsernameInput' maxlength='50' placeholder="Your Name">
+	      <input type='text' id='joinRoomName' class='hidden'>
             </div>
             <div class="icon">
               <i class="fa fa-user"></i>
             </div>
           </div>
+	  <!--
           <div class="roomname row">
             <div class="input-holder">
               <select id='roomselector'>
@@ -83,6 +93,7 @@
               <i class="fa fa-key"></i>
             </div>
           </div>
+	  -->
         </div>
         <div class="button-holder">
           <button type="submit" id='joinroombutton' onclick='joinroom();'>JOIN!</button>
@@ -91,7 +102,8 @@
       
       <div class="room-details hidden" id="roomDiv">
         <div class="lobby-box">
-          <div id='roommembers'>Not in a room yet.</div>
+          <div id='detailsRoomMembers'>Not in a room yet.</div>
+	  <div id='roomLink'></div>
           <button id='leaveroom' onclick='leaveroom();'>Leave Current Room</button>
         </div>
         
@@ -394,7 +406,7 @@
       function showJoin(){
         $('#startDiv').hide();
         $('#joinDiv').show();
-        updaterooms();
+        //updaterooms();
       }
 
       //received after creating or joining a room
@@ -414,9 +426,7 @@
 
       //send username, room name, password 
       function createroom(){
-        socket.emit('createroom',$('#createUsernameInput').val(),
-                    $('#createRoomNameInput').val(),
-                    $('#createPasswordInput').val());
+        socket.emit('createroom',$('#createUsernameInput').val());
       }
 
       //received after emitting createroom
@@ -424,6 +434,7 @@
         if(data.success){
           $('#roomresult').text('Room created!');
           username = data.playerName;
+	  $('#roomLink').text(data.link);
           $('#createDiv').hide();
           $('#roomDiv').show();
           $('#startDiv').hide();
@@ -434,11 +445,14 @@
       });
 
       //Send request for information about all rooms
+      /*
       function updaterooms(){
         socket.emit('requestroomdata');
       }
+      */
 
       //recieved after emitting request for name and player count of all rooms
+      /*
       socket.on('roomdata',function(data){
         $('#roomselector').empty();
         for(var room in data){
@@ -448,13 +462,12 @@
           $('#roomselector').append(toAppend);
         }
       });
-
+      */
 
       //send username, room name, password 
       function joinroom(){
         socket.emit('requestjoin',$('#joinUsernameInput').val(),
-                    $('#roomselector').val(),
-                    $('#joinPasswordInput').val());
+                    $('#joinRoomName').val());
       }
 
       //received after emitting requestjoin
@@ -465,6 +478,7 @@
           $('#roomDiv').show();
           $('#startDiv').hide();
           username = data.playerName;
+	  socket.emit('requestroomdata',data.roomName);
         }
         else{
           $('#joinResult').text(data.message);
@@ -493,11 +507,14 @@
 
       //received whenever someone in the current room leaves or joins
       socket.on('updatecurrentroom', function(data){
-        var $toChange = $('#roommembers');
+        var $toChange = $('#joinRoomMembers');
+	if($('#joinDiv').is(':hidden')){
+	  $toChange = $('#detailsRoomMembers');
+	}
         $toChange.empty();
         playerList = data.players;
 
-        $toChange.append('Currently in ' + data.roomName + ':<br>');
+        $toChange.append('Currently in the room:<br>');
         for (var i = 0; i < data.players.length; i++){
           $toChange.append(data.players[i]);
           if(data.players[i] == data.leader){
@@ -704,6 +721,12 @@
         $resultDiv.append('Wrongest Words: ' + data.card + ' with a score of ' + data.cardScore);
       });
 
+      if(location.search.length > 1){
+	$('#startDiv').hide();
+	$('#joinDiv').show();
+	$('#joinRoomName').val(location.search.substr(1));
+	socket.emit('requestroomdata',location.search.substr(1));
+      }
     </script>
   </body>
 </html>

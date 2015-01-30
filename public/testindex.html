@@ -3,14 +3,16 @@
 
 <div id='startDiv'>
 	<button id='pickCreate' onclick='showCreate();'>Create a room</button>
-	<button id='pickJoin' onclick='showJoin();'>Join a room</button>
+	<!-- <button id='pickJoin' onclick='showJoin();'>Join a room</button> -->
 </div>
 
 <div id = 'createDiv' hidden>
 	<h1>Create Room</h1>
 	Name: <input type="text" id='createUsernameInput' maxlength="50">
+	<!--
 	Room Name: <input type='text' id='createRoomNameInput' maxlength='50'>
 	Password: <input type='text' id='createPasswordInput'>
+	-->
 	<button id='createroombutton' onclick='createroom();'>Create New Room</button>
 	<button onclick="$('#createDiv').hide();$('#startDiv').show();">Back</button>
 	<div id='createResult'></div>
@@ -18,19 +20,24 @@
 
 <div id='joinDiv' hidden>
 	<h1>Join Room</h1>
+	<!--
 	<select id='roomselector'>
 	</select>
+	-->
 
 	Name: <input type='text' id='joinUsernameInput' maxlength='50'>
-	Password: <input type="text" id='joinPasswordInput'>
+	<input hidden type="text" id='joinRoomName'>
 	<button id='joinroombutton' onclick='joinroom();'>Join Selected Room</button>
+	<!--
 	<button id='updaterooms' onclick='updaterooms();'>Update Room Selection</button>
+	-->
 	<button onclick="$('#joinDiv').hide();$('#startDiv').show();">Back</button>
 	<div id='joinResult'></div>
 </div>
 
 <div id='roomDiv' hidden>
 	<div id='roommembers'>Not in a room yet.</div>
+	<div id='roomlink'></div>
 	<button id='leaveroom' onclick='leaveroom();'>Leave Current Room</button>
 	<div id='leaderControls'>
 		Deck: <select id='deck' onchange='updateDeckDescription();'></select>
@@ -147,19 +154,19 @@ function updateDeckDescription(){
 
 //send username, room name, password 
 function createroom(){
-	socket.emit('createroom',$('#createUsernameInput').val(),
-				$('#createRoomNameInput').val(),
-				$('#createPasswordInput').val());
+	socket.emit('createroom',$('#createUsernameInput').val());
 }
 
 //received after emitting createroom
 socket.on('createresult',function(data){
 	if(data.success){
 		$('#roomresult').text('Room created!');
+		$('#roomlink').text(data.link);
 		username = data.playerName;
 		$('#createDiv').hide();
 		$('#roomDiv').show();
 		$('#startDiv').hide();
+		console.log(data);
 	}
 	else{
 		$('#createResult').text(data.message);
@@ -186,8 +193,7 @@ socket.on('roomdata',function(data){
 //send username, room name, password 
 function joinroom(){
 	socket.emit('requestjoin',$('#joinUsernameInput').val(),
-			$('#roomselector').val(),
-			$('#joinPasswordInput').val());
+			$('#joinRoomName').val());
 }
 
 //received after emitting requestjoin
@@ -423,5 +429,11 @@ socket.on('gameover', function(data){
 	$resultDiv.append('Wrongest Words: ' + data.card + ' with a score of ' + data.cardScore);
 });
 
+var query = location.search;
+if(query.length > 1){
+	$('#startDiv').hide();
+	$('#joinDiv').show();
+	$('#joinRoomName').val(query.substr(1));	
+}
 </script>
 </html>

@@ -5,6 +5,7 @@ var io = require('socket.io')(server);
 var logic = require('./logic.js');
 var port = process.env.OPENSHIFT_NODEJS_PORT || 3000;
 var server_ip_address = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1';
+var server_address = process.env.OPENSHIFT_APP_DNS || ('localhost:'+port);
 
 /************** Variables for testing **********/
 var connected = 0,playing=0;
@@ -22,6 +23,14 @@ server.listen(port,server_ip_address, function(){
 });
 
 app.use(express.static(__dirname + '/public'));
+app.get('/:id',function(req,res){
+	if(logic.roomExists(req.params.id)){
+		res.redirect('../index.html?'+req.params.id);
+	}
+	else{
+		res.redirect('../error.html');
+	}
+});
 
 //call logic to assign statements to everyone
 //receive a summary to send to everyone in room
@@ -42,10 +51,11 @@ function leaveOrDisconnect(result){
 	if(result.roomDeleted || result.fromWaiting) return;
 
 	io.to(result.theRoom).emit('updatecurrentroom',logic.getPlayersIn(result.theRoom));
-	if(result.duringGame){
-		var newOrder = logic.getOrder(result.theRoom);
-		io.to(result.theRoom).emit('roundorder',newOrder.order,newOrder.dealer);
+	if(!result.duringGame){
+		return;
 	}
+	var newOrder = logic.getOrder(result.theRoom);
+	io.to(result.theRoom).emit('roundorder',newOrder.order,newOrder.dealer);
 	if(result.newNeeded == 0){
 		logic.prepareForVotes(result.theRoom);
 	}
@@ -59,28 +69,28 @@ function leaveOrDisconnect(result){
 
 io.on('connection', function (socket){
 	//data is the requested room name
-	socket.on('createroom', function(playerName,roomName,password){
-		var result = logic.createRoom(playerName, socket.id, roomName, password);
-		socket.emit('createresult',result);
+	socket.on('createroom', function(playerName){
+		var result = logic.createRoom(playerName, socket.id);
 		if(result.success){
 			//join the socket.io room
 			socket.username = result.playerName;
 			socket.roomName = result.roomName;
 			socket.join(result.roomName);
+			result.link = 'http://' + server_address + '/' + result.roomName;
+			socket.emit('createresult',result);
 			socket.emit('deckdata',logic.getDeckData());
 			io.to(result.roomName).emit('updatecurrentroom',logic.getPlayersIn(result.roomName));
 		}
 	});
 
-	// data isn't necessary
-	socket.on('requestroomdata', function(data){
-		var result = logic.getAllRoomData();
-		socket.emit('roomdata',result);
+	socket.on('requestroomdata', function(roomName){
+		var result = logic.getPlayersIn(roomName);
+		socket.emit('updatecurrentroom',result);
 	});
 
 	// data is requested room name
-	socket.on('requestjoin', function(playerName,roomName,password){
-		var result = logic.joinRequest(playerName, socket.id, roomName, password);
+	socket.on('requestjoin', function(playerName,roomName){
+		var result = logic.joinRequest(playerName, socket.id, roomName);
 		if (result.success){
 			if(!result.waiting){
 				//join socket.io room
@@ -88,7 +98,7 @@ io.on('connection', function (socket){
 				//tell everyone in same room to update display
 				io.to(roomName).emit('updatecurrentroom',logic.getPlayersIn(roomName));
 			}
-			socket.emit('deckdata',logic.getDeckData());
+			//socket.emit('deckdata',logic.getDeckData());
 			socket.username = playerName;
 			socket.roomName = roomName;
 		}
