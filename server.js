@@ -9,7 +9,7 @@ var server_address = process.env.OPENSHIFT_APP_DNS || ('localhost:'+port);
 
 /************** Variables for testing **********/
 var connected = 0,playing=0;
-var testRoom = 'Test Room';
+var testRoom = '';
 var testing = false;
 if(process.argv[2] == 'test'){
 	testing = true;
@@ -192,7 +192,9 @@ io.on('connection', function (socket){
 		connected++;
 		playing++;
 		if(playing == 1){
-			socket.emit('createresult',logic.createRoom('Player1',socket.id,testRoom,''));
+			var result = logic.createRoom('Player1',socket.id);
+			socket.emit('createresult',result);
+			testRoom = result.roomName;
 			socket.username = 'Player1';
 			socket.roomName = testRoom;
 			socket.emit('deckdata',logic.getDeckData());
@@ -200,7 +202,7 @@ io.on('connection', function (socket){
 			io.to(testRoom).emit('updatecurrentroom',logic.getPlayersIn(testRoom));
 		}	
 		else{
-			socket.emit('joinresult',logic.joinRequest('Player'+connected,socket.id,testRoom,''));
+			socket.emit('joinresult',logic.joinRequest('Player'+connected,socket.id,testRoom));
 			socket.username='Player'+connected;
 			socket.roomName = testRoom;
 			socket.emit('deckdata',logic.getDeckData());
