@@ -17,3 +17,8 @@ $('#createPasswordInput').keyup(function() {
     $(this).parent().next().children().removeClass('fa-unlock').addClass('fa-lock');
   }
 });
+
+$('#roomURL').focus(function() {
+  $(this).select();
+});
+

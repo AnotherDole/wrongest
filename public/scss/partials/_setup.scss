@@ -1,4 +1,6 @@
 .setup { background-color:$black; color: $white; }
+
+/**
 .create-or-join { display: table; width:100%; margin-top: 2em;
   button { width:50%; display: table-cell; height:40vh; font-size:4vw;
     > span { display: block; }
@@ -6,6 +8,14 @@
     .small { font-size:4vw; font-weight: 400; }
   }
 }
+**/
+
+.starting-screen {
+  .game-explanation { font-size:5vw; text-align: center; padding-top: 1em; padding-bottom: 1em;}
+  input { font-size: 7vw; padding: 0.4em; margin-bottom: 1em; }
+  button { font-size:7vw; display: block; width: 100%; padding:0.4em; }
+}
+
 .create-screen { margin-top: 10vh; }
 .inputs { display: table; width: 100%; font-size:4vw;
   .row { display: table-row; }
@@ -21,6 +31,17 @@
 
 .room-details { margin-top: 5vh;
   .lobby-box { margin-bottom: 5vh; }
+  figure {
+    figcaption { font-weight: 100; text-transform: lowercase; color:$yellow; line-height:95%; }
+    //#roomLink { background-color:$white; color:$blue; border:1px solid black; padding: 0.25em; text-align: center; }
+    #roomURL { display: block; width: 100%; text-align: center; padding: 0.25em; border:2px solid $blue; color:$blue; font-size:6vw; }
+  }
+  
+  .players { font-size: 6vw; padding-top: 1em; padding-bottom: 1em;
+    li.leader {
+      &:after { content:' (leader)'; }
+    }
+  }
 }
 
 .admin-options {
