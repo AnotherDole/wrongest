@@ -429,11 +429,11 @@ socket.on('gameover', function(data){
 	$resultDiv.append('Wrongest Words: ' + data.card + ' with a score of ' + data.cardScore);
 });
 
-var query = location.search;
-if(query.length > 1){
+if(location.pathname.length > 1){
 	$('#startDiv').hide();
 	$('#joinDiv').show();
-	$('#joinRoomName').val(query.substr(1));	
+	$('#joinRoomName').val(location.pathname.substr(1));
+	socket.emit('requestroomdata',location.pathname.substr(1));
 }
 </script>
 </html>
