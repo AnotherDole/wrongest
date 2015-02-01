@@ -8,6 +8,7 @@ var Hashids = require('hashids');
 var hashids = new Hashids(Math.random().toString());
 
 var rooms = {}, decks = {}, deckData = {};
+var gamesCreated = 0;
 
 var MIN_PLAYERS = 3;
 var MAX_PLAYERS = 8;
@@ -160,7 +161,8 @@ exports.createRoom = function(playerName,UID){
 	//check if room name already exists
 	var trimRoom, keep = true;
 	while(keep){
-		trimRoom = hashids.encode(Math.floor(Math.random() * 1000000000) + 1000000000);
+		gamesCreated++;
+		trimRoom = hashids.encode(gamesCreated + 1000000000);
 		if(rooms[trimRoom] == null){
 			//if a miracle occurs, get another id
 			keep = false;
