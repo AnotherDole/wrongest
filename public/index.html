@@ -65,7 +65,9 @@
       <div class="join-screen hidden" id="joinDiv">
         <div class="room-details">
           <ol class="players" id='joinRoomMembers'>Not in a room yet.</ol>
-          <button id='leaveroom' onclick='leaveroom();'>Leave Current Room</button>
+          <!--<div class="button-holder">
+            <button id='leaveroom' onclick='leaveroom();'>Leave Current Room</button>
+          </div> -->
         </div>
         <div class="inputs">
           <div class="username row">
@@ -114,7 +116,7 @@
         
         <div class="lobby-box">
           <ol class="players" id='detailsRoomMembers'>Not in a room yet.</ol>
-          <button id='leaveroom' onclick='leaveroom();'>Leave Current Room</button>
+          <!-- <button id='leaveroom' onclick='leaveroom();'>Leave Current Room</button> -->
         </div>
         
         <ul class="admin-options" id="leaderControls" style="display:none;">
@@ -209,127 +211,127 @@
     
     <section id="VotingBooth" class="vote screen hidden">
       <div class="statement-holder">
-	<table>
-	  <tr id="voterow1">
-	    <td class="votebutton">
-	      <label>
-		<i class="fa fa-thumbs-up"></i>
-		<input id='mostwrong1' type="radio" name="player1" value="LeastWrong" />
-	      </label>
-	    </td>
-	    <td>
-	      <blockquote id='votequote1'></blockquote>
-	    </td>
-	    <td class="votebutton">
-	      <label>
-		<i class="fa fa-thumbs-down"></i>
-		<input id='leastwrong1' type="radio" name="player1" value="MostWrong" />
-	      </label>
-	    </td>
-	  </tr>
-	  <tr id="voterow2">
-	    <td class="votebutton">
-	      <label>
-		<i class="fa fa-thumbs-up"></i>
-		<input id='mostwrong2' type="radio" name="player2" value="LeastWrong" />
-	      </label>
-	    </td>
-	    <td>
-	      <blockquote id='votequote2'></blockquote>
-	    </td>
-	    <td class="votebutton">
-	      <label>
-		<i class="fa fa-thumbs-down"></i>
-		<input id='leastwrong2' type="radio" name="player2" value="MostWrong" />
-	      </label>
-	    </td>
-	  </tr>
-	  <tr id="voterow3">
-	    <td class="votebutton">
-	      <label>
-		<i class="fa fa-thumbs-up"></i>
-		<input id='mostwrong3' type="radio" name="player3" value="LeastWrong" />
-	      </label>
-	    </td>
-	    <td>
-	      <blockquote id='votequote3'></blockquote>
-	    </td>
-	    <td class="votebutton">
-	      <label>
-		<i class="fa fa-thumbs-down"></i>
-		<input id='leastwrong3' type="radio" name="player3" value="MostWrong" />
-	      </label>
-	    </td>
-	  </tr>
-	  <tr id="voterow4">
-	    <td class="votebutton">
-	      <label>
-		<i class="fa fa-thumbs-up"></i>
-		<input id='mostwrong4' type="radio" name="player4" value="LeastWrong" />
-	      </label>
-	    </td>
-	    <td>
-	      <blockquote id='votequote4'></blockquote>
-	    </td>
-	    <td class="votebutton">
-	      <label>
-		<i class="fa fa-thumbs-down"></i>
-		<input id='leastwrong4' type="radio" name="player4" value="MostWrong" />
-	      </label>
-	    </td>
-	  </tr>
-	  <tr id="voterow5">
-	    <td class="votebutton">
-	      <label>
-		<i class="fa fa-thumbs-up"></i>
-		<input id='mostwrong5' type="radio" name="player5" value="LeastWrong" />
-	      </label>
-	    </td>
-	    <td>
-	      <blockquote id='votequote5'></blockquote>
-	    </td>
-	    <td class="votebutton">
-	      <label>
-		<i class="fa fa-thumbs-down"></i>
-		<input id='leastwrong5' type="radio" name="player5" value="MostWrong" />
-	      </label>
-	    </td>
-	  </tr>
-	  <tr id="voterow6">
-	    <td class="votebutton">
-	      <label>
-		<i class="fa fa-thumbs-up"></i>
-		<input id='mostwrong6' type="radio" name="player6" value="LeastWrong" />
-	      </label>
-	    </td>
-	    <td>
-	      <blockquote id='votequote6'></blockquote>
-	    </td>
-	    <td class="votebutton">
-	      <label>
-		<i class="fa fa-thumbs-down"></i>
-		<input id='leastwrong6' type="radio" name="player6" value="MostWrong" />
-	      </label>
-	    </td>
-	  </tr>
-	  <tr id="voterow7">
-	    <td class="votebutton">
-	      <label>
-		<i class="fa fa-thumbs-up"></i>
-		<input id='mostwrong7' type="radio" name="player7" value="LeastWrong" />
-	      </label>
-	    </td>
-	    <td>
-	      <blockquote id='votequote7'></blockquote>
-	    </td>
-	    <td class="votebutton">
-	      <label>
-		<i class="fa fa-thumbs-down"></i>
-		<input id='leastwrong7' type="radio" name="player7" value="MostWrong" />
-	      </label>
-	    </td>
-	  </tr>
-	</table>
+        <table>
+          <tr id="voterow1">
+            <td class="votebutton">
+              <label>
+            <i class="fa fa-thumbs-up"></i>
+            <input id='mostwrong1' type="radio" name="player1" value="LeastWrong" />
+              </label>
+            </td>
+            <td>
+              <blockquote id='votequote1'></blockquote>
+            </td>
+            <td class="votebutton">
+              <label>
+            <i class="fa fa-thumbs-down"></i>
+            <input id='leastwrong1' type="radio" name="player1" value="MostWrong" />
+              </label>
+            </td>
+          </tr>
+          <tr id="voterow2">
+            <td class="votebutton">
+              <label>
+            <i class="fa fa-thumbs-up"></i>
+            <input id='mostwrong2' type="radio" name="player2" value="LeastWrong" />
+              </label>
+            </td>
+            <td>
+              <blockquote id='votequote2'></blockquote>
+            </td>
+            <td class="votebutton">
+              <label>
+            <i class="fa fa-thumbs-down"></i>
+            <input id='leastwrong2' type="radio" name="player2" value="MostWrong" />
+              </label>
+            </td>
+          </tr>
+          <tr id="voterow3">
+            <td class="votebutton">
+              <label>
+            <i class="fa fa-thumbs-up"></i>
+            <input id='mostwrong3' type="radio" name="player3" value="LeastWrong" />
+              </label>
+            </td>
+            <td>
+              <blockquote id='votequote3'></blockquote>
+            </td>
+            <td class="votebutton">
+              <label>
+            <i class="fa fa-thumbs-down"></i>
+            <input id='leastwrong3' type="radio" name="player3" value="MostWrong" />
+              </label>
+            </td>
+          </tr>
+          <tr id="voterow4">
+            <td class="votebutton">
+              <label>
+            <i class="fa fa-thumbs-up"></i>
+            <input id='mostwrong4' type="radio" name="player4" value="LeastWrong" />
+              </label>
+            </td>
+            <td>
+              <blockquote id='votequote4'></blockquote>
+            </td>
+            <td class="votebutton">
+              <label>
+            <i class="fa fa-thumbs-down"></i>
+            <input id='leastwrong4' type="radio" name="player4" value="MostWrong" />
+              </label>
+            </td>
+          </tr>
+          <tr id="voterow5">
+            <td class="votebutton">
+              <label>
+            <i class="fa fa-thumbs-up"></i>
+            <input id='mostwrong5' type="radio" name="player5" value="LeastWrong" />
+              </label>
+            </td>
+            <td>
+              <blockquote id='votequote5'></blockquote>
+            </td>
+            <td class="votebutton">
+              <label>
+            <i class="fa fa-thumbs-down"></i>
+            <input id='leastwrong5' type="radio" name="player5" value="MostWrong" />
+              </label>
+            </td>
+          </tr>
+          <tr id="voterow6">
+            <td class="votebutton">
+              <label>
+            <i class="fa fa-thumbs-up"></i>
+            <input id='mostwrong6' type="radio" name="player6" value="LeastWrong" />
+              </label>
+            </td>
+            <td>
+              <blockquote id='votequote6'></blockquote>
+            </td>
+            <td class="votebutton">
+              <label>
+            <i class="fa fa-thumbs-down"></i>
+            <input id='leastwrong6' type="radio" name="player6" value="MostWrong" />
+              </label>
+            </td>
+          </tr>
+          <tr id="voterow7">
+            <td class="votebutton">
+              <label>
+            <i class="fa fa-thumbs-up"></i>
+            <input id='mostwrong7' type="radio" name="player7" value="LeastWrong" />
+              </label>
+            </td>
+            <td>
+              <blockquote id='votequote7'></blockquote>
+            </td>
+            <td class="votebutton">
+              <label>
+            <i class="fa fa-thumbs-down"></i>
+            <input id='leastwrong7' type="radio" name="player7" value="MostWrong" />
+              </label>
+            </td>
+          </tr>
+        </table>
       </div>
 
       <div class="button-holder hidden">
@@ -722,8 +724,11 @@
 
         //reset player div colors
         for(var i = 1; i <= playerList.length; i++){
-          $('#player' + i).css('background-color','white');
+          //$('#player' + i).css('background-color','white');
+          $('#player' + i).removeClass('completed');
         }
+        //Reset Voting Booth colors.
+        $('#VotingBooth tr').removeClass('most-wrong least-wrong');
       });
 
       socket.on('gameover', function(data){

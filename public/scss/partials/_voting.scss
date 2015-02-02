@@ -1,23 +1,42 @@
 section.vote { padding: 0;
-  
-  .least-wrong-holder, .most-wrong-holder { height:50vh; padding:15vh 10px 0 10px; @include transition(background-color,1s);
-    label { color:$white; font-weight: $bold; text-align: center; display: block; font-size:10vw; padding-bottom: 2vh; }
+  &:not(.hidden) { position: absolute; top:0; right:0; bottom:0; left:0; overflow: hidden; }
+
+  .statement-holder { position:absolute; top:0; right:0; bottom:0; left:0; overflow:auto; padding-bottom:70px; }
+
+  blockquote { font-family:$font; font-size:1.4em; padding:1em 0; text-align:center;
+    &:before { content:"\201C"; }
+    &:after { content:"\201D"; }
   }
-  .least-wrong-holder { background-color: $green;
-    select { color:darken($green,28%); }
-    &.chosen { background-color:darken($green,15%); } 
+
+  td { transition: background-color 0.5s; }
+  .votebutton { width:15%; text-align:center; vertical-align:middle;
+    label { display:block; cursor:pointer; }
+    i { font-size:38px; }
+    input { display:block; visibility:hidden; }
+    .fa-thumbs-down { color:$red; transition: all 0.5s; }
+    .fa-thumbs-up { color:$green; transition: all 0.5s; }
+    .fa { opacity:0.35; }
   }
-  .most-wrong-holder { background-color: $red;
-    select { color:darken($red,28%); }
-    &.chosen { background-color:darken($red,15%); } 
-  }
-  
-  
-  .button-holder { position: absolute; top:46%; width: 100%;
-    button { background-color: $black; color:$white;
-      &.hidden { display: none; }
+
+  .least-wrong {
+    td { background-color:$green; }
+    .votebutton {
+      .fa-thumbs-up { color:$black; opacity:1; transform: scale(1.35); }
     }
   }
-  select { max-width: 100%; font-size: 1.5em; padding: 0.5em; }
+  .most-wrong {
+    td { background-color:$red; color:$white; }
+    .votebutton {
+      .fa-thumbs-down { color:$white; opacity:1; transform: scale(1.35); }
+    }
+  }
+
+  .button-holder { position:absolute; right:0; bottom:0; left:0; text-align:center; height:70px; padding:10px; background-color:$white; border-top:2px solid $black; transform: translateY(0); transition: all 1s;
+    &.hidden { transform: translateY(70px); }
+    button { font-family:$font; background-color:$black; color:$white; display:inline-block; border:2px solid $black; font-size:26px; padding:0.25em .75em; cursor:pointer; outline:none;
+      &:hover { background-color:$white; color:$black; }
+      &:active { box-shadow:inset 4px 4px 0 $black; }
+    }
+  }
   
 }
