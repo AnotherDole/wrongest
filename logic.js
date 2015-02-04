@@ -13,6 +13,7 @@ var gamesCreated = 0;
 var MIN_PLAYERS = 3;
 var MAX_PLAYERS = 8;
 
+var GAME_PAUSED = -1;
 var GAME_NOT_STARTED = 0;
 var GAME_BETWEEN_ARGUMENTS = 1;
 var GAME_SOMEONE_ARGUING = 2;
@@ -138,6 +139,16 @@ function getPlayer(theRoom,playerName,includeWaiting){
 	return answer;
 }
 
+function isValidName(name){
+	if (name.length < 1 || name.length > 50){
+		return false;
+	}
+	if(/[^A-Za-z0-9 ]/.test(trimPlayer)){
+		return false; 
+	}
+	return true;
+}
+
 exports.getDeckData = function(){
 	return deckData;
 }
@@ -152,22 +163,25 @@ exports.createRoom = function(playerName,UID){
 		return {success: false, message: "Please enter a name."};
 	}
 	trimPlayer = playerName.trim();
-	if (trimPlayer.length < 1 || trimPlayer.length > 50){
-		return {success: false, message: "User names must be between 1 and 50 characters."};
-	}
-	if(/[^A-Za-z0-9 ]/.test(trimPlayer)){
-		return {success: false, message: "Names can only contain letters, numbers, and spaces."}
+	if(!isValidName(trimPlayer)){
+		return {success: false, message: "Invalid name."};
 	}
 	//check if room name already exists
 	var trimRoom, keep = true;
+	/* Actually a miracle should never occur?
 	while(keep){
 		gamesCreated++;
 		trimRoom = hashids.encode(gamesCreated + 1000000000);
+		//Actually, a miracle should never occur?
+		/*
 		if(rooms[trimRoom] == null){
 			//if a miracle occurs, get another id
 			keep = false;
 		}
 	}
+	*/
+	gamesCreated++;
+	trimRoom = hashids.encode(gamesCreated + 1000000000);
 	rooms[trimRoom] = new gameRoom(trimRoom,trimPlayer,UID);
 	console.log("Created room " + trimRoom + " with leader " + trimPlayer);
 	return {success: true, roomName:trimRoom, playerName: trimPlayer};
@@ -216,11 +230,8 @@ exports.joinRequest = function(playerName,UID, roomName){
 		return {success: false, message: "Please enter a name."};
 	}
 	var trimPlayer = playerName.trim();
-	if(/[^A-Za-z0-9 ]/.test(trimPlayer)){
-		return {success: false, message: "Names can only contain letters, numbers, and spaces."};
-	}
-	if(trimPlayer.length < 1 || trimPlayer.length > 50){
-		return {success: false, message: "Names must be between 1 and 50 characters."};
+	if(!isValidName(trimPlayer)){
+		return {success: false, message: "Invalid name."};
 	}
 	if(getPlayer(theRoom,trimPlayer,true) != null){
 		return {success: false, message:"Someone in that room already has that name."};
