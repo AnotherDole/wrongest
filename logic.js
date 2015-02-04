@@ -75,6 +75,7 @@ function gameRoom(name, leaderName,UID){
 	this.dealerFirst = false;
 	this.whosUp = 0;
 	this.round = 1;
+	this.leaverData = {};
 }
 
 function masterDeck(name, description){
@@ -237,7 +238,14 @@ exports.joinRequest = function(playerName,UID, roomName){
 		return {success: false, message:"Someone in that room already has that name."};
 	}
 	if(theRoom.gameState > GAME_NOT_STARTED){
-		theRoom.waiting.push(new gamePlayer(trimPlayer,UID));
+		var toAdd = new gamePlayer(trimPlayer,UID);
+		var prevData = theRoom.leaverData[trimPlayer];
+		if(prevData){
+			toAdd.score = prevData.score;
+			toAdd.previousCards = prevData.previous;
+			delete theRoom.leaverData[trimPlayer];
+		}
+		theRoom.waiting.push(toAdd);
 		return {success: true, waiting: true, roomName: roomName, playerName:trimPlayer};
 	}
 	else{
@@ -247,7 +255,7 @@ exports.joinRequest = function(playerName,UID, roomName){
 	}
 }
 
-//playerID requests to leave their current room
+//playerName requests to leave their current room
 exports.leaveRequest = function(playerName,roomName){
 	//to be safe
 	var theRoom = rooms[roomName];
@@ -307,6 +315,7 @@ exports.leaveRequest = function(playerName,roomName){
 		thePlayer.card.inPlay = false;
 		toReturn.duringVote = true;
 	}
+	theRoom.leaverData[thePlayer.name] = {score: thePlayer.score, previous: thePlayer.previousCards};
 	return toReturn;
 }
 
@@ -605,7 +614,9 @@ exports.endRound = function(roomName){
 	theRoom.votesReceived = 0;
 	//add players from the waiting list to the game
 	while(theRoom.waiting.length > 0){
-		result.socketsToAdd.push(theRoom.waiting[0].ID);
+		var fromWaiting = theRoom.waiting[0];
+		result.playerData[fromWaiting.name] = {scoreChange: 0, newScore: fromWaiting.score};
+		result.socketsToAdd.push(fromWaiting.ID);
 		if(theRoom.dealerFirst){
 			theRoom.players.push(theRoom.waiting.shift());
 		}

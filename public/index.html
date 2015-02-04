@@ -717,6 +717,7 @@
 
         $resultDiv.empty();
         $resultDiv.append('<b>End of round ' + gameData.round + '</b>');
+	console.log(playerData);
         for(var player in playerData){
           $resultDiv.append('<br>' + player + ' gains ' + playerData[player].scoreChange + ' points. Current Score: ' + playerData[player].newScore);
         }
