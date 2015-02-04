@@ -1,4 +1,4 @@
-Mini Deck
+A Mini Deck
 A 20 card deck for testing the game.
 
 Clowns are sexy.

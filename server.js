@@ -25,7 +25,7 @@ server.listen(port,server_ip_address, function(){
 app.use(express.static(__dirname + '/public'));
 app.get('/:id',function(req,res){
 	if(logic.roomExists(req.params.id)){
-		res.location('../'+req.params.id);
+	//	res.location('../'+req.params.id);
 		res.sendFile(__dirname + '/public/index.html');
 	}
 	else{
