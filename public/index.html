@@ -157,11 +157,7 @@
     </section>
     
     <section id="GameView" class="order screen">
-      
-      <div id='timerDiv' style='display:none'>
-        <div id='timeLeftDiv'>Time goes here.</div>
-      </div>
-      
+
       <div class="clock-holder hidden">
         <div class="your-clock" id="GameClock"></div>
       </div>
@@ -393,8 +389,6 @@
       var deckData;
       var currentStatements;
       var playerList;
-      var timeLeft;
-      var timerVar;
       var meDefending = false;
       
       var clock = $('.your-clock').FlipClock(10, {
@@ -404,8 +398,10 @@
         callbacks: {
           stop: function() {
             $('.clock-holder').addClass('hidden');
-            $('.button-holder').removeClass('hidden')
-            nextPlayer();
+            //$('.button-holder').removeClass('hidden')
+	    if(meDefending){
+	      donedefend();
+	    }
           }
         }
       });
@@ -602,8 +598,6 @@
       }
 
       socket.on('timetodefend',function(player,time){
-        timeLeft = time;
-        timerVar = window.setInterval(function() {timerFunction()},1000);
         if(player == username){
           meDefending = true;
           $('#defendDiv').show();
@@ -617,26 +611,11 @@
         else{
           meDefending = false;
         }
-        $('#timerDiv').show();
-        $('#timeLeftDiv').text(time + ' seconds left.');
         //alert(time);
         clock.setTime(time);
         $('.clock-holder').removeClass('hidden');
-        clock.start(function () {
-    
-        });
+        clock.start();
       })
-
-      function timerFunction(){
-        if(timeLeft > 0){
-          timeLeft--;
-        }
-        $('#timeLeftDiv').text(timeLeft + ' seconds left.');
-        if(timeLeft == 0 && meDefending){
-          donedefend();
-        }
-      }
-
 
       //Tell server you are done defending your statement
       function donedefend(){
@@ -647,10 +626,8 @@
       //received when anyone in the room says they are done defending
       //data is the # of people who are not done
       socket.on('newdefendcount',function(data){
-	$('.clock-holder').addClass('hidden');
-        $('#timerDiv').hide();
+	clock.stop();
         $('#orderDiv').show();
-        window.clearInterval(timerVar);
         if(data > 0){
           var playersDone = playerList.length - data;
           for(var i = 1; i <= playersDone; i++){
