@@ -183,7 +183,7 @@ io.on('connection', function (socket){
 	socket.on('disconnect', function(data){
 		var result = logic.leaveRequest(socket.username,socket.roomName);
 		if(result && !result.roomDeleted){
-			io.to(result.theRoom).emit('updatecurrentroom',logic.getPlayersIn(result.theRoom));
+			//io.to(result.theRoom).emit('updatecurrentroom',logic.getPlayersIn(result.theRoom));
 			leaveOrDisconnect(result);
 		}
 		if(testing) playing--;

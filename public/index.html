@@ -107,6 +107,10 @@
       </div>
       
       <div class="room-details hidden" id="roomDiv">
+
+	<div class="hidden" id="waitingDiv">
+	  <p>You have joined a game in progress. When the current round ends, you will be able to start playing.</p>
+	</div>
         
         <figure>
           <figcaption>Copy and paste:</figcaption>
@@ -489,6 +493,9 @@
           $('#roomURL').val(data.link);
           username = data.playerName;
 	  socket.emit('requestroomdata',data.roomName);
+	  if(data.waiting){
+	    $('#waitingDiv').removeClass('hidden');
+	  }
         }
         else{
           $('#joinResult').text(data.message);
@@ -567,6 +574,7 @@
         $('#voteDiv').hide();
         currentStatements = data;
         // getStatements();
+	$('#waitingDiv').addClass('hidden');
         $('#RoomSetup').addClass('hidden');
         $('#GameView').removeClass('hidden');
         $('#orderDiv').show();
@@ -582,11 +590,14 @@
           $('#dealerControls').hide();
         }
         for (var i = 0; i < list.length; i++){
-          var $theDiv = $('#player' + (i+1)).show();
+          var $theDiv = $('#player' + (i+1)).removeClass('hidden');
           $theDiv.empty().append(list[i]);
           if(list[i] == dealer){
             $theDiv.addClass('dealer');
           }
+	  else{
+	    $theDiv.removeClass('dealer');
+	  }
         }
         for(var i = list.length+1; i <= 8; i++){
           $('#player' + i).addClass('hidden');
