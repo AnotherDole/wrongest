@@ -51,10 +51,18 @@ function getAndSendStatements(roomName){
 function leaveOrDisconnect(result){
 	if(result.roomDeleted || result.fromWaiting) return;
 
-	io.to(result.theRoom).emit('updatecurrentroom',logic.getPlayersIn(result.theRoom));
+	var playerList = logic.getPlayersIn(result.theRoom);
 	if(!result.duringGame){
+		io.to(result.theRoom).emit('updatecurrentroom',playerList);
 		return;
 	}
+	if(playerList.players.length <= 2){
+		logic.pauseGame(result.theRoom);
+		io.to(result.theRoom).emit('pausegame');
+		io.to(result.theRoom).emit('updatecurrentroom',logic.getPlayersIn(result.theRoom));
+		return;
+	}
+	io.to(result.theRoom).emit('updatecurrentroom',logic.getPlayersIn(result.theRoom));
 	var newOrder = logic.getOrder(result.theRoom);
 	io.to(result.theRoom).emit('roundorder',newOrder.order,newOrder.dealer);
 	if(result.newNeeded == 0){
@@ -177,6 +185,16 @@ io.on('connection', function (socket){
 		}
 		else{
 			socket.emit('votefailed',result.message);
+		}
+	});
+
+	socket.on('restartgame', function(data){
+		var result = logic.canRestartGame(socket.username,socket.roomName);
+		if(result){
+			var order = logic.adjustOrder(socket.roomName);
+			io.to(socket.roomName).emit('roundorder',order.order,order.dealer);
+			io.to(socket.roomName).emit('newdefendcount',order.order.length);
+			getAndSendStatements(socket.roomName);
 		}
 	});
 

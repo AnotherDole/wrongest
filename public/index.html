@@ -105,7 +105,28 @@
           <button type="submit" id='joinroombutton' onclick='joinroom();'>JOIN!</button>
         </div>
       </div>
-      
+
+      <div class="pause-screen hidden" id="pauseDiv">
+
+	<p>The number of active players in the room dropped below 3 and so the game was paused.</p>
+	<p>When the number of players in the room reaches 3 or more gain, the leader can restart the game.</p>
+
+        <figure>
+          <figcaption>Copy and paste:</figcaption>
+          <!-- <div id='roomLink'></div> -->
+          <input type="url" readonly id="pauseRoomURL" />
+        </figure>
+
+        <div class="lobby-box">
+          <ol class="players" id="pauseRoomMembers"></ol>
+        </div>
+	
+	<div class="button-holder hidden" id='restartOption'>
+	  <button id="restartButton" onclick="socket.emit('restartgame');">Restart Game</button>
+	</div>
+
+      </div>
+
       <div class="room-details hidden" id="roomDiv">
 
 	<div class="hidden" id="waitingDiv">
@@ -421,6 +442,13 @@
         //updaterooms();
       }
 
+      socket.on('pausegame', function(){
+	  $('#GameView').addClass('hidden');
+	  $('#VotingBooth').addClass('hidden');
+	  $('#RoomSetup').removeClass('hidden');
+	  $('#pauseDiv').removeClass('hidden');
+      });
+
       //received after creating or joining a room
       socket.on('deckdata',function(data){
         deckData = data;
@@ -447,7 +475,7 @@
           $('#roomresult').text('Room created!');
           username = data.playerName;
           $('#roomLink').text(data.link);
-          $('#roomURL').val(data.link);
+          $('#roomURL').add('#pauseRoomURL').val(data.link);
           $('#createDiv').hide();
           $('#roomDiv').show();
           $('#startDiv').hide();
@@ -490,7 +518,7 @@
           $('#joinDiv').hide();
           $('#roomDiv').show();
           $('#startDiv').hide();
-          $('#roomURL').val(data.link);
+          $('#roomURL').add('#pauseRoomURL').val(data.link);
           username = data.playerName;
 	  socket.emit('requestroomdata',data.roomName);
 	  if(data.waiting){
@@ -511,8 +539,6 @@
       socket.on('leaveresult',function(data){
         if(data.success){
           username = false;
-          $('#roommembers').empty();
-          $('#roommembers').text('Not in a room yet');
           $('#roomDiv').hide();
           $('#orderDiv').hide();
           $('#statementsDiv').hide();
@@ -524,10 +550,13 @@
 
       //received whenever someone in the current room leaves or joins
       socket.on('updatecurrentroom', function(data){
-        var $toChange = $('#joinRoomMembers');
+	//this is so lazy
+        var $toChange = $('#joinRoomMembers').add('#pauseRoomMembers').add('#detailsRoomMembers');
+	/*
 	if($('#joinDiv').is(':hidden')){
 	  $toChange = $('#detailsRoomMembers');
 	}
+	*/
         $toChange.empty();
         playerList = data.players;
 
@@ -541,9 +570,11 @@
         }
         if(data.leader == username){
           $('#leaderControls').show();
+	  $('#restartOption').removeClass('hidden');
         }
         else{
           $('#leaderControls').hide();
+	  $('restartOption').addClass('hidden');
         }
       });
 
@@ -641,8 +672,13 @@
         $('#orderDiv').show();
         if(data > 0){
           var playersDone = playerList.length - data;
-          for(var i = 1; i <= playersDone; i++){
-            $('#player' + i).addClass('completed');
+          for(var i = 1; i <= 8; i++){
+	    if(i <= playersDone){
+	      $('#player' + i).addClass('completed');
+	    }
+	    else{
+	      $('#player' + i).removeClass('completed');
+	    }
           }
         }
         else{

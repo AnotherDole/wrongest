@@ -65,7 +65,7 @@ function gameRoom(name, leaderName,UID){
 	this.leader = new gamePlayer(leaderName,UID);
 	this.players = [this.leader];
 	this.waiting = [];
-	this.dealer = null;
+	this.dealer = this.leader;
 	this.gameState = GAME_NOT_STARTED;
 	this.votesReceived = 0;
 	this.masterDeck = null;
@@ -319,6 +319,25 @@ exports.leaveRequest = function(playerName,roomName){
 	return toReturn;
 }
 
+exports.pauseGame = function(roomName){
+	var thePlayer, theCard;
+	var theRoom = rooms[roomName];
+	theRoom.gameState = GAME_PAUSED;
+	theRoom.votesReceived = 0;
+	for(var i = 0; i < theRoom.players.length; i++){
+		thePlayer = theRoom.players[i];
+		thePlayer.voted = false;
+		theCard = thePlayer.card;
+		theCard.mostVotes = 0;
+		theCard.leastVotes = 0;
+		theCard.inPlay = false;
+		thePlayer.card = null;
+	}
+	while(theRoom.waiting.length > 0){
+		theRoom.players.push(theRoom.waiting.shift());
+	}
+}
+
 //playerName requests to start roomName with given options
 exports.startRequest = function(playerName,roomName,options){
 	var theRoom = rooms[roomName];
@@ -333,7 +352,7 @@ exports.startRequest = function(playerName,roomName,options){
 	if(theRoom.leader != thePlayer){
 		return {success: false, message: "You are not the leader of your current room."};
 	}
-	if(theRoom.players.length < 3){
+	if(theRoom.players.length < MIN_PLAYERS){
 		return {success: false, message: "You need 3 players to play this game."};
 	}
 	if(theRoom.gameState != GAME_NOT_STARTED){
@@ -360,6 +379,20 @@ exports.startRequest = function(playerName,roomName,options){
 	console.log(theRoom.name + " has started playing with deck "+ options["deckName"]);
 	initializeGame(theRoom,options["deckName"]);
 	return {success: true, theRoom:theRoom.name};
+}
+
+exports.canRestartGame = function(playerName,roomName){
+	var theRoom = rooms[roomName];
+	if(theRoom == null) return false;
+	if(theRoom.gameState != GAME_PAUSED) return false;
+	if(theRoom.players.length < MIN_PLAYERS) return false;
+
+	var thePlayer = getPlayer(theRoom,playerName,false);
+	if(thePlayer == null) return false;
+	if(theRoom.leader != thePlayer) return false;
+
+	theRoom.gameState = GAME_BETWEEN_ARGUMENTS;
+	return true;
 }
 
 //return an object containing all the the statements
