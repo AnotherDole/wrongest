@@ -377,8 +377,8 @@
 
       $('#SubmitVotes').click(function() {
 	  socket.emit('playervotes',
-		      $('input[value="LeastWrong"]:checked').attr('name'),
-		      $('input[value="MostWrong"]:checked').attr('name'));
+		      $('input[value="MostWrong"]:checked').attr('name'),
+		      $('input[value="LeastWrong"]:checked').attr('name'));
       });
 
     //location.reload();
