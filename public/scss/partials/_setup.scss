@@ -29,12 +29,12 @@
   button { padding: 0.25em 0.75em; font-size: 2em; }
 }
 
-.room-details { margin-top: 5vh;
+.room-details, .pause-screen { margin-top: 5vh;
   .lobby-box { margin-bottom: 5vh; }
   figure {
     figcaption { font-weight: 100; text-transform: lowercase; color:$yellow; line-height:95%; }
     //#roomLink { background-color:$white; color:$blue; border:1px solid black; padding: 0.25em; text-align: center; }
-    #roomURL { display: block; width: 100%; text-align: center; padding: 0.25em; border:2px solid $blue; color:$blue; font-size:6vw; }
+    input[type=url] { display: block; width: 100%; text-align: center; padding: 0.25em; border:2px solid $blue; color:$blue; font-size:6vw; }
   }
   
   .players { font-size: 6vw; padding-top: 1em; padding-bottom: 1em;
