@@ -21,53 +21,11 @@
           <button  id='createroombutton' onclick='createroom();'>CREATE game</button>
         </div>
         
-        <!-- 
-        <button id='pickCreate' onclick='showCreate();'>
-          <span class="big">CREATE</span>
-          <span class="small">game</span>
-        </button> -->
-        
       </div>
-
-      <!-- <div class="create-screen hidden" id = 'createDiv'>
-        <div class="inputs">
-          <div class="username row">
-            <div class="input-holder">
-              <input type="text" id='createUsernameInput' maxlength="50" placeholder="Your Name">
-            </div>
-            <div class="icon">
-              <i class="fa fa-user"></i>
-            </div>
-          </div>
-          <div class="roomname row">
-            <div class="input-holder">
-              <input type='text' id='createRoomNameInput' maxlength='50' placeholder="Room Name">
-            </div>
-            <div class="icon">
-              <i class="fa fa-home"></i>
-            </div>
-          </div>
-          <div class="password row">
-            <div class="input-holder">
-              <input type='text' id='createPasswordInput' maxlength='50' placeholder="(no password)">
-            </div>
-            <div class="icon">
-              <i class="fa fa-unlock"></i>
-            </div>
-          </div>
-          <div class="button-holder">
-            <button id='createroombutton' onclick='createroom();'>Create New Room</button>
-          </div>
-          <div id='createResult'></div>
-        </div>
-      </div> -->
 
       <div class="join-screen hidden" id="joinDiv">
         <div class="room-details">
           <ol class="players" id='joinRoomMembers'>Not in a room yet.</ol>
-          <!--<div class="button-holder">
-            <button id='leaveroom' onclick='leaveroom();'>Leave Current Room</button>
-          </div> -->
         </div>
         <div class="inputs">
           <div class="username row">
@@ -79,27 +37,6 @@
               <i class="fa fa-user"></i>
             </div>
           </div>
-	  <!--
-          <div class="roomname row">
-            <div class="input-holder">
-              <select id='roomselector'>
-                <option disabled selected="selected">Select Room</option>
-                <option value="refresh-rooms">---update rooms---</option>
-              </select>
-            </div>
-            <div class="icon">
-              <i class="fa fa-home"></i>
-            </div>
-          </div>
-          <div class="password row">
-            <div class="input-holder">
-              <input type="text" id='joinPasswordInput' maxlength="50" placeholder="(no password)">
-            </div>
-            <div class="icon">
-              <i class="fa fa-key"></i>
-            </div>
-          </div>
-	  -->
         </div>
         <div class="button-holder">
           <button type="submit" id='joinroombutton' onclick='joinroom();'>JOIN!</button>
