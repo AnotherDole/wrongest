@@ -1,7 +1,8 @@
-button { cursor: pointer; background-color:$yellow; border:none; outline: none;
-  &:not(:disabled) {
-    &:hover { background-color:lighten($yellow,20%); }
-    &:active { box-shadow:inset .1em .1em .2em darken($yellow,20%); }
+button { cursor: pointer; background-color:$blue; border:none; outline: none;
+  color:$white; text-shadow: 0.03em 0.03em 0.06em $black;
+  &:not(:disabled) { @include transition(all, 0.1s);
+    &:hover { background-color:saturate($blue,20%); }
+    &:active { background-color:$blue; box-shadow:inset .1em .1em .2em darken($blue,60%); text-shadow:0.06em 0.06em 0.12em $black; }
   }
   &:disabled { background-color:$grey; cursor: not-allowed; }
 }
