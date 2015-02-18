@@ -22,3 +22,8 @@ $('#roomURL').focus(function() {
   $(this).select();
 });
 
+$('.settings-toggle').click(function() {
+  $(this).toggleClass('expanded');
+  $(this).children('.fa').toggleClass('spin');
+  $('#leaderControls').toggleClass('hidden visible');
+});

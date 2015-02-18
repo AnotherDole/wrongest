@@ -75,22 +75,18 @@
 }
 
 
-@mixin animation ($name, $duration, $iteration:1, $delay:0) {
+@mixin animation ($name, $duration, $iteration:1, $timing:ease, $delay:0) {
     -webkit-animation-name: $name;
     -webkit-animation-duration: $duration;
     -webkit-animation-iteration-count: $iteration;
+    -webkit-animation-timing-function: $timing;
     -webkit-animation-delay:$delay;
     -webkit-animation-fill-mode: forwards; /* this prevents the animation from restarting! */
- 
-    -moz-animation-name: $name;
-    -moz-animation-duration: $duration;
-    -moz-animation-iteration-count: $iteration;
-    -moz-animation-delay:$delay;
-    -moz-animation-fill-mode: forwards; /* this prevents the animation from restarting! */
  
     animation-name: $name;
     animation-duration: $duration;
     animation-iteration-count: $iteration;
+    animation-timing-function: $timing;
     animation-delay:$delay;
     animation-fill-mode: forwards; /* this prevents the animation from restarting! */
 }

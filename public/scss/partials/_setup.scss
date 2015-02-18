@@ -1,28 +1,14 @@
-.setup { background-color:$black; color: $white; }
-
-/**
-.create-or-join { display: table; width:100%; margin-top: 2em;
-  button { width:50%; display: table-cell; height:40vh; font-size:4vw;
-    > span { display: block; }
-    .big { font-size:6vw; font-weight: $bold; }
-    .small { font-size:4vw; font-weight: 400; }
-  }
-}
-**/
+.setup { background-color:$black; color: $white; position: relative; }
 
 .starting-screen {
-  .game-explanation { font-size:5vw; text-align: center; padding-top: 1em; padding-bottom: 1em;}
-  input { font-size: 7vw; padding: 0.4em; margin-bottom: 1em; }
+  .game-explanation { text-align: center; padding-top: 1em; padding-bottom: 1em;}
+  input { padding: 0.4em; margin-bottom: 1em; display: block; width: 100%; font-size: 2em; }
   button { font-size:7vw; display: block; width: 100%; padding:0.4em; }
 }
 
 .create-screen { margin-top: 10vh; }
-.inputs { display: table; width: 100%; font-size:4vw;
-  .row { display: table-row; }
-  .input-holder { display: table-cell; padding-bottom:3vh;
-    input, select { width: 100%; padding:0.25em 0.75em; font-size:5vw; }
-  }
-  .icon { display: table-cell; padding-left: 1em; font-size:5vw;  padding-bottom:3vh; }
+.inputs { width: 100%;
+  input:not(.hidden) { width: 100%; font-size:2em; margin-bottom: 1em; padding: 0.25em 0.5em; }
 }
 
 .button-holder { text-align: center;
@@ -34,18 +20,42 @@
   figure {
     figcaption { font-weight: 100; text-transform: lowercase; color:$yellow; line-height:95%; }
     //#roomLink { background-color:$white; color:$blue; border:1px solid black; padding: 0.25em; text-align: center; }
-    input[type=url] { display: block; width: 100%; text-align: center; padding: 0.25em; border:2px solid $blue; color:$blue; font-size:6vw; }
+    input[type=url] { display: block; width: 100%; text-align: center; padding: 0.25em; border:2px solid $blue; color:$blue; font-size:1.3em; }
   }
   
-  .players { font-size: 6vw; padding-top: 1em; padding-bottom: 1em;
+  .players { font-size:1.5em; padding-top: 1em; padding-bottom: 1em;
     li.leader {
       &:after { content:' (leader)'; }
     }
   }
+  
+  .settings-toggle { text-align:right; position: absolute; right:1vw; bottom:1vh; left:1vw; @include transition();
+    .fa { font-size:4em;
+      &.spin { @include animation(rotate, 4s, infinite, linear); }
+    }
+    &.expanded { @include translateY(-220px); }
+  }
+  
 }
 
-.admin-options {
+.admin-options { 
   li { padding-bottom: 0.5em; }
   label { display: block; }
   select { display: block; width: 100%; }
+}
+
+#leaderControls { position: absolute; right:1vw; bottom:1vh; left:1vw; overflow: hidden; @include transition();
+  &.hidden { height:1px; }
+  &.visible { height: 220px; }
+}
+
+
+@keyframes rotate {
+  0% { @include rotate(0); }
+100% { @include rotate(360deg); }
+}
+
+@-webkit-keyframes rotate {
+  0% { @include rotate(0); }
+100% { @include rotate(360deg); }
 }

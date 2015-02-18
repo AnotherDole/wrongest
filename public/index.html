@@ -29,13 +29,8 @@
         </div>
         <div class="inputs">
           <div class="username row">
-            <div class="input-holder">
-              <input type='text' id='joinUsernameInput' maxlength='50' placeholder="Your Name">
-	      <input type='text' id='joinRoomName' class='hidden'>
-            </div>
-            <div class="icon">
-              <i class="fa fa-user"></i>
-            </div>
+            <input type='text' id='joinUsernameInput' maxlength='50' placeholder="Your Name">
+            <input type='text' id='joinRoomName' class='hidden'>
           </div>
         </div>
         <div class="button-holder">
@@ -81,7 +76,16 @@
           <!-- <button id='leaveroom' onclick='leaveroom();'>Leave Current Room</button> -->
         </div>
         
-        <ul class="admin-options" id="leaderControls" style="display:none;">
+        <div class="button-holder admin-options">
+          <button id='startgamebutton' onclick='startgame();'>Start Game</button>
+        </div>
+        
+        <div class="settings-toggle admin-options">
+          <span>settings</span>
+          <i class="fa fa-cog"></i>
+        </div>
+        
+        <ul class="admin-options hidden" id="leaderControls" style="display:none;">
           <li class="option">
             <label for="deck"><span>Deck:</span></label>
             <select id='deck' onchange='updateDeckDescription();'></select>
@@ -108,9 +112,6 @@
               <option value='last'>Last</option>
               <option value='first'>First</option>
             </select>
-          </li>
-          <li class="button-holder">
-            <button id='startgamebutton' onclick='startgame();'>Start Game</button>
           </li>
           <li id='startresult'></li>
         </ul>
@@ -506,11 +507,11 @@
           }
         }
         if(data.leader == username){
-          $('#leaderControls').show();
+          $('.admin-options').show();
 	  $('#restartOption').removeClass('hidden');
         }
         else{
-          $('#leaderControls').hide();
+          $('.admin-options').hide();
 	  $('restartOption').addClass('hidden');
         }
       });
