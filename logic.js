@@ -10,6 +10,8 @@ var hashids = new Hashids(Math.random().toString());
 var rooms = {}, decks = {}, deckData = {};
 var gamesCreated = 0;
 
+var ROUND_LIMIT = 5;
+
 var MIN_PLAYERS = 3;
 var MAX_PLAYERS = 8;
 
@@ -401,6 +403,11 @@ exports.canRestartGame = function(playerName,roomName){
 exports.getStatements = function(roomName){
 	//eventually check that this makes sense
 	var theRoom = rooms[roomName];
+
+	if(theRoom.round > ROUND_LIMIT){
+		return false;
+	}
+
 	var result = {};
 	var i,selected, theCard, thePlayer,possible;
 	//the strategy: find all possible cards for that player
