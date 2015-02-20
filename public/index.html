@@ -608,9 +608,6 @@
           $('#sourceDiv').empty().text(myStatement.source);
           $('#cardScoreDiv').empty().text('Score: ' + myStatement.score);
         }	
-        else{
-          meDefending = false;
-        }
         //alert(time);
         clock.setTime(time);
         $('.clock-holder').removeClass('hidden');
@@ -621,6 +618,7 @@
       function donedefend(){
         $('#defendDiv').hide();
         socket.emit('donedefending');
+	meDefending = false;
       }
 
       //received when anyone in the room says they are done defending

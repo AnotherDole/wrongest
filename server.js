@@ -72,7 +72,10 @@ function leaveOrDisconnect(result){
 	if(result.newNeeded == 0){
 		logic.prepareForVotes(result.theRoom);
 	}
-	io.to(result.theRoom).emit('newdefendcount',result.newNeeded);
+	//if the person who left wasn't defending
+	if((result.duringArg && result.defenderLeft) || result.newNeeded == 0){
+		io.to(result.theRoom).emit('newdefendcount',result.newNeeded);
+	}
 	if(result.duringVote){
 		//For now, just call for a new vote
 		logic.prepareForVotes(result.theRoom);

@@ -299,9 +299,10 @@ exports.leaveRequest = function(playerName,roomName){
 		}
 	}
 	var toReturn = {success: true, roomDeleted: false, theRoom:theRoom.name, whoLeft: playerName, 
-		duringArg: false, newNeeded: -1, duringVote: false, duringGame:false};
+		duringArg: false, newNeeded: -1, duringVote: false, duringGame:false, defenderLeft:false};
 	if(theRoom.gameState == GAME_BETWEEN_ARGUMENTS || theRoom.gameState == GAME_SOMEONE_ARGUING){
 		toReturn.duringGame = true;
+		toReturn.duringArg = true;
 		thePlayer.card.inPlay = false;
 		if(thePlayer.voted){
 			theRoom.votesReceived--;
@@ -309,8 +310,8 @@ exports.leaveRequest = function(playerName,roomName){
 		toReturn.newNeeded = theRoom.players.length - theRoom.votesReceived;
 		//the player who left was defending
 		if(theRoom.gameState == GAME_SOMEONE_ARGUING && theRoom.whosUp == index){
-			toReturn.duringArg = true;
 			theRoom.gameState = GAME_BETWEEN_ARGUMENTS;
+			toReturn.defenderLeft = true;
 		}
 	}
 	else if (theRoom.gameState == GAME_WAITING_VOTES){
