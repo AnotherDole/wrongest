@@ -53,18 +53,22 @@ function leaveOrDisconnect(result){
 
 	var playerList = logic.getPlayersIn(result.theRoom);
 	if(!result.duringGame){
-		io.to(result.theRoom).emit('updatecurrentroom',playerList);
+		io.to(result.theRoom).emit('updatecurrentroom',playerList.players,playerList.leader,playerList.dealer);
 		return;
 	}
 	if(playerList.players.length <= 2){
 		logic.pauseGame(result.theRoom);
 		io.to(result.theRoom).emit('pausegame');
-		io.to(result.theRoom).emit('updatecurrentroom',logic.getPlayersIn(result.theRoom));
+		//this is necessary because waiting players may have been added
+		var newList = logic.getPlayersIn(result.theRoom);
+		io.to(result.theRoom).emit('updatecurrentroom',newList.players,newList.leader,newList.dealer);
 		return;
 	}
-	io.to(result.theRoom).emit('updatecurrentroom',logic.getPlayersIn(result.theRoom));
+	io.to(result.theRoom).emit('updatecurrentroom', playerList.players, playerList.leader, playerList.dealer);
+	/*
 	var newOrder = logic.getOrder(result.theRoom);
 	io.to(result.theRoom).emit('roundorder',newOrder.order,newOrder.dealer);
+	*/
 	if(result.newNeeded == 0){
 		logic.prepareForVotes(result.theRoom);
 	}
@@ -88,13 +92,14 @@ io.on('connection', function (socket){
 			result.link = 'http://' + server_address + '/' + result.roomName;
 			socket.emit('createresult',result);
 			socket.emit('deckdata',logic.getDeckData());
-			io.to(result.roomName).emit('updatecurrentroom',logic.getPlayersIn(result.roomName));
+			var blar = logic.getPlayersIn(result.roomName);
+			io.to(result.roomName).emit('updatecurrentroom',blar.players,blar.leader,blar.dealer);
 		}
 	});
 
 	socket.on('requestroomdata', function(roomName){
 		var result = logic.getPlayersIn(roomName);
-		socket.emit('updatecurrentroom',result);
+		socket.emit('updatecurrentroom',result.players,result.leader,result.dealer);
 	});
 
 	// data is requested room name
@@ -105,7 +110,8 @@ io.on('connection', function (socket){
 				//join socket.io room
 				socket.join(roomName);
 				//tell everyone in same room to update display
-				io.to(roomName).emit('updatecurrentroom',logic.getPlayersIn(roomName));
+				var blar = logic.getPlayersIn(roomName);
+				io.to(roomName).emit('updatecurrentroom',blar.players,blar.leader,blar.dealer);
 			}
 			//socket.emit('deckdata',logic.getDeckData());
 			socket.username = playerName;
@@ -136,7 +142,7 @@ io.on('connection', function (socket){
 		if(result.success){
 			getAndSendStatements(socket.roomName);
 			var order = logic.adjustOrder(socket.roomName);
-			io.to(socket.roomName).emit('roundorder',order['order'],order['dealer']);
+			io.to(socket.roomName).emit('updatecurrentroom',order.players,order.leader,order.dealer);
 		}
 	});
 
@@ -174,13 +180,14 @@ io.on('connection', function (socket){
 					for(var i = 0; i < result.socketsToAdd.length; i++){
 						io.sockets.connected[result.socketsToAdd[i]].join(socket.roomName);
 					}
-					io.to(socket.roomName).emit('updatecurrentroom',logic.getPlayersIn(socket.roomName));
+					var blar = logic.getPlayersIn(socket.roomName);
+					io.to(socket.roomName).emit('updatecurrentroom',blar.players,blar.leader,blar.dealer);
 				}
 				delete result.socketsToAdd;
 				io.to(socket.roomName).emit('roundend',result);
 				getAndSendStatements(socket.roomName);
 				var order = logic.adjustOrder(socket.roomName);
-				io.to(socket.roomName).emit('roundorder',order.order,order.dealer);
+				io.to(socket.roomName).emit('updatecurrentroom',order.players,order.leader,order.dealer);
 			}
 		}
 		else{
@@ -192,8 +199,8 @@ io.on('connection', function (socket){
 		var result = logic.canRestartGame(socket.username,socket.roomName);
 		if(result){
 			var order = logic.adjustOrder(socket.roomName);
-			io.to(socket.roomName).emit('roundorder',order.order,order.dealer);
-			io.to(socket.roomName).emit('newdefendcount',order.order.length);
+			io.to(socket.roomName).emit('updatecurrentroom',order.players,order.leader,order.dealer);
+			io.to(socket.roomName).emit('newdefendcount',order.players.length);
 			getAndSendStatements(socket.roomName);
 		}
 	});
@@ -219,7 +226,8 @@ io.on('connection', function (socket){
 			socket.roomName = testRoom;
 			socket.emit('deckdata',logic.getDeckData());
 			socket.join(testRoom);
-			io.to(testRoom).emit('updatecurrentroom',logic.getPlayersIn(testRoom));
+			var blar = logic.getPlayersIn(testRoom);
+			io.to(testRoom).emit('updatecurrentroom',blar.players,blar.leader,blar.dealer);
 		}	
 		else{
 			socket.emit('joinresult',logic.joinRequest('Player'+connected,socket.id,testRoom));
@@ -227,7 +235,8 @@ io.on('connection', function (socket){
 			socket.roomName = testRoom;
 			socket.emit('deckdata',logic.getDeckData());
 			socket.join(testRoom);
-			io.to(testRoom).emit('updatecurrentroom',logic.getPlayersIn(testRoom));
+			var blar = logic.getPlayersIn(testRoom);
+			io.to(testRoom).emit('updatecurrentroom',blar.players,blar.leader,blar.dealer);
 		}
 	}
 /***************** End code for testing ***************/

@@ -211,6 +211,7 @@ exports.getPlayersIn = function(roomName){
 	var toReturn = {success: true};
 	toReturn["roomName"] = roomName;
 	toReturn["leader"] = theRoom.leader.name;
+	toReturn["dealer"] = theRoom.dealer.name;
 	toReturn["players"] = [];
 	for(var i = 0; i < theRoom.players.length; i++){
 		toReturn["players"].push(theRoom.players[i].name);
@@ -442,6 +443,7 @@ exports.getStatements = function(roomName){
 	return result;
 }
 
+/*
 function generateOrder(theRoom){
 	var result = {};
 	result["dealer"] = theRoom.dealer.name;
@@ -451,9 +453,9 @@ function generateOrder(theRoom){
 	}
 	return result;
 }
+*/
 
 //adjust the play order for the given room
-//return the play order to dispense to the players
 exports.adjustOrder = function(roomName){
 	//shouldn't have to check this, only called by the server
 	var theRoom = rooms[roomName];
@@ -483,14 +485,15 @@ exports.adjustOrder = function(roomName){
 		}
 	}
 	theRoom.whosUp = 0;
-	//adjustments done, return the list;
-	return generateOrder(theRoom);
+	return exports.getPlayersIn(roomName);
 }
 
+/*
 //just get the order for a room
 exports.getOrder = function(roomName){
 	return generateOrder(rooms[roomName]);
 }
+*/
 
 //only called when there is a request to make someone defend
 exports.getWhosUp = function(roomName,playerName){

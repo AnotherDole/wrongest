@@ -234,20 +234,19 @@ socket.on('leaveresult',function(data){
 });
 
 //received whenever someone in the current room leaves or joins
-socket.on('updatecurrentroom', function(data){
+socket.on('updatecurrentroom', function(playerList, leader, dealer){
 	var $toChange = $('#roommembers');
 	$toChange.empty();
-	playerList = data.players;
 
 	$toChange.append('Currently in ' + data.roomName + ':<br>');
 	for (var i = 0; i < data.players.length; i++){
 		$toChange.append(data.players[i]);
-		if(data.players[i] == data.leader){
+		if(playersList[i] == leader){
 			$toChange.append(" (leader)");
 		}
 		$toChange.append("<br>");
 	}
-	if(data.leader == username){
+	if(leader == username){
 		$('#leaderControls').show();
 	}
 	else{

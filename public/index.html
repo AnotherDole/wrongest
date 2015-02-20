@@ -487,33 +487,51 @@
       });
 
       //received whenever someone in the current room leaves or joins
-      socket.on('updatecurrentroom', function(data){
+      socket.on('updatecurrentroom', function(players, leader, dealer){
+	playerList = players;
 	//this is so lazy
         var $toChange = $('#joinRoomMembers').add('#pauseRoomMembers').add('#detailsRoomMembers');
+	var $theDiv;
 	/*
 	if($('#joinDiv').is(':hidden')){
 	  $toChange = $('#detailsRoomMembers');
 	}
 	*/
         $toChange.empty();
-        playerList = data.players;
 
         $toChange.append('Currently in the room:');
-        for (var i = 0; i < data.players.length; i++){
-          if(data.players[i] == data.leader){
-            $toChange.append('<li class="leader">'+data.players[i]+'</li>');
+        for (var i = 0; i < players.length; i++){
+          if(players[i] == leader){
+            $toChange.append('<li class="leader">'+players[i]+'</li>');
           } else {
-            $toChange.append('<li>'+data.players[i]+'</li>');
+            $toChange.append('<li>'+players[i]+'</li>');
           }
+	  $theDiv = $('#player' + (i+1)).removeClass('hidden');
+	  $theDiv.empty().append(players[i]);
+	  if(players[i] == dealer){
+	    $theDiv.addClass('dealer');
+	  }
+	  else{
+	    $theDiv.removeClass('dealer');
+	  }
         }
-        if(data.leader == username){
+	for(var i = players.length+1; i <=8; i++){
+	  $('#player' + i).addClass('hidden');
+	}
+        if(leader == username){
           $('.admin-options').show();
 	  $('#restartOption').removeClass('hidden');
         }
         else{
           $('.admin-options').hide();
-	  $('restartOption').addClass('hidden');
+	  $('#restartOption').addClass('hidden');
         }
+        if(dealer == username){
+          $('#dealerControls').show();
+        }
+        else{
+          $('#dealerControls').hide();
+        }	
       });
 
       //Request to start the game. Only works if you are the leader of the room
@@ -549,6 +567,7 @@
         $('#orderDiv').show();
       });
 
+/*
       //Received at the start of a round
       //Includes the order for the current round and the dealer
       socket.on('roundorder', function(list,dealer){
@@ -572,6 +591,7 @@
           $('#player' + i).addClass('hidden');
         }
       });
+*/
 
       function makeDefend(){
         socket.emit('makedefend');
