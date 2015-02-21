@@ -72,14 +72,17 @@ function leaveOrDisconnect(result){
   if(result.newNeeded == 0){
     logic.prepareForVotes(result.theRoom);
   }
-  //if the person who left wasn't defending
+  //if the person who left was defending
   if((result.duringArg && result.defenderLeft) || result.newNeeded == 0){
-    io.to(result.theRoom).emit('newdefendcount',result.newNeeded);
+    io.to(result.theRoom).emit('newdefendcount',result.newNeeded,true);
+  }
+  else{
+    io.to(result.theRoom).emit('newdefendcount',result.newNeeded,false);
   }
   if(result.duringVote){
     //For now, just call for a new vote
     logic.prepareForVotes(result.theRoom);
-    io.to(result.theRoom).emit('newdefendcount',0);
+    io.to(result.theRoom).emit('newdefendcount',0,false);
   }
 }
 
@@ -160,7 +163,7 @@ io.on('connection', function (socket){
     var result = logic.doneDefending(socket.roomName, socket.username);
     if(result.success){
       //tell everyone in room new votesNeeded
-      io.to(socket.roomName).emit('newdefendcount',result.votesNeeded);
+      io.to(socket.roomName).emit('newdefendcount',result.votesNeeded,true);
       if(result.votesNeeded <= 0){
 	logic.prepareForVotes(socket.roomName);
       }
@@ -203,7 +206,7 @@ io.on('connection', function (socket){
     if(result){
       var order = logic.adjustOrder(socket.roomName);
       io.to(socket.roomName).emit('updatecurrentroom',order.players,order.leader,order.dealer);
-      io.to(socket.roomName).emit('newdefendcount',order.players.length);
+      io.to(socket.roomName).emit('newdefendcount',order.players.length,true);
       getAndSendStatements(socket.roomName);
     }
   });

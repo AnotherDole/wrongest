@@ -306,6 +306,7 @@ exports.leaveRequest = function(playerName,roomName){
     thePlayer.card.inPlay = false;
     if(thePlayer.voted){
       theRoom.votesReceived--;
+      theRoom.whosUp--;
     }
     toReturn.newNeeded = theRoom.players.length - theRoom.votesReceived;
     //the player who left was defending

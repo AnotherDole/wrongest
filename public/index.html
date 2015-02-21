@@ -623,11 +623,13 @@
 
       //received when anyone in the room says they are done defending
       //data is the # of people who are not done
-      socket.on('newdefendcount',function(data){
-	clock.stop();
+      socket.on('newdefendcount',function(newCount,stopClock){
+	if(stopClock){
+	  clock.stop();
+	}
         $('#orderDiv').show();
-        if(data > 0){
-          var playersDone = playerList.length - data;
+        if(newCount > 0){
+          var playersDone = playerList.length - newCount;
           for(var i = 1; i <= 8; i++){
 	    if(i <= playersDone){
 	      $('#player' + i).addClass('completed');
