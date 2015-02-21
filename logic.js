@@ -146,7 +146,7 @@ function isValidName(name){
 	if (name.length < 1 || name.length > 50){
 		return false;
 	}
-	if(/[^A-Za-z0-9 ]/.test(trimPlayer)){
+	if(/[^A-Za-z0-9 ]/.test(name)){
 		return false; 
 	}
 	return true;
