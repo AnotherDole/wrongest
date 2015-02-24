@@ -2,10 +2,15 @@ var express = require('express');
 var app = express();
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);
-var logic = require('./logic.js');
 var port = process.env.OPENSHIFT_NODEJS_PORT || 3000;
 var server_ip_address = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1';
 var server_address = process.env.OPENSHIFT_APP_DNS || ('localhost:'+port);
+
+var redis = require('redis');
+var client = redis.createClient();
+
+var logic = require('./logic.js');
+logic.setClient(client);
 
 /************** Variables for testing **********/
 var connected = 0,playing=0;
@@ -17,20 +22,20 @@ if(process.argv[2] == 'test'){
 }
 /************** End testing variables *********/
 
-
 server.listen(port,server_ip_address, function(){
   console.log('Server listening on ' + server_ip_address + ' on port ' + port);
 });
 
 app.use(express.static(__dirname + '/public'));
 app.get('/:id',function(req,res){
-  if(logic.roomExists(req.params.id)){
-    //	res.location('../'+req.params.id);
-    res.sendFile(__dirname + '/public/index.html');
-  }
-  else{
-    res.redirect('../error.html');
-  }
+  logic.roomExists(req.params.id,function(err,data){
+    if(data == true){
+      res.sendFile(__dirname + '/public/index.html');
+    }
+    else{
+      res.redirect('../error.html');
+    }
+  })
 });
 
 //call logic to assign statements to everyone
@@ -89,42 +94,47 @@ function leaveOrDisconnect(result){
 io.on('connection', function (socket){
   //data is the requested room name
   socket.on('createroom', function(playerName){
-    var result = logic.createRoom(playerName, socket.id);
-    if(result.success){
-      //join the socket.io room
-      socket.username = result.playerName;
-      socket.roomName = result.roomName;
-      socket.join(result.roomName);
-      result.link = 'http://' + server_address + '/' + result.roomName;
-      socket.emit('createresult',result);
-      socket.emit('deckdata',logic.getDeckData());
-      var blar = logic.getPlayersIn(result.roomName);
-      io.to(result.roomName).emit('updatecurrentroom',blar.players,blar.leader,blar.dealer);
-    }
+    logic.createRoom(playerName, socket.id,function(err,result){
+      if(!err){
+	//join the socket.io room
+	socket.username = result.playerName;
+	socket.roomName = result.roomName;
+	socket.join(result.roomName);
+	result.link = 'http://' + server_address + '/' + result.roomName;
+	socket.emit('createresult',result);
+	socket.emit('deckdata',logic.getDeckData());
+	var blar = logic.getPlayersIn(result.roomName,function(err,blar){;
+	  io.to(result.roomName).emit('updatecurrentroom',blar.players,blar.leader,blar.dealer);
+	});
+      }
+    });
   });
 
   socket.on('requestroomdata', function(roomName){
-    var result = logic.getPlayersIn(roomName);
-    socket.emit('updatecurrentroom',result.players,result.leader,result.dealer);
+    logic.getPlayersIn(roomName, function(err,result){
+      socket.emit('updatecurrentroom',result.players,result.leader,result.dealer);
+    });
   });
 
   // data is requested room name
   socket.on('requestjoin', function(playerName,roomName){
-    var result = logic.joinRequest(playerName, socket.id, roomName);
-    if (result.success){
-      if(!result.waiting){
-	//join socket.io room
-	socket.join(roomName);
-	//tell everyone in same room to update display
-	var blar = logic.getPlayersIn(roomName);
-	io.to(roomName).emit('updatecurrentroom',blar.players,blar.leader,blar.dealer);
+    logic.joinRequest(playerName, socket.id, roomName,function(err,result){
+      if (result.success){
+	if(!result.waiting){
+	  //join socket.io room
+	  socket.join(roomName);
+	  //tell everyone in same room to update display
+	  logic.getPlayersIn(roomName,function (err,blar){
+	    io.to(roomName).emit('updatecurrentroom',blar.players,blar.leader,blar.dealer);
+	  });
+	}
+	//socket.emit('deckdata',logic.getDeckData());
+	socket.username = playerName;
+	socket.roomName = roomName;
+	result.link = 'http://' + server_address + '/' + result.roomName;
       }
-      //socket.emit('deckdata',logic.getDeckData());
-      socket.username = playerName;
-      socket.roomName = roomName;
-      result.link = 'http://' + server_address + '/' + result.roomName;
-    }
-    socket.emit('joinresult',result);
+      socket.emit('joinresult',result);
+    });
   });
 
   //data isn't necessary 

@@ -8,6 +8,7 @@ var Hashids = require('hashids');
 var hashids = new Hashids(Math.random().toString());
 
 var rooms = {}, decks = {}, deckData = {};
+var client = null;
 var gamesCreated = 0;
 
 var ROUND_LIMIT = 5;
@@ -152,42 +153,71 @@ function isValidName(name){
   return true;
 }
 
+function playerDataKey(roomName,playerName){
+  return 'player:data:'+roomName+':'+playerName;
+}
+
+function playerPreviousKey(roomName,playerName){
+  return 'player:previous:'+roomName+':'+playerName;
+}
+
+function roomDataKey(roomName){
+  return 'room:data:'+roomName;
+}
+
+function roomPlayersKey(roomName){
+  return 'room:players:'+roomName;
+}
+
+function roomWaitingKey(roomName){
+  return 'room:waiting:'+roomName;
+}
+
+function roomLeaversKey(roomName,userName){
+  return 'room:leavers:'+roomName+':'+userName;
+}
+
 exports.getDeckData = function(){
   return deckData;
 }
 
-exports.roomExists = function(roomName){
-  return (rooms[roomName] != null);
+exports.roomExists = function(roomName,callback){
+  client.exists(roomDataKey(roomName),callback);
+}
+
+exports.setClient = function(newClient){
+  client = newClient;
 }
 
 //Create a new room. playerID is the requestor, name is requested name
-exports.createRoom = function(playerName,UID){
+exports.createRoom = function(playerName,UID,callback){
   if(playerName == null){
     return {success: false, message: "Please enter a name."};
   }
-  trimPlayer = playerName.trim();
+  var trimPlayer = playerName.trim();
   if(!isValidName(trimPlayer)){
     return {success: false, message: "Invalid name."};
   }
-  //check if room name already exists
-  var trimRoom, keep = true;
-  /* Actually a miracle should never occur?
-     while(keep){
-     gamesCreated++;
-     trimRoom = hashids.encode(gamesCreated + 1000000000);
-  //Actually, a miracle should never occur?
-  /*
-  if(rooms[trimRoom] == null){
-  //if a miracle occurs, get another id
-  keep = false;
-  }
-  }
-  */
-  gamesCreated++;
-  trimRoom = hashids.encode(gamesCreated + 1000000000);
-  rooms[trimRoom] = new gameRoom(trimRoom,trimPlayer,UID);
-  console.log("Created room " + trimRoom + " with leader " + trimPlayer);
-  return {success: true, roomName:trimRoom, playerName: trimPlayer};
+
+  client.incr('roomsCreated', function(err, data) {
+    if(err){
+      return callback(true,null);
+    }
+    var roomName = hashids.encode(data + 1000000000);
+    client.multi()
+      .hmset([playerDataKey(roomName,trimPlayer),'uid',UID,'score',0,'card',-1,'voted',0])
+      .hmset([roomDataKey(roomName),'leader',trimPlayer,'dealer',trimPlayer,'gameState',GAME_NOT_STARTED,
+		'votesReceived',0,'masterDeck','','timeLimit',-1,'allowRedraw',-1,'dealerFirst',-1,
+		'whosUp',-1,'round',0])
+      .rpush([roomPlayersKey(roomName),trimPlayer])
+      .exec(function (err, data){
+	if(err){
+	  return callback(true,null)
+	}
+	console.log("Created room " + roomName + " with leader " + trimPlayer);
+	callback(null, {success: true, roomName:roomName, playerName: trimPlayer});
+      });
+  });
 }
 
 //Returns object describing current rooms
@@ -203,24 +233,66 @@ exports.createRoom = function(playerName,UID){
    */
 
 //Returns object with array of player names and the leader
-exports.getPlayersIn = function(roomName){
-  var theRoom = rooms[roomName];
-  if(theRoom == null){
-    return {success: false, message:"That room doesn't exist."};
-  }
-  var toReturn = {success: true};
-  toReturn["roomName"] = roomName;
-  toReturn["leader"] = theRoom.leader.name;
-  toReturn["dealer"] = theRoom.dealer.name;
-  toReturn["players"] = [];
-  for(var i = 0; i < theRoom.players.length; i++){
-    toReturn["players"].push(theRoom.players[i].name);
-  }
-  return toReturn; 
+exports.getPlayersIn = function(roomName, callback){
+  client.multi()
+    .hmget([roomDataKey(roomName),'leader','dealer'])
+    .lrange([roomPlayersKey(roomName),0,-1])
+    .exec(function(err, data){
+      if(err){
+	return callback(err,null);
+      }
+      var toReturn = {};
+      toReturn.success = true;
+      toReturn.leader = data[0][0];
+      toReturn.dealer = data[0][1];
+      toReturn.players = data[1];
+      callback(null,toReturn);
+    });
 }
 
 //playerName requests to join roomName
-exports.joinRequest = function(playerName,UID, roomName){
+exports.joinRequest = function(playerName,UID, roomName,callback){
+  var trimPlayer = playerName.trim();
+  if(!isValidName(trimPlayer)){
+    return callback("Invalid name.",null);
+  }
+
+  client.exists(roomDataKey(roomName),function(err, data){
+    if(data == false){
+      return callback(null,{success:false,message:'Room does not exist.'});
+    }
+    client.multi()
+      .lrange(roomPlayersKey(roomName),0,-1)
+      .lrange(roomWaitingKey(roomName),0,-1)
+      .hget(roomDataKey(roomName),'gameState')
+      .get(roomLeaversKey(roomName,trimPlayer))
+      .exec(function(err, data){
+	var currentPlayers = data[0];
+	var waitingPlayers = data[1];
+	var gameState = parseInt(data[2]);
+	var previousScore = data[3];
+	previousScore = (previousScore == null ? 0 : parseInt(previousScore));
+	if(currentPlayers.length + waitingPlayers.length >= MAX_PLAYERS){
+	  return callback(null,{success:false, message:'Room is full'});
+	}
+	if((currentPlayers.indexOf(trimPlayer) != -1) || (waitingPlayers.indexOf(trimPlayer) != -1)){
+	  return callback(null,{success:false, message:'That name is already taken.'});
+	}
+	client.hmset(playerDataKey(roomName,trimPlayer),'uid',UID,'score',previousScore,'card',-1,'voted',0,function(err,data){
+	  if(gameState > GAME_NOT_STARTED){
+	    client.rpush(roomWaitingKey(roomName),trimPlayer,function(err,data){
+	      callback(null,{success: true,waiting: true, roomName: roomName, playerName:trimPlayer});
+	    });
+	  }
+	  else{
+	    client.rpush(roomPlayersKey(roomName),trimPlayer,function(err,data){
+	      callback(null,{success: true, waiting: false, roomName: roomName, playerName:trimPlayer});
+	    });
+	  }
+	});	  
+      })
+  })
+/*
   var theRoom = rooms[roomName];
   //check if room exits. this should just be for safety.
   if (theRoom == null){
@@ -229,13 +301,6 @@ exports.joinRequest = function(playerName,UID, roomName){
   //full room
   if ((theRoom.players.length + theRoom.waiting.length) >= MAX_PLAYERS){
     return {success: false, message:"That room is full."};
-  }
-  if(playerName == null){
-    return {success: false, message: "Please enter a name."};
-  }
-  var trimPlayer = playerName.trim();
-  if(!isValidName(trimPlayer)){
-    return {success: false, message: "Invalid name."};
   }
   if(getPlayer(theRoom,trimPlayer,true) != null){
     return {success: false, message:"Someone in that room already has that name."};
@@ -256,6 +321,7 @@ exports.joinRequest = function(playerName,UID, roomName){
     console.log(playerName + " joined room " + theRoom.name);
     return {success: true, waiting: false, roomName: roomName, playerName:trimPlayer};
   }
+*/
 }
 
 //playerName requests to leave their current room
