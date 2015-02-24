@@ -174,12 +174,9 @@ exports.setClient = function(newClient){
 
 //Create a new room. playerID is the requestor, name is requested name
 exports.createRoom = function(playerName,UID,callback){
-  if(playerName == null){
-    return {success: false, message: "Please enter a name."};
-  }
   var trimPlayer = playerName.trim();
   if(!isValidName(trimPlayer)){
-    return {success: false, message: "Invalid name."};
+    return callback(null,{success: false, message: "Invalid name."});
   }
 
   client.incr('roomsCreated', function(err, data) {
@@ -197,7 +194,7 @@ exports.createRoom = function(playerName,UID,callback){
 	if(err){
 	  return callback(true,null)
 	}
-	console.log("Created room " + roomName + " with leader " + trimPlayer);
+	//console.log("Created room " + roomName + " with leader " + trimPlayer);
 	callback(null, {success: true, roomName:roomName, playerName: trimPlayer});
       });
   });
@@ -225,7 +222,7 @@ exports.getPlayersIn = function(roomName, callback){
 exports.joinRequest = function(playerName,UID, roomName,callback){
   var trimPlayer = playerName.trim();
   if(!isValidName(trimPlayer)){
-    return callback("Invalid name.",null);
+    return callback(null,{success:false,message:'Invalid name'});
   }
 
   client.exists(roomDataKey(roomName),function(err, data){
@@ -285,17 +282,17 @@ exports.leaveRequest = function(playerName,roomName){
     return {success: true, fromWaiting: true};
   }
   theRoom.players.splice(index,1);
-  console.log(playerName + " left room " + theRoom.name);
+  //console.log(playerName + " left room " + theRoom.name);
   //no one left in room, so delete it
   if(theRoom.players.length == 0){
-    console.log(theRoom.name + " was deleted");
+    //console.log(theRoom.name + " was deleted");
     delete rooms[roomName];
     return {success: true, roomDeleted: true};
   }
   //need to find new leader
   if(theRoom.leader == thePlayer){
     theRoom.leader = theRoom.players[Math.floor(Math.random() * theRoom.players.length)];
-    console.log(theRoom.leader.name + " is the new leader");
+    //console.log(theRoom.leader.name + " is the new leader");
   }
   if(theRoom.dealer == thePlayer){
     if(theRoom.dealerFirst){
@@ -613,7 +610,7 @@ exports.getWinner = function(roomName){
       wCard = theCard.masterCard.quote;
     }
   }
-  console.log("Game in " + roomName + " is over.");
+  //console.log("Game in " + roomName + " is over.");
   return {player: wPlayer, playerScore: playerScore, card: wCard, cardScore: cardScore};
 }
 
@@ -642,7 +639,7 @@ exports.doneDefending = function(roomName,playerName){
   thePlayer.voted = true;
   theRoom.votesReceived++;
   theRoom.whosUp++;
-  console.log(playerName + " is done defending");
+  //console.log(playerName + " is done defending");
   return {success:true, roomName:theRoom.name, votesNeeded: (theRoom.players.length - theRoom.votesReceived)};
 }
 
@@ -689,7 +686,7 @@ exports.processVote = function(roomName,playerName,mostWrong,leastWrong){
   thePlayer.voted = true;
   theRoom.votesReceived++;
   var votesNeeded = theRoom.players.length - theRoom.votesReceived;
-  console.log("Player " + thePlayer.name + " votes: most is " + mostWrong + ", least is " + leastWrong);
+  //console.log("Player " + thePlayer.name + " votes: most is " + mostWrong + ", least is " + leastWrong);
   return { success: true, roomName: theRoom.name, voter: playerName, mostName: mostWrong, leastName: leastWrong,
     votesNeeded: votesNeeded};
 }
