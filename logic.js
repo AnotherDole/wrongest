@@ -103,44 +103,23 @@ function gameCard(number,masterCard) {
   this.masterCard = masterCard;
 }
 
-function initializeGame(gameRoom,deckName) {
-  var i;
-  //reset player data
-  for (i=0; i < gameRoom.players.length; i++){
-    gameRoom.players[i].score=0;
-    gameRoom.players[i].card=null;
-    gameRoom.players[i].voted = false;
-    gameRoom.players[i].previousCards = [];
+function initializeGame(roomName,deckName,playerList,callback) {
+  var i, theMulti = client.multi();
+  for(i = 0; i < playerList.length; i++){
+    theMulti.hmset(playerDataKey(roomName,playerList[i]),'score',0,'card',-1,'voted',0);
+    theMulti.del(playerPreviousKey(roomName,playerList[i]));
   }
   var theDeck = decks[deckName];
-  gameRoom.masterDeck = theDeck;
-  gameRoom.deck = [];
   for(i = 0; i < theDeck.cards.length; i++){
-    gameRoom.deck.push(new gameCard(i,gameRoom.masterDeck.cards[i]));
+    theMulti.hmset(cardDataKey(roomName,i),'inPlay',0,'discarded',0,'mostVotes',0,'leastVotes',0,'score',0);
   }
-  gameRoom.gameState = GAME_BETWEEN_ARGUMENTS;
-  gameRoom.cardsLeft = gameRoom.deck.length;
-  gameRoom.round = 1;
-}
-
-//return reference to the player
-function getPlayer(theRoom,playerName,includeWaiting){
-  var answer = null;
-  for(var i = 0; i < theRoom.players.length; i++){
-    if(theRoom.players[i].name == playerName){
-      answer = theRoom.players[i];
-      break;
+  theMulti.hmset(roomDataKey(roomName),'gameState',GAME_BETWEEN_ARGUMENTS,'cardsLeft',theDeck.cards.length,'round',1);
+  theMulti.exec(function(err,data){
+    if(err){
+      return callback(err,null);
     }
-  }
-  if(includeWaiting){
-    for (var i = 0; i < theRoom.waiting.length; i++){
-      if(theRoom.waiting[i].name == playerName){
-	answer = theRoom.waiting[i];
-	break;
-      }
-    }
-  }
-  return answer;
+    return callback(null,{success:true,theRoom:roomName});
+  })
 }
 
 function isValidName(name){
@@ -175,6 +154,10 @@ function roomWaitingKey(roomName){
 
 function roomLeaversKey(roomName,userName){
   return 'room:leavers:'+roomName+':'+userName;
+}
+
+function cardDataKey(roomName,cardNum){
+  return 'card:'+roomName+':'+cardNum;
 }
 
 exports.getDeckData = function(){
@@ -219,18 +202,6 @@ exports.createRoom = function(playerName,UID,callback){
       });
   });
 }
-
-//Returns object describing current rooms
-//currently not necessary
-/*
-   exports.getAllRoomData = function(){
-   var toReturn = {};
-   for (var room in rooms){
-   toReturn[room]= {name: room, playerCount: rooms[room].players.length + rooms[room].waiting.length};
-   }
-   return toReturn;
-   }
-   */
 
 //Returns object with array of player names and the leader
 exports.getPlayersIn = function(roomName, callback){
@@ -292,36 +263,6 @@ exports.joinRequest = function(playerName,UID, roomName,callback){
 	});	  
       })
   })
-/*
-  var theRoom = rooms[roomName];
-  //check if room exits. this should just be for safety.
-  if (theRoom == null){
-    return {success: false, message:"That room does not exist."};
-  }
-  //full room
-  if ((theRoom.players.length + theRoom.waiting.length) >= MAX_PLAYERS){
-    return {success: false, message:"That room is full."};
-  }
-  if(getPlayer(theRoom,trimPlayer,true) != null){
-    return {success: false, message:"Someone in that room already has that name."};
-  }
-  if(theRoom.gameState > GAME_NOT_STARTED){
-    var toAdd = new gamePlayer(trimPlayer,UID);
-    var prevData = theRoom.leaverData[trimPlayer];
-    if(prevData){
-      toAdd.score = prevData.score;
-      toAdd.previousCards = prevData.previous;
-      delete theRoom.leaverData[trimPlayer];
-    }
-    theRoom.waiting.push(toAdd);
-    return {success: true, waiting: true, roomName: roomName, playerName:trimPlayer};
-  }
-  else{
-    theRoom.players.push(new gamePlayer(trimPlayer,UID));
-    console.log(playerName + " joined room " + theRoom.name);
-    return {success: true, waiting: false, roomName: roomName, playerName:trimPlayer};
-  }
-*/
 }
 
 //playerName requests to leave their current room
@@ -410,46 +351,43 @@ exports.pauseGame = function(roomName){
 }
 
 //playerName requests to start roomName with given options
-exports.startRequest = function(playerName,roomName,options){
-  var theRoom = rooms[roomName];
-  if(theRoom == null){
-    return {success: false, message: "You are not in a room."};
-  }	
-  var thePlayer = getPlayer(theRoom,playerName,false);
-
-  if(thePlayer == null){
-    return {success: false, message: "You do not exist"};
-  }
-  if(theRoom.leader != thePlayer){
-    return {success: false, message: "You are not the leader of your current room."};
-  }
-  if(theRoom.players.length < MIN_PLAYERS){
-    return {success: false, message: "You need 3 players to play this game."};
-  }
-  if(theRoom.gameState != GAME_NOT_STARTED){
-    return {success: false, message: "The game is already in progress."};
-  }
-
-  //Deal with the options
-  if(decks[options['deckName']] == null){
-    return {success: false, message: "That deck doesn't exist"};
-  }
-  if(options['time'] == '30'){
-    theRoom.timeLimit = 30;
-  }
-  else if(options['time'] == '90'){
-    theRoom.timeLimit = 90;
-  }
-  if(options['allowRedraw'] == 'yes'){
-    theRoom.allowRedraw = true;
-  }
-  if(options['dealerFirstOrLast'] == 'first'){
-    theRoom.dealerFirst = true;
-  }
-  //everything's fine, start the game
-  console.log(theRoom.name + " has started playing with deck "+ options["deckName"]);
-  initializeGame(theRoom,options["deckName"]);
-  return {success: true, theRoom:theRoom.name};
+exports.startRequest = function(playerName,roomName,options,callback){
+  var genericNo = {success:false, message:'no'};
+  client.multi()
+   .hmget(roomDataKey(roomName),'leader','dealer','gameState')
+   .lrange(roomPlayersKey(roomName),0,-1)
+   .exec(function(err,data){
+     if(data[0] == null){
+       return callback(null,genericNo);
+     }
+     var leader = data[0][0];
+     var dealer = data[0][1];
+     var gameState = data[0][2];
+     var players = data[1];
+     //These are just for saftey so no detailed error message
+     if(playerName != leader || players.length < MIN_PLAYERS || gameState != GAME_NOT_STARTED){
+       return callback(null,genericNo);
+     }
+     if(decks[options['deckName']] == null){
+       return callback(null,genericNo);
+     }
+     var timeLimit = parseInt(options['time']);
+     if(timeLimit == null || timeLimit < 30){
+       timeLimit = 60;
+     }
+     var allowRedraw = 0;
+     if(options['allowRedraw'] == 'yes'){
+       allowRedraw = 1;
+     }
+     var dealerFirst = 0;
+     if(options['dealerFirstOrLast'] == 'first'){
+       dealerFirst = 1;
+     }
+     client.hmset(roomDataKey(roomName),'masterDeck',options['deckName'],'timeLimit',timeLimit,
+	 'allowRedraw',allowRedraw,'dealerFirst',dealerFirst,function(err,data){
+	   return initializeGame(roomName,options['deckName'],players,callback);
+	 });
+   });
 }
 
 exports.canRestartGame = function(playerName,roomName){
@@ -466,10 +404,85 @@ exports.canRestartGame = function(playerName,roomName){
   return true;
 }
 
+//previous cards is an array of cardNums
+//cardData is an array of {inPlay, discarded, score}
+//return the card number of the card selected
+function findCardForPlayer(previousCards, cardData, allowRedraw){
+  var possible = [];
+  for (var i = 0; i < cardData.length; i++){
+    if((cardData[i].discarded == '1') || (cardData[i].inPlay == '1')){
+      continue;
+    }
+    if(allowRedraw || (previousCards.indexOf(i) == -1)){
+      possible.push(i);
+    }
+  }
+  var selected = Math.floor(Math.random() * possible.length);
+  cardData[selected].inPlay = true;
+  return selected;
+}
+
 //return an object containing all the the statements
 //assigned to the players in the room.
 //return false if game is over
-exports.getStatements = function(roomName){
+exports.getStatements = function(roomName,callback){
+  /**** First query: get some room data and the player list ***/
+  var theMulti = client.multi();
+  theMulti.hmget(roomDataKey(roomName),'round','masterDeck','allowRedraw');
+  theMulti.lrange(roomPlayersKey(roomName),0,-1);
+  theMulti.exec(function(err,data1){
+    var round = parseInt(data1[0][0]);
+
+    if(round > ROUND_LIMIT){
+      callback(null,false);
+    }
+    
+    var masterDeck = data1[0][1];
+    var allowRedraw = (data1[0][2] == '1')
+    var deckLength = decks[masterDeck].cards.length;
+    var playerList = data1[1];
+    
+    //get the data needed to assign statements;
+    theMulti = client.multi();
+    for(var i = 0; i < playerList.length; i++){
+      theMulti.lrange(playerPreviousKey(playerList[i]),0,-1);
+    }
+    for(var i = 0; i < deckLength; i++){
+      theMulti.hmget(cardDataKey(roomName,i),'inPlay','discarded','score');
+    }
+    /*** Second query: get each players previous card list, each card's data. ****/
+    theMulti.exec(function(err,data2){
+      //var previousCards = {};
+      var cards = [];
+      /*
+      for(var i = 0; i < playerList.length; i++){
+	previousCards[playerList[i]] = data[i];
+      }
+      */
+      for(var i = 0; i < deckLength; i++){
+	var index = playerList.length + i;
+	cards.push({inPlay : parseInt(data2[index][0]),discarded:parseInt(data2[index][1]),score:parseInt(data2[index][2])});
+      }
+      //data is in a convenient form, now assign the statements
+      theMulti = client.multi();
+      var selected, result = {}, theCard;
+      for(var i = 0; i < playerList.length; i++){
+	selected = findCardForPlayer(data2[i],cards,allowRedraw);
+	theCard = decks[masterDeck].cards[i];
+	//build the result to send to players
+	result[playerList[i]] = {quote: theCard.quote, author: theCard.author, source: theCard.source, score: cards[selected].score};
+	//build the redis update
+	theMulti.hmset(cardDataKey(roomName,selected),'inPlay',1,'mostVotes',0,'leastVotes',0);
+	theMulti.hset(playerDataKey(roomName,playerList[i]),'card',selected);
+	theMulti.rpush(playerPreviousKey(roomName,playerList[i]),selected);
+      }
+      /*** Query 3: update the redis data with the card selections **/
+      theMulti.exec(function(err,data){
+	return callback(null,result);
+      })
+    });
+  })
+  /*
   //eventually check that this makes sense
   var theRoom = rooms[roomName];
 
@@ -509,6 +522,7 @@ exports.getStatements = function(roomName){
   }
   console.log("Sent statements to " + theRoom.name);
   return result;
+  */
 }
 
 /*

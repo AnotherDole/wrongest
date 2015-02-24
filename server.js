@@ -42,14 +42,16 @@ app.get('/:id',function(req,res){
 //receive a summary to send to everyone in room
 //Or declare a winner
 function getAndSendStatements(roomName){
-  var result = logic.getStatements(roomName);
-  if(result == false){
-    result = logic.getWinner(roomName);
-    io.to(roomName).emit('gameover',result);
-  }
-  else{
-    io.to(roomName).emit('getstatements',result);
-  }
+  logic.getStatements(roomName,function(err,result){
+    console.log(result);
+    if(result == false){
+      result = logic.getWinner(roomName);
+      io.to(roomName).emit('gameover',result);
+    }
+    else{
+      io.to(roomName).emit('getstatements',result);
+    }
+  });
 }
 
 //Common code for when a player leaves or disconnects
@@ -152,14 +154,15 @@ io.on('connection', function (socket){
   //request to start a game with certain options
   socket.on('requeststart', function(deckName, time, allowRedraw, dealerFirstOrLast){
     var options = {deckName: deckName, time: time, allowRedraw: allowRedraw, dealerFirstOrLast: dealerFirstOrLast};
-    var result = logic.startRequest(socket.username,socket.roomName,options);
-    socket.emit('startresult',result);
-    //time to start game, send out the first statements
-    if(result.success){
-      getAndSendStatements(socket.roomName);
-      var order = logic.adjustOrder(socket.roomName);
-      io.to(socket.roomName).emit('updatecurrentroom',order.players,order.leader,order.dealer);
-    }
+    logic.startRequest(socket.username,socket.roomName,options,function(err,result){
+      socket.emit('startresult',result);
+      //time to start game, send out the first statements
+      if(result.success){
+	getAndSendStatements(socket.roomName);
+	//var order = logic.adjustOrder(socket.roomName);
+	//io.to(socket.roomName).emit('updatecurrentroom',order.players,order.leader,order.dealer);
+      }
+    });
   });
 
   socket.on('makedefend', function(){
