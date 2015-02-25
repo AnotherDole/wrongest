@@ -113,7 +113,8 @@ function initializeGame(roomName,deckName,playerList,callback) {
   for(i = 0; i < theDeck.cards.length; i++){
     theMulti.hmset(cardDataKey(roomName,i),'inPlay',0,'discarded',0,'mostVotes',0,'leastVotes',0,'score',0);
   }
-  theMulti.hmset(roomDataKey(roomName),'gameState',GAME_BETWEEN_ARGUMENTS,'cardsLeft',theDeck.cards.length,'round',1);
+  theMulti.hmset(roomDataKey(roomName),'gameState',GAME_BETWEEN_ARGUMENTS,
+      'cardsLeft',theDeck.cards.length,'round',1,'whosUp',-1);
   theMulti.exec(function(err,data){
     if(err){
       return callback(err,null);
@@ -187,7 +188,7 @@ exports.createRoom = function(playerName,UID,callback){
     client.multi()
       .hmset([playerDataKey(roomName,trimPlayer),'uid',UID,'score',0,'card',-1,'voted',0])
       .hmset([roomDataKey(roomName),'leader',trimPlayer,'dealer',trimPlayer,'gameState',GAME_NOT_STARTED,
-		'votesReceived',0,'masterDeck','','timeLimit',-1,'allowRedraw',-1,'dealerFirst',-1,
+		'votesReceived',0,'masterDeck','','timeLimit',-1,'allowRedraw',-1,'dealerFirst',1,
 		'whosUp',-1,'round',0])
       .rpush([roomPlayersKey(roomName),trimPlayer])
       .exec(function (err, data){
@@ -203,7 +204,7 @@ exports.createRoom = function(playerName,UID,callback){
 //Returns object with array of player names and the leader
 exports.getPlayersIn = function(roomName, callback){
   client.multi()
-    .hmget([roomDataKey(roomName),'leader','dealer'])
+    .hmget([roomDataKey(roomName),'leader','dealer','dealerFirst'])
     .lrange([roomPlayersKey(roomName),0,-1])
     .exec(function(err, data){
       if(err){
@@ -212,8 +213,21 @@ exports.getPlayersIn = function(roomName, callback){
       var toReturn = {};
       toReturn.success = true;
       toReturn.leader = data[0][0];
-      toReturn.dealer = data[0][1];
-      toReturn.players = data[1];
+      var dealer = data[0][1];
+      toReturn.dealer = dealer;
+      var dealerFirst = data[0][2];
+      var playerList = data[1];
+      if(dealerFirst == '1'){
+	while(playerList[0] != dealer){
+	  playerList.push(playerList.shift());
+	}
+      }
+      else{
+	while(playerList[playerList.length-1] != dealer){
+	  playerList.unshift(playerList.pop());
+	}
+      }
+      toReturn.players = playerList;
       callback(null,toReturn);
     });
 }
@@ -423,7 +437,7 @@ function findCardForPlayer(previousCards, cardData, allowRedraw){
 //assigned to the players in the room.
 //return false if game is over
 exports.getStatements = function(roomName,callback){
-  /**** First query: get some room data and the player list ***/
+  /**** First transaction: get some room data and the player list ***/
   var theMulti = client.multi();
   theMulti.hmget(roomDataKey(roomName),'round','masterDeck','allowRedraw');
   theMulti.lrange(roomPlayersKey(roomName),0,-1);
@@ -431,7 +445,7 @@ exports.getStatements = function(roomName,callback){
     var round = parseInt(data1[0][0]);
 
     if(round > ROUND_LIMIT){
-      callback(null,false);
+      return callback(null,false);
     }
     
     var masterDeck = data1[0][1];
@@ -447,15 +461,10 @@ exports.getStatements = function(roomName,callback){
     for(var i = 0; i < deckLength; i++){
       theMulti.hmget(cardDataKey(roomName,i),'inPlay','discarded','score');
     }
-    /*** Second query: get each players previous card list, each card's data. ****/
+    /*** Second transaction: get each players previous card list, each card's data. ****/
     theMulti.exec(function(err,data2){
-      //var previousCards = {};
       var cards = [];
-      /*
-      for(var i = 0; i < playerList.length; i++){
-	previousCards[playerList[i]] = data[i];
-      }
-      */
+
       for(var i = 0; i < deckLength; i++){
 	var index = playerList.length + i;
 	cards.push({inPlay : parseInt(data2[index][0]),discarded:parseInt(data2[index][1]),score:parseInt(data2[index][2])});
@@ -465,7 +474,7 @@ exports.getStatements = function(roomName,callback){
       var selected, result = {}, theCard;
       for(var i = 0; i < playerList.length; i++){
 	selected = findCardForPlayer(data2[i],cards,allowRedraw);
-	theCard = decks[masterDeck].cards[i];
+	theCard = decks[masterDeck].cards[selected];
 	//build the result to send to players
 	result[playerList[i]] = {quote: theCard.quote, author: theCard.author, source: theCard.source, score: cards[selected].score};
 	//build the redis update
@@ -473,122 +482,75 @@ exports.getStatements = function(roomName,callback){
 	theMulti.hset(playerDataKey(roomName,playerList[i]),'card',selected);
 	theMulti.rpush(playerPreviousKey(roomName,playerList[i]),selected);
       }
-      /*** Query 3: update the redis data with the card selections **/
+      /*** Third Transaction: update the redis data with the card selections **/
       theMulti.exec(function(err,data){
 	return callback(null,result);
       })
     });
   })
-  /*
-  //eventually check that this makes sense
-  var theRoom = rooms[roomName];
-
-  if(theRoom.round > ROUND_LIMIT){
-    return false;
-  }
-
-  var result = {};
-  var i,selected, theCard, thePlayer,possible;
-  //the strategy: find all possible cards for that player
-  //randomly pick one and assign it to that player
-  //if there are no possible cards for a player, the game is over
-  for(i = 0; i < theRoom.players.length; i++){
-    thePlayer = theRoom.players[i];
-    possible = [];
-    for(var j = 0; j < theRoom.deck.length; j++){
-      theCard = theRoom.deck[j];
-      if(!theCard.inPlay && !theCard.discarded){
-	if(theRoom.allowRedraw || (thePlayer.previousCards.indexOf(theCard) == -1)){
-	  possible.push(theCard);
-	}
-      }
-    }
-    if (possible.length == 0){
-      return false;
-    }
-    theCard = possible[Math.floor(Math.random() * possible.length)];
-    theCard.mostVotes = 0;
-    theCard.leastvotes = 0;
-    thePlayer.card = theCard;
-    thePlayer.previousCards.push(theCard);
-    theCard.inPlay = true;
-    result[thePlayer.name] = {quote: theCard.masterCard.quote,
-      author: theCard.masterCard.author,
-      source: theCard.masterCard.source,
-      score: theCard.score};
-  }
-  console.log("Sent statements to " + theRoom.name);
-  return result;
-  */
 }
-
-/*
-   function generateOrder(theRoom){
-   var result = {};
-   result["dealer"] = theRoom.dealer.name;
-   result["order"] = [];
-   for(var i = 0; i < theRoom.players.length; i++){
-   result["order"].push(theRoom.players[i].name);
-   }
-   return result;
-   }
-   */
 
 //adjust the play order for the given room
-exports.adjustOrder = function(roomName){
-  //shouldn't have to check this, only called by the server
-  var theRoom = rooms[roomName];
-  var playerList = theRoom.players;
-  //room leader is the first dealer
-  if(theRoom.round == 1){
-    theRoom.dealer = theRoom.leader;
-    //move leader to first
-    if(theRoom.dealerFirst){
-      while(playerList[0] != theRoom.leader){
-	playerList.push(playerList.shift());	
-      }
-    }
-    else{
-      while(playerList[playerList.length-1] != theRoom.leader){
-	playerList.unshift(playerList.pop());
-      }
-    }
-  }
-  else{
-    playerList.unshift(playerList.pop());
-    if(theRoom.dealerFirst){
-      theRoom.dealer = playerList[0]
-    }
-    else{
-      theRoom.dealer = playerList[playerList.length-1];
-    }
-  }
-  theRoom.whosUp = 0;
-  return exports.getPlayersIn(roomName);
-}
+exports.adjustOrder = function(roomName,callback){
+  //** Transaction 1: get room data and player list
+  var theMulti = client.multi();
+  theMulti.hmget(roomDataKey(roomName),'leader','dealer','dealerFirst','round','whosUp');
+  theMulti.lrange(roomPlayersKey(roomName),0,-1);
+  theMulti.exec(function(err,data1){
+    var leader = data1[0][0];
+    var dealer = data1[0][1];
+    var dealerFirst = data1[0][2];
+    var round = data1[0][3];
+    var whosUp = data1[0][4];
+    var playerList = data1[1];
+    var numPlayers = playerList.length;
 
-/*
-//just get the order for a room
-exports.getOrder = function(roomName){
-return generateOrder(rooms[roomName]);
+    var leaderIndex = playerList.indexOf(leader);
+    var dealerIndex = playerList.indexOf(dealer);
+    theMulti = client.multi();
+    if(round == '1'){
+      if(dealerFirst == '1'){
+	theMulti.hmset(roomDataKey(roomName),'whosUp',leaderIndex,'dealer',leader);
+      }
+      else{
+	theMulti.hmset(roomDataKey(roomName),'whosUp',(leaderIndex + 1) % numPlayers,'dealer',leader);
+      }
+    }
+    else{
+      var newIndex = (dealerIndex + 1) % numPlayers;
+      if(dealerFirst == '1'){
+	theMulti.hmset(roomDataKey(roomName),'whosUp',newIndex,'dealer',playerList[newIndex]);
+      }
+      else{
+	//always the same play order, so start with the player after the dealer
+	//I'm pretty sure this is right. I made diagrams and everything.
+	theMulti.hmset(roomDataKey(roomName),'whosUp',(newIndex + 1) % numPlayers,'dealer',playerList[newIndex]);
+      }
+    }
+    theMulti.exec(function(err,data){
+      exports.getPlayersIn(roomName,callback);
+    })
+  })
 }
-*/
 
 //only called when there is a request to make someone defend
-exports.getWhosUp = function(roomName,playerName){
-  var theRoom = rooms[roomName];
-  var thePlayer = getPlayer(theRoom,playerName,false);
-  if(thePlayer != theRoom.dealer){
-    return false;
-  }
-  if(theRoom.gameState != GAME_BETWEEN_ARGUMENTS){
-    return false;
-  }
-  if(theRoom.players[theRoom.whosUp] == null){
-    return false;
-  }
-  theRoom.gameState = GAME_SOMEONE_ARGUING;
-  return {player: theRoom.players[theRoom.whosUp].name,time: theRoom.timeLimit};
+exports.getWhosUp = function(roomName,playerName,callback){
+  client.hmget(roomDataKey(roomName),'dealer','gameState','whosUp','timeLimit',function(err,data){
+    var dealer = data[0];
+    var gameState = parseInt(data[1]);
+    var whosUp = parseInt(data[2]);
+    var timeLimit = parseInt(data[3]);
+    if((playerName != dealer)||(gameState != GAME_BETWEEN_ARGUMENTS)){
+      return callback(null,false);
+    }
+    client.lrange(roomPlayersKey(roomName),0,-1,function(err,data2){
+      var playerName = data2[whosUp];
+      client.hset(roomDataKey(roomName),'gameState',GAME_SOMEONE_ARGUING,function(err,data){
+	var result = {player:playerName,time:timeLimit};
+	return callback(null,result);
+      })
+    })
+  })
 }
 
 exports.getWinner = function(roomName){
@@ -614,33 +576,34 @@ exports.getWinner = function(roomName){
   return {player: wPlayer, playerScore: playerScore, card: wCard, cardScore: cardScore};
 }
 
-//playerID is done defending their statement
-exports.doneDefending = function(roomName,playerName){
-  var theRoom = rooms[roomName];
-  if (theRoom == null){
-    return {success: false, message: "You are not in a room."};
-  }
-  if (theRoom.gameState != GAME_SOMEONE_ARGUING){
-    return {success: false, message: "It's not time for that."};
-  }
-  var thePlayer = getPlayer(theRoom,playerName,false);
-  if(thePlayer == null){
-    return {success: false, message: "You're not in that room."};
-  }
-  if(thePlayer != theRoom.players[theRoom.whosUp]){
-    return {success: false, message: "It's not your turn."};
-  }
-  //player already voted
-  if(thePlayer.voted){
-    return {success: false, message: "You already said you were done."};
-  }
-  //okay, the vote matters
-  theRoom.gameState = GAME_BETWEEN_ARGUMENTS;
-  thePlayer.voted = true;
-  theRoom.votesReceived++;
-  theRoom.whosUp++;
-  //console.log(playerName + " is done defending");
-  return {success:true, roomName:theRoom.name, votesNeeded: (theRoom.players.length - theRoom.votesReceived)};
+//playerName is done defending their statement
+exports.doneDefending = function(roomName,playerName,callback){
+  var theMulti = client.multi();
+  theMulti.hmget(roomDataKey(roomName),'gameState','whosUp');
+  theMulti.hget(playerDataKey(roomName,playerName),'voted');
+  theMulti.lrange(roomPlayersKey(roomName),0,-1);
+  /*** Transaction 1: get room data, player voted status, player list ***/
+  theMulti.exec(function(err,data1){
+    var gameState = parseInt(data1[0][0]);
+    var whosUp = parseInt(data1[0][1]);
+    var voted = (data1[1] == '1');
+    var playerList = data1[2];
+
+    if((gameState != GAME_SOMEONE_ARGUING) || voted || (playerList[whosUp] != playerName)){
+      return callback(null,false);
+    }
+
+    var newNext = (whosUp + 1) % playerList.length;
+
+    theMulti = client.multi();
+    theMulti.hmset(roomDataKey(roomName),'gameState',GAME_BETWEEN_ARGUMENTS,'whosUp',newNext);
+    theMulti.hset(playerDataKey(roomName,playerName),'voted',1);
+    theMulti.hincrby(roomDataKey(roomName),'votesReceived',1);
+    //** Transaction 2: update data based on the vote ***/
+    theMulti.exec(function(err,data2){
+      return callback(null, {success:true,roomName:roomName,votesNeeded: (playerList.length - data2[2])});
+    })
+  })
 }
 
 exports.prepareForVotes = function(roomName){

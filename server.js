@@ -43,7 +43,6 @@ app.get('/:id',function(req,res){
 //Or declare a winner
 function getAndSendStatements(roomName){
   logic.getStatements(roomName,function(err,result){
-    console.log(result);
     if(result == false){
       result = logic.getWinner(roomName);
       io.to(roomName).emit('gameover',result);
@@ -159,32 +158,35 @@ io.on('connection', function (socket){
       //time to start game, send out the first statements
       if(result.success){
 	getAndSendStatements(socket.roomName);
-	//var order = logic.adjustOrder(socket.roomName);
-	//io.to(socket.roomName).emit('updatecurrentroom',order.players,order.leader,order.dealer);
+	logic.adjustOrder(socket.roomName,function(err,order){
+	  io.to(socket.roomName).emit('updatecurrentroom',order.players,order.leader,order.dealer);
+	});
       }
     });
   });
 
   socket.on('makedefend', function(){
-    var result = logic.getWhosUp(socket.roomName, socket.username);
-    if(result){
-      io.to(socket.roomName).emit('timetodefend',result.player,result.time);
-    }
+    logic.getWhosUp(socket.roomName, socket.username,function(err,result){
+      if(result){
+	io.to(socket.roomName).emit('timetodefend',result.player,result.time);
+      }
+    })
   });
 
   socket.on('donedefending', function(data){
-    var result = logic.doneDefending(socket.roomName, socket.username);
-    if(result.success){
-      //tell everyone in room new votesNeeded
-      io.to(socket.roomName).emit('newdefendcount',result.votesNeeded,true);
-      if(result.votesNeeded <= 0){
-	logic.prepareForVotes(socket.roomName);
+    logic.doneDefending(socket.roomName, socket.username,function(err,result){
+      if(result.success){
+	//tell everyone in room new votesNeeded
+	io.to(socket.roomName).emit('newdefendcount',result.votesNeeded,true);
+	if(result.votesNeeded <= 0){
+	  logic.prepareForVotes(socket.roomName);
+	}
       }
-    }
-    else{
-      //tell specific user they are stupid
-      socket.emit('donefailed', result.message);
-    }
+      else{
+	//tell specific user they are stupid
+	socket.emit('donefailed', 'no');
+      }
+    })
   });
 
   socket.on('playervotes',function(most,least){
