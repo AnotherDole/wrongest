@@ -65,6 +65,12 @@ describe('Joining Rooms',function(){
 	done();
       })
     })
+    it('should not accept duplicate names',function(done){
+      logic.joinRequest('Player1','hi',testRoom,function(err,result){
+	result.success.should.equal(false);
+	done();
+      })
+    })
     it('and these',function(done){
       logic.joinRequest('Player3','hi',testRoom,function(err,result){
 	result.success.should.equal(true);

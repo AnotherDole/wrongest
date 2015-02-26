@@ -5,6 +5,8 @@
 var fs = require('fs');
 var path = require('path');
 var Hashids = require('hashids');
+var Scripto = require('redis-scripto');
+var scriptManager = null;
 var hashids = new Hashids(Math.random().toString());
 
 var rooms = {}, decks = {}, deckData = {};
@@ -111,10 +113,10 @@ function initializeGame(roomName,deckName,playerList,callback) {
   }
   var theDeck = decks[deckName];
   for(i = 0; i < theDeck.cards.length; i++){
-    theMulti.hmset(cardDataKey(roomName,i),'inPlay',0,'discarded',0,'mostVotes',0,'leastVotes',0,'score',0);
+    theMulti.hmset(cardDataKey(roomName,i+1),'inPlay',0,'discarded',0,'mostVotes',0,'leastVotes',0,'score',0);
   }
   theMulti.hmset(roomDataKey(roomName),'gameState',GAME_BETWEEN_ARGUMENTS,
-      'cardsLeft',theDeck.cards.length,'round',1,'whosUp',-1);
+      'cardsLeft',theDeck.cards.length,'round',1,'whosUp',-1,'deckLength',theDeck.cards.length);
   theMulti.exec(function(err,data){
     if(err){
       return callback(err,null);
@@ -171,6 +173,8 @@ exports.roomExists = function(roomName,callback){
 
 exports.setClient = function(newClient){
   client = newClient;
+  scriptManager = new Scripto(newClient);
+  scriptManager.loadFromDir('./lua/');
 }
 
 //Create a new room. playerID is the requestor, name is requested name
@@ -437,56 +441,18 @@ function findCardForPlayer(previousCards, cardData, allowRedraw){
 //assigned to the players in the room.
 //return false if game is over
 exports.getStatements = function(roomName,callback){
-  /**** First transaction: get some room data and the player list ***/
-  var theMulti = client.multi();
-  theMulti.hmget(roomDataKey(roomName),'round','masterDeck','allowRedraw');
-  theMulti.lrange(roomPlayersKey(roomName),0,-1);
-  theMulti.exec(function(err,data1){
-    var round = parseInt(data1[0][0]);
-
-    if(round > ROUND_LIMIT){
-      return callback(null,false);
+  var seed = Math.floor(Math.random() * Math.pow(2,32));
+  //run lua script
+  //result[0] is array of player names, result[1] is array of selected cards, result[2] is array of scores, result[3] is deck name
+  scriptManager.run('getStatements',[roomDataKey(roomName),roomPlayersKey(roomName)],[ROUND_LIMIT,roomName,seed],function(err,result){
+    //console.log(result);
+    var theDeck = decks[result[3]];
+    var toReturn = {};
+    for (var i = 0; i < result[0].length; i++){
+      var theCard = theDeck.cards[result[1][i] - 1]
+      toReturn[result[0][i]] = {quote: theCard.quote, author: theCard.author, source: theCard.source, score: result[2][i]};
     }
-    
-    var masterDeck = data1[0][1];
-    var allowRedraw = (data1[0][2] == '1')
-    var deckLength = decks[masterDeck].cards.length;
-    var playerList = data1[1];
-    
-    //get the data needed to assign statements;
-    theMulti = client.multi();
-    for(var i = 0; i < playerList.length; i++){
-      theMulti.lrange(playerPreviousKey(playerList[i]),0,-1);
-    }
-    for(var i = 0; i < deckLength; i++){
-      theMulti.hmget(cardDataKey(roomName,i),'inPlay','discarded','score');
-    }
-    /*** Second transaction: get each players previous card list, each card's data. ****/
-    theMulti.exec(function(err,data2){
-      var cards = [];
-
-      for(var i = 0; i < deckLength; i++){
-	var index = playerList.length + i;
-	cards.push({inPlay : parseInt(data2[index][0]),discarded:parseInt(data2[index][1]),score:parseInt(data2[index][2])});
-      }
-      //data is in a convenient form, now assign the statements
-      theMulti = client.multi();
-      var selected, result = {}, theCard;
-      for(var i = 0; i < playerList.length; i++){
-	selected = findCardForPlayer(data2[i],cards,allowRedraw);
-	theCard = decks[masterDeck].cards[selected];
-	//build the result to send to players
-	result[playerList[i]] = {quote: theCard.quote, author: theCard.author, source: theCard.source, score: cards[selected].score};
-	//build the redis update
-	theMulti.hmset(cardDataKey(roomName,selected),'inPlay',1,'mostVotes',0,'leastVotes',0);
-	theMulti.hset(playerDataKey(roomName,playerList[i]),'card',selected);
-	theMulti.rpush(playerPreviousKey(roomName,playerList[i]),selected);
-      }
-      /*** Third Transaction: update the redis data with the card selections **/
-      theMulti.exec(function(err,data){
-	return callback(null,result);
-      })
-    });
+    callback(err,toReturn);
   })
 }
 
