@@ -383,7 +383,7 @@ exports.startRequest = function(playerName,roomName,options,callback){
        return callback(null,genericNo);
      }
      var timeLimit = parseInt(options['time']);
-     if(timeLimit == null || timeLimit < 30){
+     if(isNaN(timeLimit) || timeLimit < 30){
        timeLimit = 60;
      }
      var allowRedraw = 0;

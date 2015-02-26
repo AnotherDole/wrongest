@@ -65,10 +65,13 @@ describe('Joining Rooms',function(){
 	done();
       })
     })
-    it('and this one',function(done){
+    it('and these',function(done){
       logic.joinRequest('Player3','hi',testRoom,function(err,result){
 	result.success.should.equal(true);
-	done();
+	logic.joinRequest('Player4','hi',testRoom,function(err,result){
+	  result.success.should.equal(true);
+	  done();
+	})
       })
     })
   })
@@ -81,7 +84,98 @@ describe('Joining Rooms',function(){
 	result.players[0].should.equal('Player1');
 	result.players[1].should.equal('Player2');
 	result.players[2].should.equal('Player3');
+	result.players[3].should.equal('Player4');
 	done();
+      })
+    })
+  })
+})
+
+describe('Starting Games',function(){
+  describe('Bad Start Requests',function(){
+    it('should not accept a start from someone other than the leader',function(done){
+      logic.startRequest('Player2',testRoom,{},function(err,result){
+	result.success.should.equal(false);
+	done();
+      })
+    })
+    it('should not start with a bad deck name',function(done){
+      logic.startRequest('Player1',testRoom,{deckName:'this deck will never exist'},function(err,result){
+	result.success.should.equal(false);
+	done();
+      })
+    })
+  })
+  describe('Good Start Request',function(){
+    it('should accept this start request',function(done){
+      logic.startRequest('Player1',testRoom,{deckName:'General Nonsense'},function(err,result){
+	result.success.should.equal(true);
+
+	logic.getStatements(testRoom,function(err,result){
+	  result.should.have.property('Player1');
+	  result.Player1.should.have.property('quote');
+	  result.Player1.quote.length.should.be.above(1);
+
+	  logic.adjustOrder(testRoom,function(err,result){
+	    result.should.have.property('players');
+	    //default is dealer last
+	    result.players[0].should.equal('Player2');
+	    result.players[1].should.equal('Player3');
+	    result.players[2].should.equal('Player4');
+	    result.players[3].should.equal('Player1');
+	    done();
+	  })
+	})
+      })
+    })
+  })
+})
+
+describe('Playing the Game',function(){
+  describe('getWhosUp',function(){
+    it('should not accept requests from non-dealers',function(done){
+      logic.getWhosUp(testRoom,'Player2',function(err,result){
+	result.should.equal(false);
+	done();
+      })
+    })
+    it('should accept requests from the dealer...',function(done){
+      logic.getWhosUp(testRoom,'Player1',function(err,result){
+	result.should.not.equal(false);
+	result.should.have.property('player');
+	result.player.length.should.be.above(0);
+	result.time.should.be.above(0);
+	done();
+      })
+    })
+    it('...but not when someone is alreay defending',function(done){
+      logic.getWhosUp(testRoom,'Player1',function(err,result){
+	result.should.equal(false);
+	done();
+      })
+    })
+  })
+  describe('doneDefending',function(){
+    it('should not accept a doneDefending from the wrong player',function(done){
+      logic.doneDefending(testRoom,'Player1',function(err,result){
+	result.should.equal(false);
+	done();
+      })
+    })
+    it('should accept a doneDefending from the right player',function(done){
+      logic.doneDefending(testRoom,'Player2',function(err,result){
+	result.should.have.property('votesNeeded');
+	result.votesNeeded.should.equal(3);
+	done();
+      })
+    })
+    it('should handle the next player properly',function(done){
+      logic.getWhosUp(testRoom,'Player1',function(err,result){
+	result.should.have.property('player');
+	logic.doneDefending(testRoom,'Player3',function(err,result){
+	  result.votesNeeded.should.equal(2);
+	  done();
+	})
       })
     })
   })
