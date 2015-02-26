@@ -275,7 +275,7 @@ exports.joinRequest = function(playerName,UID, roomName,callback){
 	      callback(null,{success: true, waiting: false, roomName: roomName, playerName:trimPlayer});
 	    });
 	  }
-	});	  
+	})
       })
   })
 }
@@ -419,24 +419,6 @@ exports.canRestartGame = function(playerName,roomName){
   return true;
 }
 
-//previous cards is an array of cardNums
-//cardData is an array of {inPlay, discarded, score}
-//return the card number of the card selected
-function findCardForPlayer(previousCards, cardData, allowRedraw){
-  var possible = [];
-  for (var i = 0; i < cardData.length; i++){
-    if((cardData[i].discarded == '1') || (cardData[i].inPlay == '1')){
-      continue;
-    }
-    if(allowRedraw || (previousCards.indexOf(i) == -1)){
-      possible.push(i);
-    }
-  }
-  var selected = Math.floor(Math.random() * possible.length);
-  cardData[selected].inPlay = true;
-  return selected;
-}
-
 //return an object containing all the the statements
 //assigned to the players in the room.
 //return false if game is over
@@ -445,7 +427,6 @@ exports.getStatements = function(roomName,callback){
   //run lua script
   //result[0] is array of player names, result[1] is array of selected cards, result[2] is array of scores, result[3] is deck name
   scriptManager.run('getStatements',[roomDataKey(roomName),roomPlayersKey(roomName)],[ROUND_LIMIT,roomName,seed],function(err,result){
-    //console.log(result);
     var theDeck = decks[result[3]];
     var toReturn = {};
     for (var i = 0; i < result[0].length; i++){
@@ -458,64 +439,18 @@ exports.getStatements = function(roomName,callback){
 
 //adjust the play order for the given room
 exports.adjustOrder = function(roomName,callback){
-  //** Transaction 1: get room data and player list
-  var theMulti = client.multi();
-  theMulti.hmget(roomDataKey(roomName),'leader','dealer','dealerFirst','round','whosUp');
-  theMulti.lrange(roomPlayersKey(roomName),0,-1);
-  theMulti.exec(function(err,data1){
-    var leader = data1[0][0];
-    var dealer = data1[0][1];
-    var dealerFirst = data1[0][2];
-    var round = data1[0][3];
-    var whosUp = data1[0][4];
-    var playerList = data1[1];
-    var numPlayers = playerList.length;
-
-    var leaderIndex = playerList.indexOf(leader);
-    var dealerIndex = playerList.indexOf(dealer);
-    theMulti = client.multi();
-    if(round == '1'){
-      if(dealerFirst == '1'){
-	theMulti.hmset(roomDataKey(roomName),'whosUp',leaderIndex,'dealer',leader);
-      }
-      else{
-	theMulti.hmset(roomDataKey(roomName),'whosUp',(leaderIndex + 1) % numPlayers,'dealer',leader);
-      }
-    }
-    else{
-      var newIndex = (dealerIndex + 1) % numPlayers;
-      if(dealerFirst == '1'){
-	theMulti.hmset(roomDataKey(roomName),'whosUp',newIndex,'dealer',playerList[newIndex]);
-      }
-      else{
-	//always the same play order, so start with the player after the dealer
-	//I'm pretty sure this is right. I made diagrams and everything.
-	theMulti.hmset(roomDataKey(roomName),'whosUp',(newIndex + 1) % numPlayers,'dealer',playerList[newIndex]);
-      }
-    }
-    theMulti.exec(function(err,data){
-      exports.getPlayersIn(roomName,callback);
-    })
+  scriptManager.run('adjustOrder',[roomDataKey(roomName),roomPlayersKey(roomName)],[],function(err,result){
+    exports.getPlayersIn(roomName,callback);
   })
 }
 
 //only called when there is a request to make someone defend
 exports.getWhosUp = function(roomName,playerName,callback){
-  client.hmget(roomDataKey(roomName),'dealer','gameState','whosUp','timeLimit',function(err,data){
-    var dealer = data[0];
-    var gameState = parseInt(data[1]);
-    var whosUp = parseInt(data[2]);
-    var timeLimit = parseInt(data[3]);
-    if((playerName != dealer)||(gameState != GAME_BETWEEN_ARGUMENTS)){
-      return callback(null,false);
+  scriptManager.run('getWhosUp',[roomDataKey(roomName),roomPlayersKey(roomName)],[playerName],function(err,result){
+    if(result == null){
+      return callback(null,false)
     }
-    client.lrange(roomPlayersKey(roomName),0,-1,function(err,data2){
-      var playerName = data2[whosUp];
-      client.hset(roomDataKey(roomName),'gameState',GAME_SOMEONE_ARGUING,function(err,data){
-	var result = {player:playerName,time:timeLimit};
-	return callback(null,result);
-      })
-    })
+    callback(null,{player:result[0], time: parseInt(result[1])})
   })
 }
 
@@ -544,31 +479,11 @@ exports.getWinner = function(roomName){
 
 //playerName is done defending their statement
 exports.doneDefending = function(roomName,playerName,callback){
-  var theMulti = client.multi();
-  theMulti.hmget(roomDataKey(roomName),'gameState','whosUp');
-  theMulti.hget(playerDataKey(roomName,playerName),'voted');
-  theMulti.lrange(roomPlayersKey(roomName),0,-1);
-  /*** Transaction 1: get room data, player voted status, player list ***/
-  theMulti.exec(function(err,data1){
-    var gameState = parseInt(data1[0][0]);
-    var whosUp = parseInt(data1[0][1]);
-    var voted = (data1[1] == '1');
-    var playerList = data1[2];
-
-    if((gameState != GAME_SOMEONE_ARGUING) || voted || (playerList[whosUp] != playerName)){
+  scriptManager.run('doneDefending',[roomDataKey(roomName),playerDataKey(roomName,playerName),roomPlayersKey(roomName)],[playerName],function(err,data){
+    if(data == null){
       return callback(null,false);
     }
-
-    var newNext = (whosUp + 1) % playerList.length;
-
-    theMulti = client.multi();
-    theMulti.hmset(roomDataKey(roomName),'gameState',GAME_BETWEEN_ARGUMENTS,'whosUp',newNext);
-    theMulti.hset(playerDataKey(roomName,playerName),'voted',1);
-    theMulti.hincrby(roomDataKey(roomName),'votesReceived',1);
-    //** Transaction 2: update data based on the vote ***/
-    theMulti.exec(function(err,data2){
-      return callback(null, {success:true,roomName:roomName,votesNeeded: (playerList.length - data2[2])});
-    })
+    callback(null,{success: true,roomName:roomName,votesNeeded:data});
   })
 }
 
