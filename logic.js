@@ -487,16 +487,50 @@ exports.doneDefending = function(roomName,playerName,callback){
   })
 }
 
-exports.prepareForVotes = function(roomName){
-  var theRoom = rooms[roomName];
-  theRoom.gameState = GAME_WAITING_VOTES;
-  theRoom.votesReceived = 0;
-  for(var i = 0; i < theRoom.players.length; i++){
-    theRoom.players[i].voted = false;
-  }
+exports.prepareForVotes = function(roomName,callback){
+  scriptManager.run('prepareForVotes',[roomDataKey(roomName),roomPlayersKey(roomName)],[roomName],function(err,result){
+    //maybe include some error checking later
+    callback(null,null)
+  })
 }
 
-exports.processVote = function(roomName,playerName,mostWrong,leastWrong){
+exports.processVote = function(roomName,playerName,mostWrong,leastWrong,callback){
+  if(playerName == mostWrong || playerName == leastWrong || mostWrong == leastWrong){
+    return callback(null,false)
+  }
+
+  var keys = [roomDataKey(roomName),roomPlayersKey(roomName),playerDataKey(roomName,playerName),
+		playerDataKey(roomName,mostWrong),playerDataKey(roomName,leastWrong),roomWaitingKey(roomName)];
+  var seed = Math.floor(Math.random() * Math.pow(2,32));
+  var args = [playerName,mostWrong,leastWrong,roomName,seed]
+
+  //result[0] is votes needed
+  //if result[0] is 0 then it also returns:
+  //result[1] = round
+  //result[2] = number of cards left
+  //result[3] = array of player names
+  //result[4] = array of their scores
+  //result[5] = array of the changes to their scores
+  //result[6] = array of socket.io uuids to add to the room
+  scriptManager.run('processVote',keys,args,function(err,result){
+    //console.log(err);
+    //console.log(result);
+    if(result == null){
+      return callback(null,false)
+    }
+    var toReturn = {votesNeeded:result[0]};
+    if(result[0] > 0){
+      return callback(null, toReturn);
+    }
+    toReturn.socketsToAdd = result[6];
+    toReturn.gameData = {round: result[1],cardsLeft:result[2]}
+    toReturn.playerData = {}
+    for(var i = 0; i < result[3].length; i++){
+      toReturn.playerData[result[3][i]] = {newScore: result[4][i], scoreChange: result[5][i]};
+    }
+    callback(null,toReturn);
+  })
+  /*
   var theRoom = rooms[roomName];
   if(theRoom == null){
     return {success: false,message:"Not in a room."};
@@ -533,6 +567,7 @@ exports.processVote = function(roomName,playerName,mostWrong,leastWrong){
   //console.log("Player " + thePlayer.name + " votes: most is " + mostWrong + ", least is " + leastWrong);
   return { success: true, roomName: theRoom.name, voter: playerName, mostName: mostWrong, leastName: leastWrong,
     votesNeeded: votesNeeded};
+    */
 }
 
 //return game summary

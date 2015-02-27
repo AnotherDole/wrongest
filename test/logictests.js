@@ -82,7 +82,7 @@ describe('Joining Rooms',function(){
     })
   })
   describe('getPlayersIn',function(){
-    it('should show 3 player in this room',function(done){
+    it('should show 4 player in this room',function(done){
       logic.getPlayersIn(testRoom,function(err,result){
 	result.success.should.equal(true);
 	result.leader.should.equal('Player1');
@@ -182,6 +182,93 @@ describe('Playing the Game',function(){
 	  result.votesNeeded.should.equal(2);
 	  done();
 	})
+      })
+    })
+    it('and the next one',function(done){
+      logic.getWhosUp(testRoom,'Player1',function(err,result){
+	result.should.have.property('player');
+	logic.doneDefending(testRoom,'Player4',function(err,result){
+	  result.votesNeeded.should.equal(1);
+	  done();
+	})
+      })
+    })
+    it('and the last one',function(done){
+      logic.getWhosUp(testRoom,'Player1',function(err,result){
+	result.should.have.property('player');
+	logic.doneDefending(testRoom,'Player1',function(err,result){
+	  result.votesNeeded.should.equal(0);
+	  logic.prepareForVotes(testRoom,function(err,data){
+	    done();
+	  })
+	})
+      })
+    })
+  })
+})
+
+describe('Voting',function(){
+  describe('Bad Votes',function(){
+    it('should reject vote from non-existant player',function(done){
+      logic.processVote(testRoom,'Player0','Player1','Player2',function(err,result){
+	result.should.equal(false);
+	done();
+      })
+    })
+    it('should reject vote for a non-existant player', function(done){
+      logic.processVote(testRoom,'Player1','Player2','Player0',function(err,result){
+	result.should.equal(false);
+	done();
+      })
+    })
+    it('should reject vote for same players',function(done){
+      logic.processVote(testRoom,'Player1','Player2','Player2',function(err,result){
+	result.should.equal(false);
+	done();
+      })
+    })
+    it('should reject vote for self',function(done){
+      logic.processVote(testRoom,'Player1','Player1','Player2',function(err,result){
+	result.should.equal(false);
+	done();
+      })
+    })
+  })
+  describe('Good Votes',function(){
+    it('should accept this vote',function(done){
+      logic.processVote(testRoom,'Player1','Player2','Player3',function(err,result){
+	result.should.not.equal(false);
+	result.should.have.property('votesNeeded');
+	result.votesNeeded.should.equal(3);
+	done();
+      })
+    })
+    it('but not a re-vote',function(done){
+      logic.processVote(testRoom,'Player1','Player2','Player3',function(err,result){
+	result.should.equal(false);
+	done();
+      })
+    })
+    it('should accept these votes',function(done){
+      logic.processVote(testRoom,'Player2','Player3','Player1',function(err,result){
+	result.should.not.equal(false);
+	result.should.have.property('votesNeeded');
+	result.votesNeeded.should.equal(2);
+	logic.processVote(testRoom,'Player3','Player1','Player2',function(err,result){
+	  result.should.not.equal(false);
+	  result.should.have.property('votesNeeded');
+	  result.votesNeeded.should.equal(1);
+	  done();
+	})
+      })
+    })
+    it('should end the round with this vote',function(done){
+      logic.processVote(testRoom,'Player4','Player1','Player2',function(err, result){
+	result.should.not.equal(false)
+	result.votesNeeded.should.equal(0);
+	//round 2
+	result.gameData.round.should.equal(2);
+	done();
       })
     })
   })

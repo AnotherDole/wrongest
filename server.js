@@ -41,14 +41,16 @@ app.get('/:id',function(req,res){
 //call logic to assign statements to everyone
 //receive a summary to send to everyone in room
 //Or declare a winner
-function getAndSendStatements(roomName){
+function getAndSendStatements(roomName,callback){
   logic.getStatements(roomName,function(err,result){
     if(result == false){
       result = logic.getWinner(roomName);
       io.to(roomName).emit('gameover',result);
+      return callback(false);
     }
     else{
       io.to(roomName).emit('getstatements',result);
+      return callback(true);
     }
   });
 }
@@ -157,10 +159,11 @@ io.on('connection', function (socket){
       socket.emit('startresult',result);
       //time to start game, send out the first statements
       if(result.success){
-	getAndSendStatements(socket.roomName);
-	logic.adjustOrder(socket.roomName,function(err,order){
-	  io.to(socket.roomName).emit('updatecurrentroom',order.players,order.leader,order.dealer);
-	});
+	getAndSendStatements(socket.roomName,function(uh){
+	  logic.adjustOrder(socket.roomName,function(err,order){
+	    io.to(socket.roomName).emit('updatecurrentroom',order.players,order.leader,order.dealer);
+	  });
+	})
       }
     });
   });
@@ -179,7 +182,9 @@ io.on('connection', function (socket){
 	//tell everyone in room new votesNeeded
 	io.to(socket.roomName).emit('newdefendcount',result.votesNeeded,true);
 	if(result.votesNeeded <= 0){
-	  logic.prepareForVotes(socket.roomName);
+	  logic.prepareForVotes(socket.roomName,function(err,result){
+	    //nothing yet
+	  })
 	}
       }
       else{
@@ -190,30 +195,32 @@ io.on('connection', function (socket){
   });
 
   socket.on('playervotes',function(most,least){
-    var result = logic.processVote(socket.roomName,socket.username,most,least);
-    if (result.success){
-      //tell everyone in room about vote
-      io.to(socket.roomName).emit('receivevote',result);
-      if(result.votesNeeded == 0){
-	result = logic.endRound(socket.roomName);
-	//add players from the waiting list
-	if(result.socketsToAdd.length > 0){
-	  for(var i = 0; i < result.socketsToAdd.length; i++){
-	    io.sockets.connected[result.socketsToAdd[i]].join(socket.roomName);
+    logic.processVote(socket.roomName,socket.username,most,least,function(err,result){
+      if (result){
+	//tell everyone in room about vote
+	io.to(socket.roomName).emit('receivevote',result);
+	if(result.votesNeeded == 0){
+	  //add players from the waiting list
+	  if(result.socketsToAdd.length > 0){
+	    for(var i = 0; i < result.socketsToAdd.length; i++){
+	      io.sockets.connected[result.socketsToAdd[i]].join(socket.roomName);
+	    }
+	    //var blar = logic.getPlayersIn(socket.roomName);
+	    //io.to(socket.roomName).emit('updatecurrentroom',blar.players,blar.leader,blar.dealer);
 	  }
-	  var blar = logic.getPlayersIn(socket.roomName);
-	  io.to(socket.roomName).emit('updatecurrentroom',blar.players,blar.leader,blar.dealer);
+	  delete result.socketsToAdd;
+	  io.to(socket.roomName).emit('roundend',result);
+	  getAndSendStatements(socket.roomName,function(uh){
+	    logic.adjustOrder(socket.roomName,function(err,order){
+	      io.to(socket.roomName).emit('updatecurrentroom',order.players,order.leader,order.dealer);
+	    })
+	  })
 	}
-	delete result.socketsToAdd;
-	io.to(socket.roomName).emit('roundend',result);
-	getAndSendStatements(socket.roomName);
-	var order = logic.adjustOrder(socket.roomName);
-	io.to(socket.roomName).emit('updatecurrentroom',order.players,order.leader,order.dealer);
       }
-    }
-    else{
-      socket.emit('votefailed',result.message);
-    }
+      else{
+	socket.emit('votefailed');
+      }
+    })
   });
 
   socket.on('restartgame', function(data){
