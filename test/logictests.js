@@ -48,33 +48,33 @@ describe('Room Creation',function(){
 describe('Joining Rooms',function(){
   describe('Usernames',function(){
     it('should reject this name',function(done){
-      logic.joinRequest('  ','hi',testRoom,function(err,result){
+      logic.joinRequest(testRoom,'  ','hi',function(err,result){
 	result.success.should.equal(false);
 	done();
       })
     });
     it('should not allow joining a room that is not there',function(done){
-      logic.joinRequest('Player2','hi','blahbhahlsd',function(err,result){
+      logic.joinRequest('lklsjldjlsjdlsjkdff','Player2','hi',function(err,result){
 	result.success.should.equal(false);
 	done();
       })
     })
     it('should accept this one',function(done){
-      logic.joinRequest('Player2','hi',testRoom,function(err,result){
+      logic.joinRequest(testRoom,'Player2','hi',function(err,result){
 	result.success.should.equal(true);
 	done();
       })
     })
     it('should not accept duplicate names',function(done){
-      logic.joinRequest('Player1','hi',testRoom,function(err,result){
+      logic.joinRequest(testRoom,'Player1','hi',function(err,result){
 	result.success.should.equal(false);
 	done();
       })
     })
     it('and these',function(done){
-      logic.joinRequest('Player3','hi',testRoom,function(err,result){
+      logic.joinRequest(testRoom,'Player3','hi',function(err,result){
 	result.success.should.equal(true);
-	logic.joinRequest('Player4','hi',testRoom,function(err,result){
+	logic.joinRequest(testRoom,'Player4','hi',function(err,result){
 	  result.success.should.equal(true);
 	  done();
 	})
@@ -300,6 +300,35 @@ describe('Leaving',function(){
     it('should have paused the game',function(done){
       logic.getWhosUp(testRoom,'Player3',function(err,result){
 	result.should.equal(false);
+	done();
+      })
+    })
+  })
+  describe('Restart',function(){
+    it('should not allow a restart with only 2 players',function(done){
+      logic.tryRestartGame(testRoom,'Player3',function(err,result){
+	result.should.equal(false);
+	done();
+      })
+    })
+    it('should only allow a restart from the dealer',function(done){
+      logic.joinRequest(testRoom,'Player5','hi',function(err,result){
+	result.success.should.equal(true);
+	logic.tryRestartGame(testRoom,'Player4',function(err,result){
+	  result.should.equal(false);
+	  done();
+	})
+      })
+    })
+    it('should allow this restart',function(done){
+      logic.tryRestartGame(testRoom,'Player3',function(err,result){
+	result.should.equal(true);
+	done();
+      })
+    })
+    it('so it should allow a getWhosUp',function(done){
+      logic.getWhosUp(testRoom,'Player3',function(err,result){
+	result.player.should.equal('Player5')
 	done();
       })
     })

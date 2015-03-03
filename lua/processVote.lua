@@ -88,7 +88,7 @@ local waitingList = redis.call('lrange',KEYS[6],0,-1)
 for i, name in pairs(waitingList) do
   table.insert(resultNames,name)
   table.insert(resultScoreChanges,0)
-  local playerDataString = ('player:data:' .. AGRV[4] .. ':' .. name)
+  local playerDataString = ('player:data:' .. ARGV[4] .. ':' .. name)
   local playerData = redis.call('hmget',playerDataString,'score','uid')
   table.insert(resultNewScores,playerData[1])
   table.insert(resultNewUIDs,playerData[2])

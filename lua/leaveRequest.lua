@@ -22,7 +22,7 @@ if playerIndex == -1 then
 end
 
 redis.call('lrem',KEYS[1],0,ARGV[1])
-local numPlayers = redis.call('llen',KEYS[1])
+local numPlayers = tonumber(redis.call('llen',KEYS[1]))
 -- no players left, delete all room data
 if numPlayers == 0 then
   redis.call('del',KEYS[3])
@@ -95,5 +95,7 @@ if numPlayers == 2 then
   end
   redis.call('del',KEYS[2])
 end
+
+redis.call('del',KEYS[3])
 
 return toReturn

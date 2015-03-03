@@ -59,40 +59,40 @@ function getAndSendStatements(roomName,callback){
 function leaveOrDisconnect(result){
   if(result.roomDeleted || result.fromWaiting) return;
 
-  var playerList = logic.getPlayersIn(result.theRoom);
-  if(!result.duringGame){
-    io.to(result.theRoom).emit('updatecurrentroom',playerList.players,playerList.leader,playerList.dealer);
-    return;
-  }
-  if(playerList.players.length <= 2){
-    logic.pauseGame(result.theRoom);
-    io.to(result.theRoom).emit('pausegame');
-    //this is necessary because waiting players may have been added
-    var newList = logic.getPlayersIn(result.theRoom);
-    io.to(result.theRoom).emit('updatecurrentroom',newList.players,newList.leader,newList.dealer);
-    return;
-  }
-  io.to(result.theRoom).emit('updatecurrentroom', playerList.players, playerList.leader, playerList.dealer);
-  /*
-     var newOrder = logic.getOrder(result.theRoom);
-     io.to(result.theRoom).emit('roundorder',newOrder.order,newOrder.dealer);
-     */
-  if(result.newNeeded == 0){
-    logic.prepareForVotes(result.theRoom);
-  }
-  //if the person who left was defending
-  if((result.duringArg && result.defenderLeft) || result.newNeeded == 0){
-    io.to(result.theRoom).emit('newdefendcount',result.newNeeded,true);
-  }
-  else{
-    io.to(result.theRoom).emit('newdefendcount',result.newNeeded,false);
-  }
-  if(result.duringVote){
-    //For now, just call for a new vote
-    logic.prepareForVotes(result.theRoom);
-    io.to(result.theRoom).emit('newdefendcount',0,false);
-  }
+  logic.getPlayersIn(result.theRoom,function(err,playerList){
+    if(!result.duringGame){
+      io.to(result.theRoom).emit('updatecurrentroom',playerList.players,playerList.leader,playerList.dealer);
+      return;
+    }
+    if(playerList.players.length <= 2){
+      io.to(result.theRoom).emit('pausegame');
+      //this is necessary because waiting players may have been added
+      logic.getPlayersIn(result.theRoom,function(err,newList){
+	io.to(result.theRoom).emit('updatecurrentroom',newList.players,newList.leader,newList.dealer);
+	return;
+      })
+    }
+    io.to(result.theRoom).emit('updatecurrentroom', playerList.players, playerList.leader, playerList.dealer);
+    //if the person who left was defending
+    if((result.duringArg && result.defenderLeft) || result.newNeeded == 0){
+      io.to(result.theRoom).emit('newdefendcount',result.newNeeded,true);
+    }
+    else{
+      io.to(result.theRoom).emit('newdefendcount',result.newNeeded,false);
+    }
+    if(result.newNeeded == 0){
+      logic.prepareForVotes(result.theRoom,function(err,result){
+      })
+    }
+    else if(result.duringVote){
+      //For now, just call for a new vote
+      logic.prepareForVotes(result.theRoom,function(er,result){
+	io.to(result.theRoom).emit('newdefendcount',0,false);
+      })
+    }
+  })
 }
+
 
 io.on('connection', function (socket){
   //data is the requested room name
@@ -121,7 +121,7 @@ io.on('connection', function (socket){
 
   // data is requested room name
   socket.on('requestjoin', function(playerName,roomName){
-    logic.joinRequest(playerName, socket.id, roomName,function(err,result){
+    logic.joinRequest(roomName,playerName, socket.id,function(err,result){
       if (result.success){
 	if(!result.waiting){
 	  //join socket.io room
@@ -142,14 +142,15 @@ io.on('connection', function (socket){
 
   //data isn't necessary 
   socket.on('requestleave', function(data){
-    var result = logic.leaveRequest(socket.username,socket.roomName);
-    if (result){
-      socket.leave(socket.roomName);
-      delete socket.username;
-      delete socket.roomName;
-      leaveOrDisconnect(result);
-    }
-    socket.emit('leaveresult',result);
+    logic.leaveRequest(socket.roomName,socket.username,function(err,result){
+      if (result){
+	socket.leave(socket.roomName);
+	delete socket.username;
+	delete socket.roomName;
+	leaveOrDisconnect(result);
+      }
+      socket.emit('leaveresult',result);
+    });
   });
 
   //request to start a game with certain options
@@ -224,22 +225,24 @@ io.on('connection', function (socket){
   });
 
   socket.on('restartgame', function(data){
-    var result = logic.canRestartGame(socket.username,socket.roomName);
-    if(result){
-      var order = logic.adjustOrder(socket.roomName);
-      io.to(socket.roomName).emit('updatecurrentroom',order.players,order.leader,order.dealer);
-      io.to(socket.roomName).emit('newdefendcount',order.players.length,true);
-      getAndSendStatements(socket.roomName);
-    }
+    logic.tryRestartGame(socket.roomName,socket.username,function(err,result){
+      if(result){
+	logic.adjustOrder(socket.roomName,function(err,order){
+	  io.to(socket.roomName).emit('updatecurrentroom',order.players,order.leader,order.dealer);
+	  io.to(socket.roomName).emit('newdefendcount',order.players.length,true);
+	  getAndSendStatements(socket.roomName,function(uh){})
+	})
+      }
+    });
   });
 
   socket.on('disconnect', function(data){
-    var result = logic.leaveRequest(socket.username,socket.roomName);
-    if(result && !result.roomDeleted){
-      //io.to(result.theRoom).emit('updatecurrentroom',logic.getPlayersIn(result.theRoom));
-      leaveOrDisconnect(result);
-    }
-    if(testing) playing--;
+    logic.leaveRequest(socket.roomName,socket.username,function(err,result){
+      if(result && !result.roomDeleted){
+	leaveOrDisconnect(result);
+      }
+      if(testing) playing--;
+    })
   });
 
   /****************** Begin code for testing *************/

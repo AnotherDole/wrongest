@@ -216,7 +216,7 @@ exports.getPlayersIn = function(roomName, callback){
 }
 
 //playerName requests to join roomName
-exports.joinRequest = function(playerName,UID, roomName,callback){
+exports.joinRequest = function(roomName,playerName,UID,callback){
   var trimPlayer = playerName.trim();
   if(!isValidName(trimPlayer)){
     return callback(null,{success:false,message:'Invalid name'});
@@ -266,93 +266,17 @@ exports.leaveRequest = function(roomName,playerName,callback){
 	      roomDataKey(roomName),roomAllKey(roomName)];
   var args = [playerName,roomName];
   scriptManager.run('leaveRequest',keys,args,function(err,result){
-    console.log(err);
-    console.log(result);
-    callback(err,result)
+    var toReturn = {};
+    toReturn.fromWaiting = (result[0] != null);
+    toReturn.roomDeleted = (result[1] != null);
+    toReturn.duringGame = (result[2] != null);
+    toReturn.duringArg = (result[3] != null);
+    toReturn.defenderLeft = (result[4] != null);
+    toReturn.duringVote = (result[5] != null);
+    toReturn.newNeeded = parseInt(result[6]);
+    toReturn.theRoom = roomName;
+    callback(err,toReturn)
   })
-  /*
-  //to be safe
-  var theRoom = rooms[roomName];
-  if(theRoom == null){
-    return false;
-  }
-  var thePlayer = getPlayer(theRoom,playerName,true);
-  if(thePlayer == null){
-    return false;
-  }
-  var index = theRoom.players.indexOf(thePlayer);
-  //if player came from the waiting list
-  if(index < 0){
-    index = theRoom.waiting.indexOf(thePlayer);
-    theRoom.waiting.splice(index,1);
-    //none of the rest is necessary if they were just waiting
-    return {success: true, fromWaiting: true};
-  }
-  theRoom.players.splice(index,1);
-  //console.log(playerName + " left room " + theRoom.name);
-  //no one left in room, so delete it
-  if(theRoom.players.length == 0){
-    //console.log(theRoom.name + " was deleted");
-    delete rooms[roomName];
-    return {success: true, roomDeleted: true};
-  }
-  //need to find new leader
-  if(theRoom.leader == thePlayer){
-    theRoom.leader = theRoom.players[Math.floor(Math.random() * theRoom.players.length)];
-    //console.log(theRoom.leader.name + " is the new leader");
-  }
-  if(theRoom.dealer == thePlayer){
-    if(theRoom.dealerFirst){
-      theRoom.dealer = theRoom.players[0];
-    }
-    else{
-      theRoom.dealer = theRoom.players[theRoom.players.length-1];
-    }
-  }
-  var toReturn = {success: true, roomDeleted: false, theRoom:theRoom.name, whoLeft: playerName, 
-    duringArg: false, newNeeded: -1, duringVote: false, duringGame:false, defenderLeft:false};
-  if(theRoom.gameState == GAME_BETWEEN_ARGUMENTS || theRoom.gameState == GAME_SOMEONE_ARGUING){
-    toReturn.duringGame = true;
-    toReturn.duringArg = true;
-    thePlayer.card.inPlay = false;
-    if(thePlayer.voted){
-      theRoom.votesReceived--;
-      theRoom.whosUp--;
-    }
-    toReturn.newNeeded = theRoom.players.length - theRoom.votesReceived;
-    //the player who left was defending
-    if(theRoom.gameState == GAME_SOMEONE_ARGUING && theRoom.whosUp == index){
-      theRoom.gameState = GAME_BETWEEN_ARGUMENTS;
-      toReturn.defenderLeft = true;
-    }
-  }
-  else if (theRoom.gameState == GAME_WAITING_VOTES){
-    toReturn.duringGame = true;
-    thePlayer.card.inPlay = false;
-    toReturn.duringVote = true;
-  }
-  theRoom.leaverData[thePlayer.name] = {score: thePlayer.score, previous: thePlayer.previousCards};
-  return toReturn;
-  */
-}
-
-exports.pauseGame = function(roomName){
-  var thePlayer, theCard;
-  var theRoom = rooms[roomName];
-  theRoom.gameState = GAME_PAUSED;
-  theRoom.votesReceived = 0;
-  for(var i = 0; i < theRoom.players.length; i++){
-    thePlayer = theRoom.players[i];
-    thePlayer.voted = false;
-    theCard = thePlayer.card;
-    theCard.mostVotes = 0;
-    theCard.leastVotes = 0;
-    theCard.inPlay = false;
-    thePlayer.card = null;
-  }
-  while(theRoom.waiting.length > 0){
-    theRoom.players.push(theRoom.waiting.shift());
-  }
 }
 
 //playerName requests to start roomName with given options
@@ -394,18 +318,12 @@ exports.startRequest = function(playerName,roomName,options,callback){
    });
 }
 
-exports.canRestartGame = function(playerName,roomName){
-  var theRoom = rooms[roomName];
-  if(theRoom == null) return false;
-  if(theRoom.gameState != GAME_PAUSED) return false;
-  if(theRoom.players.length < MIN_PLAYERS) return false;
-
-  var thePlayer = getPlayer(theRoom,playerName,false);
-  if(thePlayer == null) return false;
-  if(theRoom.leader != thePlayer) return false;
-
-  theRoom.gameState = GAME_BETWEEN_ARGUMENTS;
-  return true;
+exports.tryRestartGame = function(roomName,playerName,callback){
+  var keys = [roomDataKey(roomName),roomPlayersKey(roomName)];
+  var args = [playerName,roomName];
+  scriptManager.run('tryRestart',keys,args,function(err,result){
+    callback(null,(result != null));
+  });
 }
 
 //return an object containing all the the statements
@@ -502,12 +420,10 @@ exports.processVote = function(roomName,playerName,mostWrong,leastWrong,callback
   //result[5] = array of the changes to their scores
   //result[6] = array of socket.io uuids to add to the room
   scriptManager.run('processVote',keys,args,function(err,result){
-    //console.log(err);
-    //console.log(result);
     if(result == null){
       return callback(null,false)
     }
-    var toReturn = {votesNeeded:result[0]};
+    var toReturn = {votesNeeded:parseInt(result[0])};
     if(result[0] > 0){
       return callback(null, toReturn);
     }
