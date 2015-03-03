@@ -268,6 +268,38 @@ describe('Voting',function(){
 	result.votesNeeded.should.equal(0);
 	//round 2
 	result.gameData.round.should.equal(2);
+	logic.adjustOrder(testRoom,function(err,result){
+	  result.dealer.should.equal('Player2');
+	  done();
+	})
+      })
+    })
+  })
+})
+
+describe('Leaving',function(){
+  describe('Between arguments',function(){
+    it('should accept this leave',function(done){
+      logic.leaveRequest(testRoom,'Player2',function(err,result){
+	logic.getPlayersIn(testRoom,function(err,result){
+	  result.players.length.should.equal(3);
+	  result.dealer.should.equal('Player3');
+	  done();
+	})
+      })
+    })
+    it('should accept this one too',function(done){
+      logic.leaveRequest(testRoom,'Player1',function(err,result){
+	logic.getPlayersIn(testRoom,function(err,result){
+	  result.players.length.should.equal(2);
+	  result.dealer.should.equal('Player3');
+	  done();
+	})
+      })
+    })
+    it('should have paused the game',function(done){
+      logic.getWhosUp(testRoom,'Player3',function(err,result){
+	result.should.equal(false);
 	done();
       })
     })

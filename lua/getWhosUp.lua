@@ -6,6 +6,7 @@ if (ARGV[1] ~= roomData[1]) or (roomData[2] ~= '1') then
   return false
 end
 
+-- lua arrays start at 1, redis index starts at 0, so -1
 local up = redis.call('lindex',KEYS[2],tonumber(roomData[3])-1)
 -- magic number alert: 2 is GAME_SOMEONE_ARGUING
 redis.call('hset',KEYS[1],'gameState','2')
