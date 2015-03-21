@@ -41,7 +41,7 @@
       <div class="pause-screen hidden" id="pauseDiv">
 
 	<p>The number of active players in the room dropped below 3 and so the game was paused.</p>
-	<p>When the number of players in the room reaches 3 or more gain, the leader can restart the game.</p>
+	<p>When the number of players in the room reaches 3 or more again, the leader can restart the game.</p>
 
         <figure>
           <figcaption>Copy and paste:</figcaption>
@@ -348,11 +348,13 @@
       else{
         socket = io();
       }
+
       var username = "";
       var deckData;
       var currentStatements;
       var playerList;
       var meDefending = false;
+      var meDealer = false;
       
       var clock = $('.your-clock').FlipClock(10, {
         clockFace: 'MinuteCounter',
@@ -422,26 +424,6 @@
           $('#createResult').text(data.message);
         }	
       });
-
-      //Send request for information about all rooms
-      /*
-      function updaterooms(){
-        socket.emit('requestroomdata');
-      }
-      */
-
-      //recieved after emitting request for name and player count of all rooms
-      /*
-      socket.on('roomdata',function(data){
-        $('#roomselector').empty();
-        for(var room in data){
-          var name = data[room].name;
-          var toAppend = '<option value="'+name+ '">' + name + ' (' + data[room].playerCount;
-          toAppend = toAppend +'/8) </option>';
-          $('#roomselector').append(toAppend);
-        }
-      });
-      */
 
       //send username, room name, password 
       function joinroom(){
@@ -527,9 +509,11 @@
 	  $('#restartOption').addClass('hidden');
         }
         if(dealer == username){
+	  meDealer = true;
           $('#dealerControls').show();
         }
         else{
+	  meDealer = false;
           $('#dealerControls').hide();
         }	
       });
@@ -572,9 +556,11 @@
       //Includes the order for the current round and the dealer
       socket.on('roundorder', function(list,dealer){
         if(dealer == username){
+	  meDealer = true;
           $('#dealerControls').show();
         }
         else{
+	  meDealer = false;
           $('#dealerControls').hide();
         }
         for (var i = 0; i < list.length; i++){
@@ -594,6 +580,7 @@
 */
 
       function makeDefend(){
+	$('#dealerControls').hide();
         socket.emit('makedefend');
       }
 
@@ -626,6 +613,9 @@
       socket.on('newdefendcount',function(newCount,stopClock){
 	if(stopClock){
 	  clock.stop();
+	}
+	if(meDealer){
+	  $('#dealerControls').show();
 	}
         $('#orderDiv').show();
         if(newCount > 0){
@@ -684,7 +674,6 @@
         var whoVoted = data.voter;
         var most = data.mostName;
         var least = data.leastName;
-        $('#voteResult').append(whoVoted + " says that " + least + " is least wrong and " + most + " is most wrong.<br>");
       });
 
       //received at the end of a round
