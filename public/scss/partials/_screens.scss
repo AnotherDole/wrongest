@@ -1,9 +1,16 @@
 html, body { max-height: 100vh; overflow: hidden; }
 
-section { width: 100%; height:100vh; overflow-x: hidden; overflow-y: auto;  padding:2vh 2vw; max-width:480px; margin-left:auto; margin-right:auto;
+section { width: 100%; height:100%; overflow-x: hidden; overflow-y: auto;  padding:2vh 2vw;
   ol { padding-left: 2em;
     li { list-style-type: decimal; }
   }
 }
 
+@media (max-width: $mobile-max) {
+  
+}
 
+
+@media (min-width:$desktop-min) {
+  section { max-width:480px; margin-left:auto; margin-right:auto; }
+}

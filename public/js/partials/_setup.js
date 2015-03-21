@@ -11,15 +11,16 @@ $('#JoinRoomButton').click(function() {
 
 $('#createPasswordInput').keyup(function() {
   console.log($(this).val());
-  if ( $(this).val() == "") {
+  if ( $(this).val() === "") {
     $(this).parent().next().children().removeClass('fa-lock').addClass('fa-unlock');
   } else {
     $(this).parent().next().children().removeClass('fa-unlock').addClass('fa-lock');
   }
 });
 
-$('#roomURL').focus(function() {
+$('#roomURL').click(function() {
   $(this).select();
+  return false;
 });
 
 $('.settings-toggle').click(function() {
