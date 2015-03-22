@@ -6,6 +6,7 @@
   <link href="css/wrongest.css" rel="stylesheet" />
   <body>
 
+    <!-- PREGAME: Lobby Stuff -->
     <section id="RoomSetup" class="setup screen">
 
       <img src="svg/logo2.svg" class="game-logo" />
@@ -119,12 +120,11 @@
 
     </section>
 
+    <!-- Game View -->
     <section id="GameView" class="order screen">
-
       <div class="clock-holder hidden">
         <div class="your-clock" id="GameClock"></div>
       </div>
-
       <div id='orderDiv'>
         <ol class="player-order">
           <li id="player1"></li>
@@ -140,17 +140,12 @@
           <button onclick='makeDefend();'>Deal a Card</button>
         </div>
       </div>
-
       <div id='defendDiv' class="card" style='display:none'>
-
         <div class="flip-container">
           <div class="flipper">
             <div class="front">
               <div class="inner">
                 <blockquote id='statementDiv'></blockquote>
-                <!--<cite id='authorDiv'></cite>
-<div id='sourceDiv'></div>
-<div id='cardScoreDiv'></div> -->
                 <div class="button-holder">
                   <button onclick='donedefend()'>I'm done early.</button>
                 </div>
@@ -163,11 +158,10 @@
             </div>
           </div>
         </div>
-
       </div>
-
     </section>
-
+    
+    <!-- Voting Booth -->
     <section id="VotingBooth" class="vote screen hidden">
       <div class="statement-holder">
         <table>
@@ -180,8 +174,12 @@
             </td>
             <td>
               <blockquote id='votequote1'></blockquote>
+              <cite><span id="quotecite1"></span></cite>
             </td>
             <td class="votebutton">
+              <div class="player-score">
+                <span class="inner" id="ScoreChange1">+2</span>
+              </div>
               <label>
                 <i class="fa fa-thumbs-down"></i>
                 <input id='leastwrong1' type="radio" name="player1" value="MostWrong" />
@@ -197,8 +195,12 @@
             </td>
             <td>
               <blockquote id='votequote2'></blockquote>
+              <cite><span id="quotecite2"></span></cite>
             </td>
             <td class="votebutton">
+              <div class="player-score">
+                <span class="inner" id="ScoreChange2"></span>
+              </div>
               <label>
                 <i class="fa fa-thumbs-down"></i>
                 <input id='leastwrong2' type="radio" name="player2" value="MostWrong" />
@@ -214,8 +216,12 @@
             </td>
             <td>
               <blockquote id='votequote3'></blockquote>
+              <cite><span id="quotecite3"></span></cite>
             </td>
             <td class="votebutton">
+              <div class="player-score">
+                <span class="inner" id="ScoreChange3">+1</span>
+              </div>
               <label>
                 <i class="fa fa-thumbs-down"></i>
                 <input id='leastwrong3' type="radio" name="player3" value="MostWrong" />
@@ -231,8 +237,12 @@
             </td>
             <td>
               <blockquote id='votequote4'></blockquote>
+              <cite><span id="quotecite4"></span></cite>
             </td>
             <td class="votebutton">
+              <div class="player-score">
+                <span class="inner" id="ScoreChange4">-1</span>
+              </div>
               <label>
                 <i class="fa fa-thumbs-down"></i>
                 <input id='leastwrong4' type="radio" name="player4" value="MostWrong" />
@@ -248,8 +258,12 @@
             </td>
             <td>
               <blockquote id='votequote5'></blockquote>
+              <cite><span id="quotecite5"></span></cite>
             </td>
             <td class="votebutton">
+              <div class="player-score">
+                <span class="inner" id="ScoreChange5"></span>
+              </div>
               <label>
                 <i class="fa fa-thumbs-down"></i>
                 <input id='leastwrong5' type="radio" name="player5" value="MostWrong" />
@@ -265,8 +279,12 @@
             </td>
             <td>
               <blockquote id='votequote6'></blockquote>
+              <cite><span id="quotecite6"></span></cite>
             </td>
             <td class="votebutton">
+              <div class="player-score">
+                <span class="inner" id="ScoreChange6"></span>
+              </div>
               <label>
                 <i class="fa fa-thumbs-down"></i>
                 <input id='leastwrong6' type="radio" name="player6" value="MostWrong" />
@@ -282,8 +300,12 @@
             </td>
             <td>
               <blockquote id='votequote7'></blockquote>
+              <cite><span id="quotecite7"></span></cite>
             </td>
             <td class="votebutton">
+              <div class="player-score">
+                <span class="inner" id="ScoreChange7">+999</span>
+              </div>
               <label>
                 <i class="fa fa-thumbs-down"></i>
                 <input id='leastwrong7' type="radio" name="player7" value="MostWrong" />
@@ -295,6 +317,7 @@
 
       <div class="button-holder hidden">
         <button id="SubmitVotes">Submit Votes</button>
+        <summary id="WaitingAtBoothBecause" class="hidden"></summary>
       </div>
     </section>
 
@@ -326,6 +349,14 @@ $('.fa-thumbs-down').click(function() {
   showButton();
 });
 
+////////////////////////////////////////////////////////////
+//FOR DEMO PURPOSES ONLY PLEASE DELETE THIS FUNCTION!!!!!
+///////////////////////////////////////////////////////////
+$('#WaitingAtBoothBecause').click(function() {
+  $('#VotingBooth').toggleClass('show-scores');
+});
+
+
 function showButton() {
   if ( $('input[value="LeastWrong"]:checked').length > 0 && $('input[value="MostWrong"]:checked').length > 0 ) {
     $('.button-holder').removeClass('hidden');
@@ -335,9 +366,13 @@ function showButton() {
 }
 
 $('#SubmitVotes').click(function() {
+  $('#VotingBooth').addClass('revealed');
+  $('#SubmitVotes').addClass('hidden');
+  $('#WaitingAtBoothBecause').text('waiting for other players to vote').removeClass('hidden');
   socket.emit('playervotes',
-              $('input[value="MostWrong"]:checked').attr('name'),
-              $('input[value="LeastWrong"]:checked').attr('name'));
+    $('input[value="MostWrong"]:checked').attr('name'),
+    $('input[value="LeastWrong"]:checked').attr('name')
+  );
 });
 
 //location.reload();
@@ -427,8 +462,11 @@ socket.on('createresult',function(data){
 
 //send username, room name, password 
 function joinroom(){
-  socket.emit('requestjoin',$('#joinUsernameInput').val(),
-              $('#joinRoomName').val());
+  socket.emit(
+    'requestjoin',
+    $('#joinUsernameInput').val(),
+    $('#joinRoomName').val()
+  );
 }
 
 //received after emitting requestjoin
@@ -462,7 +500,6 @@ socket.on('leaveresult',function(data){
     $('#roomDiv').hide();
     $('#orderDiv').hide();
     $('#statementsDiv').hide();
-    $('#voteDiv').hide();
     $('#voteResult').hide();
     $('#startDiv').show();
   }	
@@ -542,7 +579,6 @@ socket.on('startresult', function(data){
 //Automatically sent out at the start of a new round
 socket.on('getstatements', function(data){
   $('#roomDiv').hide();
-  $('#voteDiv').hide();
   currentStatements = data;
   $('#waitingDiv').addClass('hidden');
   $('#RoomSetup').addClass('hidden');
@@ -629,9 +665,10 @@ socket.on('newdefendcount',function(newCount,stopClock){
     }
   }
   else{
-    //$('#orderDiv').hide();
-    //$('#voteDiv').show();
     $('#GameView').addClass('hidden');
+    $('#VotingBooth').removeClass('revealed');
+    $('#SubmitVotes').removeClass('hidden');
+    $('#WaitingAtBoothBecause').addClass('hidden');
     $('#VotingBooth').removeClass('hidden');
     $('#VotingBooth').children().removeClass('chosen');
     $('#SendVotesButton').addClass('hidden');
@@ -642,12 +679,14 @@ socket.on('newdefendcount',function(newCount,stopClock){
 
 function updateVoteSelectors(){
   var row = 0;
+  console.log(playerList);
   for(var i = 0; i < playerList.length; i++){
     if (playerList[i] == username) continue;
     row++;
     var theStatement = currentStatements[playerList[i]].quote;
     $('#voterow' + row).removeClass('hidden');
     $('#votequote' + row).empty().text(theStatement);
+    $('#quotecite' + row).empty().text(playerList[i]);
     $('#mostwrong' + row).attr('name',playerList[i]);
     $('#leastwrong' + row).attr('name',playerList[i]);
   }
@@ -677,14 +716,11 @@ socket.on('receivevote', function(data){
 
 //received at the end of a round
 socket.on('roundend', function(data){
+  //Bring the voting booth design back to its initial state.
   $('#VotingBooth').addClass('hidden');
-  //Next line temporarily commented out by Dole
-  //$('#ScoreSheet').removeClass('hidden');
-  //$('#scoreDiv').show();
   var $resultDiv = $('#roundText');
   var gameData = data.gameData;
   var playerData = data.playerData;
-
   $resultDiv.empty();
   $resultDiv.append('<b>End of round ' + gameData.round + '</b>');
   console.log(playerData);

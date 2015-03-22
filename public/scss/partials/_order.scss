@@ -14,7 +14,7 @@ section.order { background-color:$white; }
       &:after { background-color:$grey; }
     }
     &.dealer {
-      &:after { background-color:desaturate($green,40%); }
+      &:after { background-color:desaturate($blue,50%); }
     }
     &.completed { opacity:.6; }
     
