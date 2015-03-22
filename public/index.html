@@ -434,6 +434,10 @@ function showJoin(){
   //updaterooms();
 }
 
+function clearToast() {
+  setTimeout(function(){ $('#SetupToasts li:first-child').remove() }, 5200);
+});
+
 socket.on('pausegame', function(){
   $('#GameView').addClass('hidden');
   $('#VotingBooth').addClass('hidden');
@@ -540,7 +544,6 @@ $('input[data-holds="playerName"]').change(function() {
   } else if (pn.indexOf('indif') > -1) {
     $('#SetupToasts').append('<li class="info">bird knees don&apos;t bend backwards</li>');
   }
-  setTimeout(function(){ $('#SetupToasts li:first-child').remove() }, 5200);
 });
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
