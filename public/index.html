@@ -647,6 +647,13 @@ socket.on('timetodefend',function(player,time){
     $('#sourceDiv').empty().text(myStatement.source);
     $('#cardScoreDiv').empty().text('Score: ' + myStatement.score);
   }	
+  //find first li that isn't completed, make it active
+  for(var i = 1; i <=8; i++){
+    if(!$('#player' + i).hasClass('completed')){
+      $('#player' + i).addClass('active');
+      break;
+    }
+  }
   //alert(time);
   clock.setTime(time);
   $('.clock-holder').removeClass('hidden');
@@ -710,6 +717,7 @@ socket.on('newdefendcount',function(newCount,stopClock){
     $('#voteResult').empty();
     updateVoteSelectors();
   }
+  $('.active').removeClass('active');
 });
 
 function updateVoteSelectors(){
