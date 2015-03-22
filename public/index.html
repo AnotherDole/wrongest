@@ -485,7 +485,8 @@ socket.on('createresult',function(data){
     $('#startDiv').hide();
   }
   else{
-    $('#createResult').text(data.message);
+    clearToast();
+    $('#SetupToasts').append('<li class="alert">' + data.message + '</li>');
   }	
 });
 
@@ -513,7 +514,8 @@ socket.on('joinresult',function(data){
     }
   }
   else{
-    $('#joinResult').text(data.message);
+    clearToast();
+    $('#SetupToasts').append('<li class="alert">' + data.message + '</li>');
   }
 });
 
