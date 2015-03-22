@@ -38,7 +38,7 @@ app.get('/:id',function(req,res){
 //Or declare a winner
 function getAndSendStatements(roomName){
   var result = logic.getStatements(roomName);
-  if(result == false){
+  if(result === false){
     result = logic.getWinner(roomName);
     io.to(roomName).emit('gameover',result);
   }

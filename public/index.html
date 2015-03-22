@@ -16,7 +16,7 @@
           Here will be some text that explains how the game works. It will include a link to some other resource, like a page of text or maybe a video?
         </summary>
 
-        <input type="text" id='createUsernameInput' maxlength="50" placeholder="Your Name">
+        <input type="text" data-holds="playerName" id='createUsernameInput' maxlength="50" placeholder="Your Name">
         <div class="button-holder">
           <button  id='createroombutton' onclick='createroom();'>CREATE game</button>
         </div>
@@ -29,7 +29,7 @@
         </div>
         <div class="inputs">
           <div class="username row">
-            <input type='text' id='joinUsernameInput' maxlength='50' placeholder="Your Name">
+            <input type='text' data-holds="playerName" id='joinUsernameInput' maxlength='50' placeholder="Your Name">
             <input type='text' id='joinRoomName' class='hidden'>
           </div>
         </div>
@@ -116,6 +116,7 @@
           <li id='startresult'></li>
         </ul>
       </div>
+      <ul id="SetupToasts"></ul>
 
     </section>
 
@@ -521,12 +522,29 @@ socket.on('leaveresult',function(data){
   }	
 });
 
-////////////////////////////////////////////////////////////
-//FOR DEMO PURPOSES ONLY PLEASE DELETE THIS FUNCTION!!!!!
-///////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+// EVERYTHING FROM THIS COMMENT BLOCK TO THE NEXT IS JUST TO DEMO SOME EFFECTS, DELETE WHEN DONE WITH IT
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////
 $('#WaitingAtBoothBecause').click(function() {
   $('#VotingBooth').toggleClass('show-scores');
 });
+
+$('input[data-holds="playerName"]').change(function() {
+  var pn = $(this).val().toLowerCase();
+  if (pn.indexOf('good') > -1) {
+    $('#SetupToasts').append('<li class="success">Hooray! Something terrific happened, though I cannot tell you exactly what. I just want to type for a while. Typity typity type, this is fun!</li>');
+  } else if (pn.indexOf('bad') > -1) {
+    $('#SetupToasts').append('<li class="alert">now you fucked up!</li>');
+  } else if (pn.indexOf('indif') > -1) {
+    $('#SetupToasts').append('<li class="info">bird knees don&apos;t bend backwards</li>');
+  }
+  setTimeout(function(){ $('#SetupToasts li:first-child').remove() }, 5200);
+});
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+// END OF "TEST ONLY" COMMENT BLOCK
 
 //received whenever someone in the current room leaves or joins
 socket.on('updatecurrentroom', function(players, leader, dealer){
