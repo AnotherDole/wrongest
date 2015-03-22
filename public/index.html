@@ -29,7 +29,7 @@
 
       <div class="join-screen hidden" id="joinDiv">
         <div class="room-details">
-          <ol class="players" id='joinRoomMembers'>Not in a room yet.</ol>
+          <ol class="players" id='joinRoomMembers'>Retrieving the player list...</ol>
         </div>
         <div class="inputs">
           <div class="username row">
@@ -58,7 +58,8 @@
         </div>
 
         <div class="button-holder hidden" id='restartOption'>
-          <button id="restartButton" onclick="socket.emit('restartgame');">Restart Game</button>
+          <button id="RestartButton" onclick="socket.emit('restartgame');">Restart Game</button>
+	  <span id="RestartGameBother">You need at least 3 players. Go bug your friends!</span>
         </div>
 
       </div>
@@ -76,12 +77,13 @@
         </figure>
 
         <div class="lobby-box">
-          <ol class="players" id='detailsRoomMembers'>Not in a room yet.</ol>
+          <ol class="players" id='detailsRoomMembers'>Retrieving player list...</ol>
           <!-- <button id='leaveroom' onclick='leaveroom();'>Leave Current Room</button> -->
         </div>
 
         <div class="button-holder admin-options">
-          <button id='startgamebutton' onclick='startgame();'>Start Game</button>
+          <button id="StartGameButton" onclick="startgame();">Start Game</button>
+	  <span id="StartGameBother">You need at least 3 players. Go bug your friends!</span>
         </div>
 
         <div class="settings-toggle admin-options">
@@ -589,6 +591,17 @@ socket.on('updatecurrentroom', function(players, leader, dealer){
   if(leader == username){
     $('.admin-options').show();
     $('#restartOption').removeClass('hidden');
+    if (players.length < 3){
+      $('#RestartButton').addClass('hidden');
+      $('#RestartGameBother').removeClass('hidden');
+      $('#StartGameButton').addClass('hidden');
+      $('#StartGameBother').removeClass('hidden');
+    } else {
+      $('#RestartButton').removeClass('hidden');
+      $('#RestartGameBother').addClass('hidden');
+      $('#StartGameButton').removeClass('hidden');
+      $('#StartGameBother').addClass('hidden');
+    }
   }
   else{
     $('.admin-options').hide();
