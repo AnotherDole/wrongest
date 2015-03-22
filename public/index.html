@@ -7,20 +7,20 @@
   <body>
 
     <section id="RoomSetup" class="setup screen">
-      
+
       <img src="svg/logo2.svg" class="game-logo" />
-      
+
       <div class="starting-screen" id='startDiv'>
-        
+
         <summary class="game-explanation">
           Here will be some text that explains how the game works. It will include a link to some other resource, like a page of text or maybe a video?
         </summary>
-        
+
         <input type="text" id='createUsernameInput' maxlength="50" placeholder="Your Name">
         <div class="button-holder">
           <button  id='createroombutton' onclick='createroom();'>CREATE game</button>
         </div>
-        
+
       </div>
 
       <div class="join-screen hidden" id="joinDiv">
@@ -40,8 +40,8 @@
 
       <div class="pause-screen hidden" id="pauseDiv">
 
-	<p>The number of active players in the room dropped below 3 and so the game was paused.</p>
-	<p>When the number of players in the room reaches 3 or more again, the leader can restart the game.</p>
+        <p>The number of active players in the room dropped below 3 and so the game was paused.</p>
+        <p>When the number of players in the room reaches 3 or more again, the leader can restart the game.</p>
 
         <figure>
           <figcaption>Copy and paste:</figcaption>
@@ -52,39 +52,39 @@
         <div class="lobby-box">
           <ol class="players" id="pauseRoomMembers"></ol>
         </div>
-	
-	<div class="button-holder hidden" id='restartOption'>
-	  <button id="restartButton" onclick="socket.emit('restartgame');">Restart Game</button>
-	</div>
+
+        <div class="button-holder hidden" id='restartOption'>
+          <button id="restartButton" onclick="socket.emit('restartgame');">Restart Game</button>
+        </div>
 
       </div>
 
       <div class="room-details hidden" id="roomDiv">
 
-	<div class="hidden" id="waitingDiv">
-	  <p>You have joined a game in progress. When the current round ends, you will be able to start playing.</p>
-	</div>
-        
+        <div class="hidden" id="waitingDiv">
+          <p>You have joined a game in progress. When the current round ends, you will be able to start playing.</p>
+        </div>
+
         <figure>
           <figcaption>Copy and paste:</figcaption>
           <!-- <div id='roomLink'></div> -->
           <input type="url" readonly id="roomURL" />
         </figure>
-        
+
         <div class="lobby-box">
           <ol class="players" id='detailsRoomMembers'>Not in a room yet.</ol>
           <!-- <button id='leaveroom' onclick='leaveroom();'>Leave Current Room</button> -->
         </div>
-        
+
         <div class="button-holder admin-options">
           <button id='startgamebutton' onclick='startgame();'>Start Game</button>
         </div>
-        
+
         <div class="settings-toggle admin-options">
           <span>settings</span>
           <i class="fa fa-cog"></i>
         </div>
-        
+
         <ul class="admin-options hidden" id="leaderControls" style="display:none;">
           <li class="option">
             <label for="deck"><span>Deck:</span></label>
@@ -116,15 +116,15 @@
           <li id='startresult'></li>
         </ul>
       </div>
-      
+
     </section>
-    
+
     <section id="GameView" class="order screen">
 
       <div class="clock-holder hidden">
         <div class="your-clock" id="GameClock"></div>
       </div>
-      
+
       <div id='orderDiv'>
         <ol class="player-order">
           <li id="player1"></li>
@@ -140,17 +140,17 @@
           <button onclick='makeDefend();'>Deal a Card</button>
         </div>
       </div>
-      
+
       <div id='defendDiv' class="card" style='display:none'>
-        
+
         <div class="flip-container">
           <div class="flipper">
             <div class="front">
               <div class="inner">
                 <blockquote id='statementDiv'></blockquote>
                 <!--<cite id='authorDiv'></cite>
-                <div id='sourceDiv'></div>
-                <div id='cardScoreDiv'></div> -->
+<div id='sourceDiv'></div>
+<div id='cardScoreDiv'></div> -->
                 <div class="button-holder">
                   <button onclick='donedefend()'>I'm done early.</button>
                 </div>
@@ -163,19 +163,19 @@
             </div>
           </div>
         </div>
-        
+
       </div>
-      
+
     </section>
-    
+
     <section id="VotingBooth" class="vote screen hidden">
       <div class="statement-holder">
         <table>
           <tr id="voterow1">
             <td class="votebutton">
               <label>
-            <i class="fa fa-thumbs-up"></i>
-            <input id='mostwrong1' type="radio" name="player1" value="LeastWrong" />
+                <i class="fa fa-thumbs-up"></i>
+                <input id='mostwrong1' type="radio" name="player1" value="LeastWrong" />
               </label>
             </td>
             <td>
@@ -183,16 +183,16 @@
             </td>
             <td class="votebutton">
               <label>
-            <i class="fa fa-thumbs-down"></i>
-            <input id='leastwrong1' type="radio" name="player1" value="MostWrong" />
+                <i class="fa fa-thumbs-down"></i>
+                <input id='leastwrong1' type="radio" name="player1" value="MostWrong" />
               </label>
             </td>
           </tr>
           <tr id="voterow2">
             <td class="votebutton">
               <label>
-            <i class="fa fa-thumbs-up"></i>
-            <input id='mostwrong2' type="radio" name="player2" value="LeastWrong" />
+                <i class="fa fa-thumbs-up"></i>
+                <input id='mostwrong2' type="radio" name="player2" value="LeastWrong" />
               </label>
             </td>
             <td>
@@ -200,16 +200,16 @@
             </td>
             <td class="votebutton">
               <label>
-            <i class="fa fa-thumbs-down"></i>
-            <input id='leastwrong2' type="radio" name="player2" value="MostWrong" />
+                <i class="fa fa-thumbs-down"></i>
+                <input id='leastwrong2' type="radio" name="player2" value="MostWrong" />
               </label>
             </td>
           </tr>
           <tr id="voterow3">
             <td class="votebutton">
               <label>
-            <i class="fa fa-thumbs-up"></i>
-            <input id='mostwrong3' type="radio" name="player3" value="LeastWrong" />
+                <i class="fa fa-thumbs-up"></i>
+                <input id='mostwrong3' type="radio" name="player3" value="LeastWrong" />
               </label>
             </td>
             <td>
@@ -217,16 +217,16 @@
             </td>
             <td class="votebutton">
               <label>
-            <i class="fa fa-thumbs-down"></i>
-            <input id='leastwrong3' type="radio" name="player3" value="MostWrong" />
+                <i class="fa fa-thumbs-down"></i>
+                <input id='leastwrong3' type="radio" name="player3" value="MostWrong" />
               </label>
             </td>
           </tr>
           <tr id="voterow4">
             <td class="votebutton">
               <label>
-            <i class="fa fa-thumbs-up"></i>
-            <input id='mostwrong4' type="radio" name="player4" value="LeastWrong" />
+                <i class="fa fa-thumbs-up"></i>
+                <input id='mostwrong4' type="radio" name="player4" value="LeastWrong" />
               </label>
             </td>
             <td>
@@ -234,16 +234,16 @@
             </td>
             <td class="votebutton">
               <label>
-            <i class="fa fa-thumbs-down"></i>
-            <input id='leastwrong4' type="radio" name="player4" value="MostWrong" />
+                <i class="fa fa-thumbs-down"></i>
+                <input id='leastwrong4' type="radio" name="player4" value="MostWrong" />
               </label>
             </td>
           </tr>
           <tr id="voterow5">
             <td class="votebutton">
               <label>
-            <i class="fa fa-thumbs-up"></i>
-            <input id='mostwrong5' type="radio" name="player5" value="LeastWrong" />
+                <i class="fa fa-thumbs-up"></i>
+                <input id='mostwrong5' type="radio" name="player5" value="LeastWrong" />
               </label>
             </td>
             <td>
@@ -251,16 +251,16 @@
             </td>
             <td class="votebutton">
               <label>
-            <i class="fa fa-thumbs-down"></i>
-            <input id='leastwrong5' type="radio" name="player5" value="MostWrong" />
+                <i class="fa fa-thumbs-down"></i>
+                <input id='leastwrong5' type="radio" name="player5" value="MostWrong" />
               </label>
             </td>
           </tr>
           <tr id="voterow6">
             <td class="votebutton">
               <label>
-            <i class="fa fa-thumbs-up"></i>
-            <input id='mostwrong6' type="radio" name="player6" value="LeastWrong" />
+                <i class="fa fa-thumbs-up"></i>
+                <input id='mostwrong6' type="radio" name="player6" value="LeastWrong" />
               </label>
             </td>
             <td>
@@ -268,16 +268,16 @@
             </td>
             <td class="votebutton">
               <label>
-            <i class="fa fa-thumbs-down"></i>
-            <input id='leastwrong6' type="radio" name="player6" value="MostWrong" />
+                <i class="fa fa-thumbs-down"></i>
+                <input id='leastwrong6' type="radio" name="player6" value="MostWrong" />
               </label>
             </td>
           </tr>
           <tr id="voterow7">
             <td class="votebutton">
               <label>
-            <i class="fa fa-thumbs-up"></i>
-            <input id='mostwrong7' type="radio" name="player7" value="LeastWrong" />
+                <i class="fa fa-thumbs-up"></i>
+                <input id='mostwrong7' type="radio" name="player7" value="LeastWrong" />
               </label>
             </td>
             <td>
@@ -285,8 +285,8 @@
             </td>
             <td class="votebutton">
               <label>
-            <i class="fa fa-thumbs-down"></i>
-            <input id='leastwrong7' type="radio" name="player7" value="MostWrong" />
+                <i class="fa fa-thumbs-down"></i>
+                <input id='leastwrong7' type="radio" name="player7" value="MostWrong" />
               </label>
             </td>
           </tr>
@@ -294,10 +294,10 @@
       </div>
 
       <div class="button-holder hidden">
-	<button id="SubmitVotes">Submit Votes</button>
+        <button id="SubmitVotes">Submit Votes</button>
       </div>
     </section>
-    
+
     <section id="ScoreSheet" class="score screen hidden">
       <div id='roundText'></div>
       <div class="button-holder">
@@ -310,246 +310,245 @@
     <script src="http://flipclockjs.com/_themes/flipclockjs/js/flipclock/flipclock.js"></script>
     <script src="js/min/wrongest.min.js"></script>
     <script>
-      $('.fa-thumbs-up').click(function() {
-	  $(this).siblings('input').prop('checked',true);
-	  $(this).parent().parent().parent().addClass('least-wrong');
-	  $(this).parent().parent().parent().siblings().removeClass('least-wrong');
-	  $(this).parent().parent().parent().siblings().find('input[value="LeastWrong"]').prop('checked',false);
-	  showButton();
-      });
+$('.fa-thumbs-up').click(function() {
+  $(this).siblings('input').prop('checked',true);
+  $(this).parent().parent().parent().addClass('least-wrong');
+  $(this).parent().parent().parent().siblings().removeClass('least-wrong');
+  $(this).parent().parent().parent().siblings().find('input[value="LeastWrong"]').prop('checked',false);
+  showButton();
+});
 
-      $('.fa-thumbs-down').click(function() {
-	  $(this).siblings('input').prop('checked',true);
-	  $(this).parent().parent().parent().addClass('most-wrong');
-	  $(this).parent().parent().parent().siblings().removeClass('most-wrong');
-	  $(this).parent().parent().parent().siblings().find('input[value="MostWrong"]').prop('checked',false);
-	  showButton();
-      });
+$('.fa-thumbs-down').click(function() {
+  $(this).siblings('input').prop('checked',true);
+  $(this).parent().parent().parent().addClass('most-wrong');
+  $(this).parent().parent().parent().siblings().removeClass('most-wrong');
+  $(this).parent().parent().parent().siblings().find('input[value="MostWrong"]').prop('checked',false);
+  showButton();
+});
 
-      function showButton() {
-	if ( $('input[value="LeastWrong"]:checked').length > 0 && $('input[value="MostWrong"]:checked').length > 0 ) {
-	  $('.button-holder').removeClass('hidden');
-	} else {
-	  $('.button-holder').addClass('hidden');
-	}
+function showButton() {
+  if ( $('input[value="LeastWrong"]:checked').length > 0 && $('input[value="MostWrong"]:checked').length > 0 ) {
+    $('.button-holder').removeClass('hidden');
+  } else {
+    $('.button-holder').addClass('hidden');
+  }
+}
+
+$('#SubmitVotes').click(function() {
+  socket.emit('playervotes',
+              $('input[value="MostWrong"]:checked').attr('name'),
+              $('input[value="LeastWrong"]:checked').attr('name'));
+});
+
+//location.reload();
+var socket;
+if(location.hostname.indexOf('rhcloud.com') > -1){
+  socket = io(location.hostname + ':8000');
+}
+else{
+  socket = io();
+}
+
+var username = "";
+var deckData;
+var currentStatements;
+var playerList;
+var meDefending = false;
+var meDealer = false;
+
+var clock = $('.your-clock').FlipClock(10, {
+  clockFace: 'MinuteCounter',
+  countdown: true,
+  autoStart: false,
+  callbacks: {
+    stop: function() {
+      $('.clock-holder').addClass('hidden');
+      //$('.button-holder').removeClass('hidden')
+      if(meDefending){
+        donedefend();
       }
+    }
+  }
+});
 
-      $('#SubmitVotes').click(function() {
-	  socket.emit('playervotes',
-		      $('input[value="MostWrong"]:checked').attr('name'),
-		      $('input[value="LeastWrong"]:checked').attr('name'));
-      });
+function showCreate(){
+  $('#startDiv').hide();
+  $('#createDiv').show();
+}
 
-    //location.reload();
-      var socket;
-      if(location.hostname.indexOf('rhcloud.com') > -1){
-        socket = io(location.hostname + ':8000');
-      }
-      else{
-        socket = io();
-      }
+function showJoin(){
+  $('#startDiv').hide();
+  $('#joinDiv').show();
+  //updaterooms();
+}
 
-      var username = "";
-      var deckData;
-      var currentStatements;
-      var playerList;
-      var meDefending = false;
-      var meDealer = false;
-      
-      var clock = $('.your-clock').FlipClock(10, {
-        clockFace: 'MinuteCounter',
-        countdown: true,
-        autoStart: false,
-        callbacks: {
-          stop: function() {
-            $('.clock-holder').addClass('hidden');
-            //$('.button-holder').removeClass('hidden')
-	    if(meDefending){
-	      donedefend();
-	    }
-          }
-        }
-      });
+socket.on('pausegame', function(){
+  $('#GameView').addClass('hidden');
+  $('#VotingBooth').addClass('hidden');
+  $('#RoomSetup').removeClass('hidden');
+  $('#pauseDiv').removeClass('hidden');
+});
 
-      function showCreate(){
-        $('#startDiv').hide();
-        $('#createDiv').show();
-      }
+//received after creating or joining a room
+socket.on('deckdata',function(data){
+  deckData = data;
+  $('#deck').empty();
+  for(var deck in data){
+    $('#deck').append($('<option/>', {text: deck, value: deck}));
+  }
+  updateDeckDescription();
+});
 
-      function showJoin(){
-        $('#startDiv').hide();
-        $('#joinDiv').show();
-        //updaterooms();
-      }
+function updateDeckDescription(){
+  var theDeck = deckData[$('#deck').val()];
+  $('#deckdescription').empty().append(theDeck.description + ' Cards: ' + theDeck.numCards);
+}
 
-      socket.on('pausegame', function(){
-	  $('#GameView').addClass('hidden');
-	  $('#VotingBooth').addClass('hidden');
-	  $('#RoomSetup').removeClass('hidden');
-	  $('#pauseDiv').removeClass('hidden');
-      });
+//send username, room name, password 
+function createroom(){
+  socket.emit('createroom',$('#createUsernameInput').val());
+}
 
-      //received after creating or joining a room
-      socket.on('deckdata',function(data){
-        deckData = data;
-        $('#deck').empty();
-        for(var deck in data){
-          $('#deck').append($('<option/>', {text: deck, value: deck}));
-        }
-        updateDeckDescription();
-      });
+//received after emitting createroom
+socket.on('createresult',function(data){
+  if(data.success){
+    $('#roomresult').text('Room created!');
+    username = data.playerName;
+    $('#roomLink').text(data.link);
+    $('#roomURL').add('#pauseRoomURL').val(data.link);
+    $('#createDiv').hide();
+    $('#roomDiv').show();
+    $('#startDiv').hide();
+  }
+  else{
+    $('#createResult').text(data.message);
+  }	
+});
 
-      function updateDeckDescription(){
-        var theDeck = deckData[$('#deck').val()];
-        $('#deckdescription').empty().append(theDeck.description + ' Cards: ' + theDeck.numCards);
-      }
+//send username, room name, password 
+function joinroom(){
+  socket.emit('requestjoin',$('#joinUsernameInput').val(),
+              $('#joinRoomName').val());
+}
 
-      //send username, room name, password 
-      function createroom(){
-        socket.emit('createroom',$('#createUsernameInput').val());
-      }
+//received after emitting requestjoin
+socket.on('joinresult',function(data){
+  if(data.success){
+    $('#roomresult').text('Successfully joined room');
+    $('#joinDiv').hide();
+    $('#roomDiv').show();
+    $('#startDiv').hide();
+    $('#roomURL').add('#pauseRoomURL').val(data.link);
+    username = data.playerName;
+    socket.emit('requestroomdata',data.roomName);
+    if(data.waiting){
+      $('#waitingDiv').removeClass('hidden');
+    }
+  }
+  else{
+    $('#joinResult').text(data.message);
+  }
+});
 
-      //received after emitting createroom
-      socket.on('createresult',function(data){
-        if(data.success){
-          $('#roomresult').text('Room created!');
-          username = data.playerName;
-          $('#roomLink').text(data.link);
-          $('#roomURL').add('#pauseRoomURL').val(data.link);
-          $('#createDiv').hide();
-          $('#roomDiv').show();
-          $('#startDiv').hide();
-        }
-        else{
-          $('#createResult').text(data.message);
-        }	
-      });
+//send request to leave current room. 
+function leaveroom(){
+  socket.emit('requestleave');
+}	
 
-      //send username, room name, password 
-      function joinroom(){
-        socket.emit('requestjoin',$('#joinUsernameInput').val(),
-                    $('#joinRoomName').val());
-      }
+//received after leaving a room
+socket.on('leaveresult',function(data){
+  if(data.success){
+    username = false;
+    $('#roomDiv').hide();
+    $('#orderDiv').hide();
+    $('#statementsDiv').hide();
+    $('#voteDiv').hide();
+    $('#voteResult').hide();
+    $('#startDiv').show();
+  }	
+});
 
-      //received after emitting requestjoin
-      socket.on('joinresult',function(data){
-        if(data.success){
-          $('#roomresult').text('Successfully joined room');
-          $('#joinDiv').hide();
-          $('#roomDiv').show();
-          $('#startDiv').hide();
-          $('#roomURL').add('#pauseRoomURL').val(data.link);
-          username = data.playerName;
-	  socket.emit('requestroomdata',data.roomName);
-	  if(data.waiting){
-	    $('#waitingDiv').removeClass('hidden');
-	  }
-        }
-        else{
-          $('#joinResult').text(data.message);
-        }
-      });
-
-      //send request to leave current room. 
-      function leaveroom(){
-        socket.emit('requestleave');
-      }	
-
-      //received after leaving a room
-      socket.on('leaveresult',function(data){
-        if(data.success){
-          username = false;
-          $('#roomDiv').hide();
-          $('#orderDiv').hide();
-          $('#statementsDiv').hide();
-          $('#voteDiv').hide();
-          $('#voteResult').hide();
-          $('#startDiv').show();
-        }	
-      });
-
-      //received whenever someone in the current room leaves or joins
-      socket.on('updatecurrentroom', function(players, leader, dealer){
-	playerList = players;
-	//this is so lazy
-        var $toChange = $('#joinRoomMembers').add('#pauseRoomMembers').add('#detailsRoomMembers');
-	var $theDiv;
-	/*
+//received whenever someone in the current room leaves or joins
+socket.on('updatecurrentroom', function(players, leader, dealer){
+  playerList = players;
+  //this is so lazy
+  var $toChange = $('#joinRoomMembers').add('#pauseRoomMembers').add('#detailsRoomMembers');
+  var $theDiv;
+  /*
 	if($('#joinDiv').is(':hidden')){
 	  $toChange = $('#detailsRoomMembers');
 	}
 	*/
-        $toChange.empty();
+  $toChange.empty();
 
-        $toChange.append('Currently in the room:');
-        for (var i = 0; i < players.length; i++){
-          if(players[i] == leader){
-            $toChange.append('<li class="leader">'+players[i]+'</li>');
-          } else {
-            $toChange.append('<li>'+players[i]+'</li>');
-          }
-	  $theDiv = $('#player' + (i+1)).removeClass('hidden');
-	  $theDiv.empty().append(players[i]);
-	  if(players[i] == dealer){
-	    $theDiv.addClass('dealer');
-	  }
-	  else{
-	    $theDiv.removeClass('dealer');
-	  }
-        }
-	for(var i = players.length+1; i <=8; i++){
-	  $('#player' + i).addClass('hidden');
-	}
-        if(leader == username){
-          $('.admin-options').show();
-	  $('#restartOption').removeClass('hidden');
-        }
-        else{
-          $('.admin-options').hide();
-	  $('#restartOption').addClass('hidden');
-        }
-        if(dealer == username){
-	  meDealer = true;
-          $('#dealerControls').show();
-        }
-        else{
-	  meDealer = false;
-          $('#dealerControls').hide();
-        }	
-      });
+  $toChange.append('Currently in the room:');
+  for (var i = 0; i < players.length; i++){
+    if(players[i] == leader){
+      $toChange.append('<li class="leader">'+players[i]+'</li>');
+    } else {
+      $toChange.append('<li>'+players[i]+'</li>');
+    }
+    $theDiv = $('#player' + (i+1)).removeClass('hidden');
+    $theDiv.empty().append(players[i]);
+    if(players[i] == dealer){
+      $theDiv.addClass('dealer');
+    }
+    else{
+      $theDiv.removeClass('dealer');
+    }
+  }
+  for(var i = players.length+1; i <=8; i++){
+    $('#player' + i).addClass('hidden');
+  }
+  if(leader == username){
+    $('.admin-options').show();
+    $('#restartOption').removeClass('hidden');
+  }
+  else{
+    $('.admin-options').hide();
+    $('#restartOption').addClass('hidden');
+  }
+  if(dealer == username){
+    meDealer = true;
+    $('#dealerControls').show();
+  }
+  else{
+    meDealer = false;
+    $('#dealerControls').hide();
+  }	
+});
 
-      //Request to start the game. Only works if you are the leader of the room
-      function startgame(){
-        socket.emit('requeststart',$('#deck').val(),
-                    $('#timeLimit').val(),
-                    $('#allowRedraw').val(),
-                    $('#dealerSelect').val());
-      }
+//Request to start the game. Only works if you are the leader of the room
+function startgame(){
+  socket.emit('requeststart',$('#deck').val(),
+    $('#timeLimit').val(),
+    $('#allowRedraw').val(),
+    $('#dealerSelect').val()
+  );
+}
 
-      socket.on('startresult', function(data){
-        if(data.success){
-          $('#startresult').text('Game Started');
-          $('#RoomSetup').addClass('hidden');
-          $('#GameView').removeClass('hidden');
-        }
-        else{
-          $('#startresult').text(data.message);
-        }
-      });
+socket.on('startresult', function(data){
+  if(data.success){
+    $('#startresult').text('Game Started');
+    $('#RoomSetup').addClass('hidden');
+    $('#GameView').removeClass('hidden');
+  }
+  else{
+    $('#startresult').text(data.message);
+  }
+});
 
-      //Receive the statments that everyone will be defending this round.
-      //Automatically sent out at the start of a new round
-      socket.on('getstatements', function(data){
-        //alert('hello!');
-        $('#roomDiv').hide();
-        $('#voteDiv').hide();
-        currentStatements = data;
-        // getStatements();
-	$('#waitingDiv').addClass('hidden');
-        $('#RoomSetup').addClass('hidden');
-        $('#GameView').removeClass('hidden');
-        $('#orderDiv').show();
-      });
+//Receive the statments that everyone will be defending this round.
+//Automatically sent out at the start of a new round
+socket.on('getstatements', function(data){
+  $('#roomDiv').hide();
+  $('#voteDiv').hide();
+  currentStatements = data;
+  $('#waitingDiv').addClass('hidden');
+  $('#RoomSetup').addClass('hidden');
+  $('#GameView').removeClass('hidden');
+  $('#orderDiv').show();
+});
 
 /*
       //Received at the start of a round
@@ -579,143 +578,143 @@
       });
 */
 
-      function makeDefend(){
-	$('#dealerControls').hide();
-        socket.emit('makedefend');
+function makeDefend(){
+  $('#dealerControls').hide();
+  socket.emit('makedefend');
+}
+
+socket.on('timetodefend',function(player,time){
+  if(player == username){
+    meDefending = true;
+    $('#defendDiv').show();
+    $('#orderDiv').hide();
+    var myStatement = currentStatements[username];
+    $('#statementDiv').empty().text(myStatement.quote);
+    $('#authorDiv').empty().text(myStatement.author);
+    $('#sourceDiv').empty().text(myStatement.source);
+    $('#cardScoreDiv').empty().text('Score: ' + myStatement.score);
+  }	
+  //alert(time);
+  clock.setTime(time);
+  $('.clock-holder').removeClass('hidden');
+  clock.start();
+})
+
+//Tell server you are done defending your statement
+function donedefend(){
+  $('#defendDiv').hide();
+  socket.emit('donedefending');
+  meDefending = false;
+}
+
+//received when anyone in the room says they are done defending
+//data is the # of people who are not done
+socket.on('newdefendcount',function(newCount,stopClock){
+  if(stopClock){
+    clock.stop();
+  }
+  if(meDealer){
+    $('#dealerControls').show();
+  }
+  $('#orderDiv').show();
+  if(newCount > 0){
+    var playersDone = playerList.length - newCount;
+    for(var i = 1; i <= 8; i++){
+      if(i <= playersDone){
+        $('#player' + i).addClass('completed');
       }
-
-      socket.on('timetodefend',function(player,time){
-        if(player == username){
-          meDefending = true;
-          $('#defendDiv').show();
-          $('#orderDiv').hide();
-          var myStatement = currentStatements[username];
-          $('#statementDiv').empty().text(myStatement.quote);
-          $('#authorDiv').empty().text(myStatement.author);
-          $('#sourceDiv').empty().text(myStatement.source);
-          $('#cardScoreDiv').empty().text('Score: ' + myStatement.score);
-        }	
-        //alert(time);
-        clock.setTime(time);
-        $('.clock-holder').removeClass('hidden');
-        clock.start();
-      })
-
-      //Tell server you are done defending your statement
-      function donedefend(){
-        $('#defendDiv').hide();
-        socket.emit('donedefending');
-	meDefending = false;
+      else{
+        $('#player' + i).removeClass('completed');
       }
+    }
+  }
+  else{
+    //$('#orderDiv').hide();
+    //$('#voteDiv').show();
+    $('#GameView').addClass('hidden');
+    $('#VotingBooth').removeClass('hidden');
+    $('#VotingBooth').children().removeClass('chosen');
+    $('#SendVotesButton').addClass('hidden');
+    $('#voteResult').empty();
+    updateVoteSelectors();
+  }
+});
 
-      //received when anyone in the room says they are done defending
-      //data is the # of people who are not done
-      socket.on('newdefendcount',function(newCount,stopClock){
-	if(stopClock){
-	  clock.stop();
-	}
-	if(meDealer){
-	  $('#dealerControls').show();
-	}
-        $('#orderDiv').show();
-        if(newCount > 0){
-          var playersDone = playerList.length - newCount;
-          for(var i = 1; i <= 8; i++){
-	    if(i <= playersDone){
-	      $('#player' + i).addClass('completed');
-	    }
-	    else{
-	      $('#player' + i).removeClass('completed');
-	    }
-          }
-        }
-        else{
-          //$('#orderDiv').hide();
-          //$('#voteDiv').show();
-          $('#GameView').addClass('hidden');
-          $('#VotingBooth').removeClass('hidden');
-          $('#VotingBooth').children().removeClass('chosen');
-          $('#SendVotesButton').addClass('hidden');
-          $('#voteResult').empty();
-          updateVoteSelectors();
-        }
-      });
+function updateVoteSelectors(){
+  var row = 0;
+  for(var i = 0; i < playerList.length; i++){
+    if (playerList[i] == username) continue;
+    row++;
+    var theStatement = currentStatements[playerList[i]].quote;
+    $('#voterow' + row).removeClass('hidden');
+    $('#votequote' + row).empty().text(theStatement);
+    $('#mostwrong' + row).attr('name',playerList[i]);
+    $('#leastwrong' + row).attr('name',playerList[i]);
+  }
+  //hide rows with no data
+  for(row++; row <= 7; row++){
+    $('#voterow' + row).addClass('hidden');
+  }
+}
 
-      function updateVoteSelectors(){
-	var row = 0;
-        for(var i = 0; i < playerList.length; i++){
-          if (playerList[i] == username) continue;
-	  row++;
-          var theStatement = currentStatements[playerList[i]].quote;
-	  $('#voterow' + row).removeClass('hidden');
-	  $('#votequote' + row).empty().text(theStatement);
-	  $('#mostwrong' + row).attr('name',playerList[i]);
-	  $('#leastwrong' + row).attr('name',playerList[i]);
-        }
-	//hide rows with no data
-	for(row++; row <= 7; row++){
-	  $('#voterow' + row).addClass('hidden');
-	}
-      }
+//received if your attempt to say you are done voting failed for some reason
+socket.on('donefailed',function(data){
+  $('#votestatus').text(data);
+});
 
-      //received if your attempt to say you are done voting failed for some reason
-      socket.on('donefailed',function(data){
-        $('#votestatus').text(data);
-      });
-      
-      //received if the submitted votes were invalid
-      socket.on('votefailed', function(data){
-        $('#voteResult').append(data + "<br>");	
-      });
+//received if the submitted votes were invalid
+socket.on('votefailed', function(data){
+  $('#voteResult').append(data + "<br>");	
+});
 
-      //received when someone else in the same room has voted
-      socket.on('receivevote', function(data){
-        $('#voteResult').show();
-        var whoVoted = data.voter;
-        var most = data.mostName;
-        var least = data.leastName;
-      });
+//received when someone else in the same room has voted
+socket.on('receivevote', function(data){
+  $('#voteResult').show();
+  var whoVoted = data.voter;
+  var most = data.mostName;
+  var least = data.leastName;
+});
 
-      //received at the end of a round
-      socket.on('roundend', function(data){
-        $('#VotingBooth').addClass('hidden');
-	//Next line temporarily commented out by Dole
-        //$('#ScoreSheet').removeClass('hidden');
-        //$('#scoreDiv').show();
-        var $resultDiv = $('#roundText');
-        var gameData = data.gameData;
-        var playerData = data.playerData;
+//received at the end of a round
+socket.on('roundend', function(data){
+  $('#VotingBooth').addClass('hidden');
+  //Next line temporarily commented out by Dole
+  //$('#ScoreSheet').removeClass('hidden');
+  //$('#scoreDiv').show();
+  var $resultDiv = $('#roundText');
+  var gameData = data.gameData;
+  var playerData = data.playerData;
 
-        $resultDiv.empty();
-        $resultDiv.append('<b>End of round ' + gameData.round + '</b>');
-	console.log(playerData);
-        for(var player in playerData){
-          $resultDiv.append('<br>' + player + ' gains ' + playerData[player].scoreChange + ' points. Current Score: ' + playerData[player].newScore);
-        }
-        $resultDiv.append('<br>Cards left: ' + gameData.cardsLeft + '<br><b> Defend your next point. </b>');
+  $resultDiv.empty();
+  $resultDiv.append('<b>End of round ' + gameData.round + '</b>');
+  console.log(playerData);
+  for(var player in playerData){
+    $resultDiv.append('<br>' + player + ' gains ' + playerData[player].scoreChange + ' points. Current Score: ' + playerData[player].newScore);
+  }
+  $resultDiv.append('<br>Cards left: ' + gameData.cardsLeft + '<br><b> Defend your next point. </b>');
 
-        //reset player div colors
-        for(var i = 1; i <= playerList.length; i++){
-          //$('#player' + i).css('background-color','white');
-          $('#player' + i).removeClass('completed');
-        }
-        //Reset Voting Booth colors.
-        $('#VotingBooth tr').removeClass('most-wrong least-wrong');
-      });
+  //reset player div colors
+  for(var i = 1; i <= playerList.length; i++){
+    //$('#player' + i).css('background-color','white');
+    $('#player' + i).removeClass('completed');
+  }
+  //Reset Voting Booth colors.
+  $('#VotingBooth tr').removeClass('most-wrong least-wrong');
+});
 
-      socket.on('gameover', function(data){
-        var $resultDiv = $('#voteResult');
-        $resultDiv.empty().append('<b>Game Over!</b><br>');
-        $resultDiv.append('Winner: ' + data.player + ' with a score of ' + data.playerScore + '.<br>');
-        $resultDiv.append('Wrongest Words: ' + data.card + ' with a score of ' + data.cardScore);
-      });
+socket.on('gameover', function(data){
+  var $resultDiv = $('#voteResult');
+  $resultDiv.empty().append('<b>Game Over!</b><br>');
+  $resultDiv.append('Winner: ' + data.player + ' with a score of ' + data.playerScore + '.<br>');
+  $resultDiv.append('Wrongest Words: ' + data.card + ' with a score of ' + data.cardScore);
+});
 
-      if(location.pathname.length > 1){
-        $('#startDiv').hide();
-        $('#joinDiv').show();
-        $('#joinRoomName').val(location.pathname.substr(1));
-        socket.emit('requestroomdata',location.pathname.substr(1));
-      }
+if(location.pathname.length > 1){
+  $('#startDiv').hide();
+  $('#joinDiv').show();
+  $('#joinRoomName').val(location.pathname.substr(1));
+  socket.emit('requestroomdata',location.pathname.substr(1));
+}
     </script>
   </body>
 </html>
