@@ -127,14 +127,30 @@
 
       <div id='orderDiv'>
         <ol class="player-order">
-          <li id="player1"></li>
-          <li id="player2"></li>
-          <li id="player3"></li>
-          <li id="player4"></li>
-          <li id="player5"></li>
-          <li id="player6"></li>
-          <li id="player7"></li>
-          <li id="player8"></li>
+          <li id="player1">
+	    <span id="playerName1" class="player-name"></span>
+	  </li>
+          <li id="player2">
+	    <span id="playerName2" class="player-name"></span>
+	  </li>
+          <li id="player3">
+	    <span id="playerName3" class="player-name"></span>
+	  </li>
+          <li id="player4">
+	    <span id="playerName4" class="player-name"></span>
+	  </li>
+          <li id="player5">
+	    <span id="playerName5" class="player-name"></span>
+	  </li>
+          <li id="player6">
+	    <span id="playerName6" class="player-name"></span>
+	  </li>
+          <li id="player7">
+	    <span id="playerName7" class="player-name"></span>
+	  </li>
+          <li id="player8">
+	    <span id="playerName8" class="player-name"></span>
+	  </li>
         </ol>
         <div id='dealerControls' class="button-holder" style='display:none'>
           <button onclick='makeDefend();'>Deal a Card</button>
@@ -353,6 +369,7 @@ var username = "";
 var deckData;
 var currentStatements;
 var playerList;
+var playerScores = {};
 var meDefending = false;
 var meDealer = false;
 
@@ -434,7 +451,6 @@ function joinroom(){
 //received after emitting requestjoin
 socket.on('joinresult',function(data){
   if(data.success){
-    $('#roomresult').text('Successfully joined room');
     $('#joinDiv').hide();
     $('#roomDiv').show();
     $('#startDiv').hide();
@@ -443,6 +459,10 @@ socket.on('joinresult',function(data){
     socket.emit('requestroomdata',data.roomName);
     if(data.waiting){
       $('#waitingDiv').removeClass('hidden');
+      for(var i = 1; i <= 8; i++){
+	$('#player'+i).addClass('has-score');
+	$('#player'+i).append('<span class="player-score" id="playerScore' + i + '"></span>');
+      }
     }
   }
   else{
@@ -471,14 +491,8 @@ socket.on('leaveresult',function(data){
 //received whenever someone in the current room leaves or joins
 socket.on('updatecurrentroom', function(players, leader, dealer){
   playerList = players;
-  //this is so lazy
   var $toChange = $('#joinRoomMembers').add('#pauseRoomMembers').add('#detailsRoomMembers');
   var $theDiv;
-  /*
-	if($('#joinDiv').is(':hidden')){
-	  $toChange = $('#detailsRoomMembers');
-	}
-	*/
   $toChange.empty();
 
   $toChange.append('Currently in the room:');
@@ -489,12 +503,17 @@ socket.on('updatecurrentroom', function(players, leader, dealer){
       $toChange.append('<li>'+players[i]+'</li>');
     }
     $theDiv = $('#player' + (i+1)).removeClass('hidden');
-    $theDiv.empty().append(players[i]);
     if(players[i] == dealer){
       $theDiv.addClass('dealer');
     }
     else{
       $theDiv.removeClass('dealer');
+    }
+    $('#playerName' + (i+1)).empty().append(players[i]);
+    if ($theDiv.hasClass('has-score')){
+      var theScore = playerScores[players[i]];
+      if (theScore == null) {theScore = 0;}
+      $('#playerScore' + (i+1)).empty().append(theScore);
     }
   }
   for(var i = players.length+1; i <=8; i++){
@@ -549,34 +568,6 @@ socket.on('getstatements', function(data){
   $('#GameView').removeClass('hidden');
   $('#orderDiv').show();
 });
-
-/*
-      //Received at the start of a round
-      //Includes the order for the current round and the dealer
-      socket.on('roundorder', function(list,dealer){
-        if(dealer == username){
-	  meDealer = true;
-          $('#dealerControls').show();
-        }
-        else{
-	  meDealer = false;
-          $('#dealerControls').hide();
-        }
-        for (var i = 0; i < list.length; i++){
-          var $theDiv = $('#player' + (i+1)).removeClass('hidden');
-          $theDiv.empty().append(list[i]);
-          if(list[i] == dealer){
-            $theDiv.addClass('dealer');
-          }
-	  else{
-	    $theDiv.removeClass('dealer');
-	  }
-        }
-        for(var i = list.length+1; i <= 8; i++){
-          $('#player' + i).addClass('hidden');
-        }
-      });
-*/
 
 function makeDefend(){
   $('#dealerControls').hide();
@@ -681,21 +672,23 @@ socket.on('roundend', function(data){
   //Next line temporarily commented out by Dole
   //$('#ScoreSheet').removeClass('hidden');
   //$('#scoreDiv').show();
-  var $resultDiv = $('#roundText');
   var gameData = data.gameData;
   var playerData = data.playerData;
 
-  $resultDiv.empty();
-  $resultDiv.append('<b>End of round ' + gameData.round + '</b>');
-  console.log(playerData);
   for(var player in playerData){
-    $resultDiv.append('<br>' + player + ' gains ' + playerData[player].scoreChange + ' points. Current Score: ' + playerData[player].newScore);
+    playerScores[player] = playerData[player].newScore;
   }
-  $resultDiv.append('<br>Cards left: ' + gameData.cardsLeft + '<br><b> Defend your next point. </b>');
+
+  //After the first round, add the spans to display score
+  if(gameData.round == 1){
+    for(var i = 1; i <=8; i++){
+      $('#player' + i).addClass('has-score');
+      $('#player' + i).append('<span class="player-score" id="playerScore' + i + '"></span>');
+    }
+  }
 
   //reset player div colors
   for(var i = 1; i <= playerList.length; i++){
-    //$('#player' + i).css('background-color','white');
     $('#player' + i).removeClass('completed');
   }
   //Reset Voting Booth colors.
