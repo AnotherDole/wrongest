@@ -5,7 +5,7 @@ var io = require('socket.io')(server);
 var logic = require('./logic.js');
 var port = process.env.OPENSHIFT_NODEJS_PORT || 3000;
 var server_ip_address = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1';
-var server_address = process.env.OPENSHIFT_APP_DNS || ('localhost:'+port);
+var server_address = process.env.OPENSHIFT_APP_DNS ? 'www.wrongest.net' : ('localhost:'+port);
 
 /************** Variables for testing **********/
 var connected = 0,playing=0;
@@ -95,7 +95,7 @@ io.on('connection', function (socket){
       socket.username = result.playerName;
       socket.roomName = result.roomName;
       socket.join(result.roomName);
-      result.link = 'http://' + server_address + '/' + result.roomName;
+      result.link = server_address + '/' + result.roomName;
       socket.emit('createresult',result);
       socket.emit('deckdata',logic.getDeckData());
       var blar = logic.getPlayersIn(result.roomName);
@@ -122,7 +122,7 @@ io.on('connection', function (socket){
       //socket.emit('deckdata',logic.getDeckData());
       socket.username = playerName;
       socket.roomName = roomName;
-      result.link = 'http://' + server_address + '/' + result.roomName;
+      result.link =  server_address + '/' + result.roomName;
     }
     socket.emit('joinresult',result);
   });
