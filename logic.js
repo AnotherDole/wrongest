@@ -162,12 +162,12 @@ exports.roomExists = function(roomName){
 
 //Create a new room. playerID is the requestor, name is requested name
 exports.createRoom = function(playerName,UID){
-  if(playerName == null){
+  if(playerName == null || playerName.trim() == ""){
     return {success: false, message: "Please enter a name."};
   }
   trimPlayer = playerName.trim();
   if(!isValidName(trimPlayer)){
-    return {success: false, message: "Invalid name."};
+    return {success: false, message: "Names must at most 50 characters and can only contain letters, number, and spaces."};
   }
   //check if room name already exists
   var trimRoom, keep = true;
@@ -230,15 +230,15 @@ exports.joinRequest = function(playerName,UID, roomName){
   if ((theRoom.players.length + theRoom.waiting.length) >= MAX_PLAYERS){
     return {success: false, message:"That room is full."};
   }
-  if(playerName == null){
+  if(playerName == null || playerName.trim() == ""){
     return {success: false, message: "Please enter a name."};
   }
   var trimPlayer = playerName.trim();
   if(!isValidName(trimPlayer)){
-    return {success: false, message: "Invalid name."};
+    return {success: false, message: "Names must be at most 50 characters and can only contain letters, number, and spaces."};
   }
   if(getPlayer(theRoom,trimPlayer,true) != null){
-    return {success: false, message:"Someone in that room already has that name."};
+    return {success: false, message:"Someone in the room already has that name."};
   }
   if(theRoom.gameState > GAME_NOT_STARTED){
     var toAdd = new gamePlayer(trimPlayer,UID);

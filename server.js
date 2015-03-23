@@ -101,6 +101,9 @@ io.on('connection', function (socket){
       var blar = logic.getPlayersIn(result.roomName);
       io.to(result.roomName).emit('updatecurrentroom',blar.players,blar.leader,blar.dealer);
     }
+    else{
+      socket.emit('createresult',result);
+    }
   });
 
   socket.on('requestroomdata', function(roomName){
