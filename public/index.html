@@ -11,7 +11,7 @@
   <body>
     
     <!-- Pregame screen (lobby stuff mainly) -->
-    <section id="RoomSetup" class="setup screen hidden">
+    <section id="RoomSetup" class="setup screen">
       <img src="svg/logo2.svg" class="game-logo" />
       <div class="starting-screen" id='startDiv'>
         <summary class="game-explanation">
@@ -102,12 +102,14 @@
           <li id='startresult'></li>
         </ul>
       </div>
+      <!-- Delete this when it's no longer needed: -->
+      <p style="padding-top:12px;">DEBUG MODE: <a style="color:yellow; text-decoration:underline; cursor:pointer" onclick="$('#GameOverScreen').removeClass('hidden').siblings('section').addClass('hidden');">This link should show the game over screen</a>, in it's current state. Once you're there, you've gotta refresh.</p>
       <ul id="SetupToasts"></ul>
 
     </section>
 
     <!-- Gameplay screen (player display and the card itself) -->
-    <section id="GameView" class="order screen hidden">
+    <section id="GameView" class="order screen">
       <div class="clock-holder hidden">
         <div class="your-clock" id="GameClock"></div>
       </div>
@@ -339,7 +341,56 @@
       </div>
     </section>
 
-    
+    <!-- GAME OVER screen -->
+    <section id="GameOverScreen" class="game-over screen hidden">
+      <figure class="wrongest-reveal">
+        <figcaption>The (actual) Wrongest Words</figcaption>
+        <div class="quote-holder">
+          <blockquote id="WrongestQuote">Sed at fringilla sem. Praesent cursus feugiat eros, sit amet mollis velit aliquam a.</blockquote>
+          <cite><span id="WrongestCite">Ol Dirty Bastard</span></cite>
+        </div>
+        <span class="card-score score">-6</span>
+      </figure>
+      <ol class="player-final-scores">
+        <li id="place1">
+          <span id="namePlace1" class="player-name">BBoy360</span>
+          <span id="scorePlace1" class="player-score">99k</span>
+        </li>
+        <li id="place2">
+          <span id="namePlace2" class="player-name">Bob</span>
+          <span id="scorePlace2" class="player-score">13</span>
+        </li>
+        <li id="place3">
+          <span id="namePlace3" class="player-name">Dickhead</span>
+          <span id="scorePlace3" class="player-score">13</span>
+        </li>
+        <li id="place4">
+          <span id="namePlace4" class="player-name">Dominique</span>
+          <span id="scorePlace4" class="player-score">10</span>
+        </li>
+        <li id="place5">
+          <span id="namePlace5" class="player-name">Jeff</span>
+          <span id="scorePlace5" class="player-score">7</span>
+        </li>
+        <li id="place6">
+          <span id="namePlace6" class="player-name">skunk skunk spray me now</span>
+          <span id="scorePlace6" class="player-score">4</span>
+        </li>
+        <li id="place7">
+          <span id="namePlace7" class="player-name">Tony Todd</span>
+          <span id="scorePlace6" class="player-score">1</span>
+        </li>
+        <li id="place8">
+          <span id="namePlace8" class="player-name">a</span>
+          <span id="scorePlace6" class="player-score">0</span>
+        </li>
+      </ol>
+      <div class="button-holder">
+        <button id="PlayAgain">Play again?</button>
+      </div>
+      <p>Did you find a bug? <a href="https://github.com/AnotherDole/wrongest/issues">Submit an issue</a> to our GitHub repo</p>
+      <p>Want to suggest additional Wrong Words? <a href="">Use the spreadsheet</a> I can't find a link for right now.</p>
+    </section>
 
     <script src="https://cdn.socket.io/socket.io-1.3.2.js"></script>
     <script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
