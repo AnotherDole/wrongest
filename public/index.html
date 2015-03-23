@@ -9,19 +9,24 @@
     <link href="css/wrongest.css" rel="stylesheet" />
   </head>
   <body>
-    
-    <!-- Pregame screen (lobby stuff mainly) -->
+
     <section id="RoomSetup" class="setup screen">
+
       <img src="svg/logo2.svg" class="game-logo" />
+
       <div class="starting-screen" id='startDiv'>
+
         <summary class="game-explanation">
           Here will be some text that explains how the game works. It will include a link to some other resource, like a page of text or maybe a video?
         </summary>
+
         <input type="text" data-holds="playerName" id='createUsernameInput' maxlength="50" placeholder="Your Name">
         <div class="button-holder">
           <button  id='createroombutton' onclick='createroom();'>CREATE game</button>
         </div>
+
       </div>
+
       <div class="join-screen hidden" id="joinDiv">
         <div class="room-details">
           <ol class="players" id='joinRoomMembers'>Retrieving the player list...</ol>
@@ -36,41 +41,56 @@
           <button type="submit" id='joinroombutton' onclick='joinroom();'>JOIN!</button>
         </div>
       </div>
+
       <div class="pause-screen hidden" id="pauseDiv">
+
         <p>The number of active players in the room dropped below 3 and so the game was paused.</p>
         <p>When the number of players in the room reaches 3 or more again, the leader can restart the game.</p>
+
         <figure>
           <figcaption>Copy and paste:</figcaption>
+          <!-- <div id='roomLink'></div> -->
           <input type="url" readonly id="pauseRoomURL" />
         </figure>
+
         <div class="lobby-box">
           <ol class="players" id="pauseRoomMembers"></ol>
         </div>
+
         <div class="button-holder hidden" id='restartOption'>
           <button id="RestartButton" onclick="socket.emit('restartgame');">Restart Game</button>
           <span id="RestartGameBother">You need at least 3 players. Go bug your friends!</span>
         </div>
+
       </div>
 
       <div class="room-details hidden" id="roomDiv">
+
         <div class="hidden" id="waitingDiv">
           <p>You have joined a game in progress. When the current round ends, you will be able to start playing.</p>
         </div>
+
         <figure>
           <figcaption>Copy and paste:</figcaption>
+          <!-- <div id='roomLink'></div> -->
           <input type="url" readonly id="roomURL" />
         </figure>
+
         <div class="lobby-box">
           <ol class="players" id='detailsRoomMembers'>Retrieving player list...</ol>
+          <!-- <button id='leaveroom' onclick='leaveroom();'>Leave Current Room</button> -->
         </div>
+
         <div class="button-holder admin-options">
           <button id="StartGameButton" onclick="startgame();">Start Game</button>
           <span id="StartGameBother">You need at least 3 players. Go bug your friends!</span>
         </div>
+
         <div class="settings-toggle admin-options">
           <span>settings</span>
           <i class="fa fa-cog"></i>
         </div>
+
         <ul class="admin-options hidden" id="leaderControls" style="display:none;">
           <li class="option">
             <label for="deck"><span>Deck:</span></label>
@@ -102,17 +122,17 @@
           <li id='startresult'></li>
         </ul>
       </div>
-      <!-- Delete this when it's no longer needed: -->
       <p style="padding-top:12px;">DEBUG MODE: <a style="color:yellow; text-decoration:underline; cursor:pointer" onclick="$('#GameOverScreen').removeClass('hidden').siblings('section').addClass('hidden');">This link should show the game over screen</a>, in it's current state. Once you're there, you've gotta refresh.</p>
       <ul id="SetupToasts"></ul>
 
     </section>
 
-    <!-- Gameplay screen (player display and the card itself) -->
     <section id="GameView" class="order screen">
+
       <div class="clock-holder hidden">
         <div class="your-clock" id="GameClock"></div>
       </div>
+
       <div id='orderDiv'>
         <ol class="player-order">
           <li id="player1">
@@ -144,12 +164,17 @@
           <button onclick='makeDefend();'>Deal a Card</button>
         </div>
       </div>
+
       <div id='defendDiv' class="card" style='display:none'>
+
         <div class="flip-container">
           <div class="flipper">
             <div class="front">
               <div class="inner">
                 <blockquote id='statementDiv'></blockquote>
+                <!--<cite id='authorDiv'></cite>
+<div id='sourceDiv'></div>
+<div id='cardScoreDiv'></div> -->
                 <div class="button-holder">
                   <button onclick='donedefend()'>I'm done early.</button>
                 </div>
@@ -162,10 +187,11 @@
             </div>
           </div>
         </div>
+
       </div>
+
     </section>
 
-    <!-- Voting Booth and post-round recap -->
     <section id="VotingBooth" class="vote screen hidden">
       <div class="statement-holder">
         <table>
@@ -178,7 +204,7 @@
               </td>
               <td class="votebutton">
                 <div class="player-score">
-                  <span class="inner" id="MyScoreChange">+3</span>
+                  <span class="inner" id="MyScoreChange"></span>
                 </div>
               </td>
             </tr>
@@ -197,7 +223,7 @@
               </td>
               <td class="votebutton">
                 <div class="player-score">
-                  <span class="inner" id="ScoreChange1">+2</span>
+                  <span class="inner" id="ScoreChange1"></span>
                 </div>
                 <label>
                   <i class="fa fa-thumbs-down"></i>
@@ -239,7 +265,7 @@
               </td>
               <td class="votebutton">
                 <div class="player-score">
-                  <span class="inner" id="ScoreChange3">+1</span>
+                  <span class="inner" id="ScoreChange3"></span>
                 </div>
                 <label>
                   <i class="fa fa-thumbs-down"></i>
@@ -260,7 +286,7 @@
               </td>
               <td class="votebutton">
                 <div class="player-score">
-                  <span class="inner" id="ScoreChange4">+6</span>
+                  <span class="inner" id="ScoreChange4"></span>
                 </div>
                 <label>
                   <i class="fa fa-thumbs-down"></i>
@@ -323,7 +349,7 @@
               </td>
               <td class="votebutton">
                 <div class="player-score">
-                  <span class="inner" id="ScoreChange7">+999</span>
+                  <span class="inner" id="ScoreChange7"></span>
                 </div>
                 <label>
                   <i class="fa fa-thumbs-down"></i>
@@ -569,29 +595,6 @@ socket.on('leaveresult',function(data){
   }	
 });
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-// EVERYTHING FROM THIS COMMENT BLOCK TO THE NEXT IS JUST TO DEMO SOME EFFECTS, DELETE WHEN DONE WITH IT
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-$('#WaitingAtBoothBecause').click(function() {
-  $('#VotingBooth').toggleClass('show-scores');
-});
-
-$('input[data-holds="playerName"]').change(function() {
-  var pn = $(this).val().toLowerCase();
-  if (pn.indexOf('good') > -1) {
-    $('#SetupToasts').append('<li class="success">Hooray! Something terrific happened, though I cannot tell you exactly what. I just want to type for a while. Typity typity type, this is fun!</li>');
-  } else if (pn.indexOf('bad') > -1) {
-    $('#SetupToasts').append('<li class="alert">now you fucked up!</li>');
-  } else if (pn.indexOf('indif') > -1) {
-    $('#SetupToasts').append('<li class="info">bird knees don&apos;t bend backwards</li>');
-  }
-});
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-// END OF "TEST ONLY" COMMENT BLOCK
-
 //received whenever someone in the current room leaves or joins
 socket.on('updatecurrentroom', function(players, leader, dealer){
   playerList = players;
@@ -675,12 +678,14 @@ socket.on('startresult', function(data){
 //Receive the statments that everyone will be defending this round.
 //Automatically sent out at the start of a new round
 socket.on('getstatements', function(data){
-  $('#roomDiv').hide();
   currentStatements = data;
-  $('#waitingDiv').addClass('hidden');
-  $('#RoomSetup').addClass('hidden');
-  $('#GameView').removeClass('hidden');
-  $('#orderDiv').show();
+  if( $('#VotingBooth').hasClass('hidden')){
+    $('#roomDiv').hide();
+    $('#waitingDiv').addClass('hidden');
+    $('#RoomSetup').addClass('hidden');
+    $('#GameView').removeClass('hidden');
+    $('#orderDiv').show();
+  }
 });
 
 function makeDefend(){
@@ -773,16 +778,21 @@ socket.on('newdefendcount',function(newCount,stopClock){
 });
 
 function updateVoteSelectors(){
-  var row = 0;
+  var row = 0, theName;
   for(var i = 0; i < playerList.length; i++){
-    if (playerList[i] == username) continue;
+    theName = playerList[i];
+    if (theName == username){
+      $('#MyQuote').empty().append(currentStatements[username].quote);
+      $('#MyCite').empty().append(theName);
+      continue;
+    }
     row++;
-    var theStatement = currentStatements[playerList[i]].quote;
+    var theStatement = currentStatements[theName].quote;
     $('#voterow' + row).removeClass('hidden');
     $('#votequote' + row).empty().text(theStatement);
-    $('#quotecite' + row).empty().text(playerList[i]);
-    $('#mostwrong' + row).attr('name',playerList[i]);
-    $('#leastwrong' + row).attr('name',playerList[i]);
+    $('#quotecite' + row).empty().text(theName);
+    $('#mostwrong' + row).attr('name',theName);
+    $('#leastwrong' + row).attr('name',theName);
   }
   //hide rows with no data
   for(row++; row <= 7; row++){
@@ -810,17 +820,11 @@ socket.on('receivevote', function(data){
 
 //received at the end of a round
 socket.on('roundend', function(data){
-  $('#VotingBooth').addClass('hidden');
-
   //Next line temporarily commented out by Dole
   //$('#ScoreSheet').removeClass('hidden');
   //$('#scoreDiv').show();
   var gameData = data.gameData;
   var playerData = data.playerData;
-
-  for(var player in playerData){
-    playerScores[player] = playerData[player].newScore;
-  }
 
   //After the first round, add the spans to display score
   if(gameData.round == 1){
@@ -830,12 +834,29 @@ socket.on('roundend', function(data){
     }
   }
 
-  //reset player div colors
+  var theName, row = 0;
+  //reset player div colors and show score changes
   for(var i = 1; i <= playerList.length; i++){
     $('#player' + i).removeClass('completed');
+    theName = playerList[i-1];
+    playerScores[theName] = playerData[theName].newScore;
+    if(theName == username){
+      $('#MyScoreChange').empty().append('+' + playerData[theName].scoreChange);
+      continue;
+    }
+    row++;
+    $('#ScoreChange' + row).empty().append('+' + playerData[theName].scoreChange);
   }
   //Reset Voting Booth colors.
   $('#VotingBooth tr').removeClass('most-wrong least-wrong');
+  $('#WaitingAtBoothBecause').text('Round ' + gameData.round + ' complete! Next round begins in 7 seconds.');
+  $('#VotingBooth').toggleClass('show-scores');
+  setTimeout(function(){
+    $('#WaitingAtBoothBecause').text('').addClass('hidden');
+    $('#VotingBooth').toggleClass('show-scores');
+    $('#VotingBooth').addClass('hidden');
+    $('#GameView').removeClass('hidden');
+  },7000);
 });
 
 socket.on('gameover', function(data){
