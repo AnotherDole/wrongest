@@ -9,24 +9,19 @@
     <link href="css/wrongest.css" rel="stylesheet" />
   </head>
   <body>
-
-    <section id="RoomSetup" class="setup screen">
-
+    
+    <!-- Pregame screen (lobby stuff mainly) -->
+    <section id="RoomSetup" class="setup screen hidden">
       <img src="svg/logo2.svg" class="game-logo" />
-
       <div class="starting-screen" id='startDiv'>
-
         <summary class="game-explanation">
           Here will be some text that explains how the game works. It will include a link to some other resource, like a page of text or maybe a video?
         </summary>
-
         <input type="text" data-holds="playerName" id='createUsernameInput' maxlength="50" placeholder="Your Name">
         <div class="button-holder">
           <button  id='createroombutton' onclick='createroom();'>CREATE game</button>
         </div>
-
       </div>
-
       <div class="join-screen hidden" id="joinDiv">
         <div class="room-details">
           <ol class="players" id='joinRoomMembers'>Retrieving the player list...</ol>
@@ -41,56 +36,41 @@
           <button type="submit" id='joinroombutton' onclick='joinroom();'>JOIN!</button>
         </div>
       </div>
-
       <div class="pause-screen hidden" id="pauseDiv">
-
         <p>The number of active players in the room dropped below 3 and so the game was paused.</p>
         <p>When the number of players in the room reaches 3 or more again, the leader can restart the game.</p>
-
         <figure>
           <figcaption>Copy and paste:</figcaption>
-          <!-- <div id='roomLink'></div> -->
           <input type="url" readonly id="pauseRoomURL" />
         </figure>
-
         <div class="lobby-box">
           <ol class="players" id="pauseRoomMembers"></ol>
         </div>
-
         <div class="button-holder hidden" id='restartOption'>
           <button id="RestartButton" onclick="socket.emit('restartgame');">Restart Game</button>
-	  <span id="RestartGameBother">You need at least 3 players. Go bug your friends!</span>
+          <span id="RestartGameBother">You need at least 3 players. Go bug your friends!</span>
         </div>
-
       </div>
 
       <div class="room-details hidden" id="roomDiv">
-
         <div class="hidden" id="waitingDiv">
           <p>You have joined a game in progress. When the current round ends, you will be able to start playing.</p>
         </div>
-
         <figure>
           <figcaption>Copy and paste:</figcaption>
-          <!-- <div id='roomLink'></div> -->
           <input type="url" readonly id="roomURL" />
         </figure>
-
         <div class="lobby-box">
           <ol class="players" id='detailsRoomMembers'>Retrieving player list...</ol>
-          <!-- <button id='leaveroom' onclick='leaveroom();'>Leave Current Room</button> -->
         </div>
-
         <div class="button-holder admin-options">
           <button id="StartGameButton" onclick="startgame();">Start Game</button>
-	  <span id="StartGameBother">You need at least 3 players. Go bug your friends!</span>
+          <span id="StartGameBother">You need at least 3 players. Go bug your friends!</span>
         </div>
-
         <div class="settings-toggle admin-options">
           <span>settings</span>
           <i class="fa fa-cog"></i>
         </div>
-
         <ul class="admin-options hidden" id="leaderControls" style="display:none;">
           <li class="option">
             <label for="deck"><span>Deck:</span></label>
@@ -126,12 +106,11 @@
 
     </section>
 
-    <section id="GameView" class="order screen">
-
+    <!-- Gameplay screen (player display and the card itself) -->
+    <section id="GameView" class="order screen hidden">
       <div class="clock-holder hidden">
         <div class="your-clock" id="GameClock"></div>
       </div>
-
       <div id='orderDiv'>
         <ol class="player-order">
           <li id="player1">
@@ -163,17 +142,12 @@
           <button onclick='makeDefend();'>Deal a Card</button>
         </div>
       </div>
-
       <div id='defendDiv' class="card" style='display:none'>
-
         <div class="flip-container">
           <div class="flipper">
             <div class="front">
               <div class="inner">
                 <blockquote id='statementDiv'></blockquote>
-                <!--<cite id='authorDiv'></cite>
-<div id='sourceDiv'></div>
-<div id='cardScoreDiv'></div> -->
                 <div class="button-holder">
                   <button onclick='donedefend()'>I'm done early.</button>
                 </div>
@@ -186,11 +160,10 @@
             </div>
           </div>
         </div>
-
       </div>
-
     </section>
 
+    <!-- Voting Booth and post-round recap -->
     <section id="VotingBooth" class="vote screen hidden">
       <div class="statement-holder">
         <table>
@@ -366,12 +339,7 @@
       </div>
     </section>
 
-    <section id="ScoreSheet" class="score screen hidden">
-      <div id='roundText'></div>
-      <div class="button-holder">
-        <button onclick='$("#ScoreSheet").addClass("hidden");'>Got it, thanks.</button>
-      </div>
-    </section>
+    
 
     <script src="https://cdn.socket.io/socket.io-1.3.2.js"></script>
     <script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
@@ -702,18 +670,18 @@ function donedefend(){
 
 (function($){
 
-    $.fn.shuffle = function() {
-        return this.each(function(){
-            var items = $(this).children().clone(true);
-            return (items.length) ? $(this).html($.shuffle(items)) : this;
-        });
-    }
-    
-    $.shuffle = function(arr) {
-        for(var j, x, i = arr.length; i; j = parseInt(Math.random() * i), x = arr[--i], arr[i] = arr[j], arr[j] = x);
-        return arr;
-    }
-    
+  $.fn.shuffle = function() {
+    return this.each(function(){
+      var items = $(this).children().clone(true);
+      return (items.length) ? $(this).html($.shuffle(items)) : this;
+    });
+  }
+
+  $.shuffle = function(arr) {
+    for(var j, x, i = arr.length; i; j = parseInt(Math.random() * i), x = arr[--i], arr[i] = arr[j], arr[j] = x);
+    return arr;
+  }
+
 })(jQuery);
 
 //received when anyone in the room says they are done defending
@@ -792,7 +760,7 @@ socket.on('receivevote', function(data){
 //received at the end of a round
 socket.on('roundend', function(data){
   $('#VotingBooth').addClass('hidden');
-  
+
   //Next line temporarily commented out by Dole
   //$('#ScoreSheet').removeClass('hidden');
   //$('#scoreDiv').show();
