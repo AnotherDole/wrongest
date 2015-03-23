@@ -203,7 +203,7 @@
               </td>
               <td class="votebutton">
                 <div class="player-score">
-                  <span class="inner" id="MyScoreChange">+3</span>
+                  <span class="inner" id="MyScoreChange"></span>
                 </div>
               </td>
             </tr>
@@ -222,7 +222,7 @@
               </td>
               <td class="votebutton">
                 <div class="player-score">
-                  <span class="inner" id="ScoreChange1">+2</span>
+                  <span class="inner" id="ScoreChange1"></span>
                 </div>
                 <label>
                   <i class="fa fa-thumbs-down"></i>
@@ -264,7 +264,7 @@
               </td>
               <td class="votebutton">
                 <div class="player-score">
-                  <span class="inner" id="ScoreChange3">+1</span>
+                  <span class="inner" id="ScoreChange3"></span>
                 </div>
                 <label>
                   <i class="fa fa-thumbs-down"></i>
@@ -285,7 +285,7 @@
               </td>
               <td class="votebutton">
                 <div class="player-score">
-                  <span class="inner" id="ScoreChange4">+6</span>
+                  <span class="inner" id="ScoreChange4"></span>
                 </div>
                 <label>
                   <i class="fa fa-thumbs-down"></i>
@@ -348,7 +348,7 @@
               </td>
               <td class="votebutton">
                 <div class="player-score">
-                  <span class="inner" id="ScoreChange7">+999</span>
+                  <span class="inner" id="ScoreChange7"></span>
                 </div>
                 <label>
                   <i class="fa fa-thumbs-down"></i>
@@ -550,29 +550,6 @@ socket.on('leaveresult',function(data){
   }	
 });
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-// EVERYTHING FROM THIS COMMENT BLOCK TO THE NEXT IS JUST TO DEMO SOME EFFECTS, DELETE WHEN DONE WITH IT
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-$('#WaitingAtBoothBecause').click(function() {
-  $('#VotingBooth').toggleClass('show-scores');
-});
-
-$('input[data-holds="playerName"]').change(function() {
-  var pn = $(this).val().toLowerCase();
-  if (pn.indexOf('good') > -1) {
-    $('#SetupToasts').append('<li class="success">Hooray! Something terrific happened, though I cannot tell you exactly what. I just want to type for a while. Typity typity type, this is fun!</li>');
-  } else if (pn.indexOf('bad') > -1) {
-    $('#SetupToasts').append('<li class="alert">now you fucked up!</li>');
-  } else if (pn.indexOf('indif') > -1) {
-    $('#SetupToasts').append('<li class="info">bird knees don&apos;t bend backwards</li>');
-  }
-});
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-// END OF "TEST ONLY" COMMENT BLOCK
-
 //received whenever someone in the current room leaves or joins
 socket.on('updatecurrentroom', function(players, leader, dealer){
   playerList = players;
@@ -656,12 +633,14 @@ socket.on('startresult', function(data){
 //Receive the statments that everyone will be defending this round.
 //Automatically sent out at the start of a new round
 socket.on('getstatements', function(data){
-  $('#roomDiv').hide();
   currentStatements = data;
-  $('#waitingDiv').addClass('hidden');
-  $('#RoomSetup').addClass('hidden');
-  $('#GameView').removeClass('hidden');
-  $('#orderDiv').show();
+  if( $('#VotingBooth').hasClass('hidden')){
+    $('#roomDiv').hide();
+    $('#waitingDiv').addClass('hidden');
+    $('#RoomSetup').addClass('hidden');
+    $('#GameView').removeClass('hidden');
+    $('#orderDiv').show();
+  }
 });
 
 function makeDefend(){
@@ -754,16 +733,21 @@ socket.on('newdefendcount',function(newCount,stopClock){
 });
 
 function updateVoteSelectors(){
-  var row = 0;
+  var row = 0, theName;
   for(var i = 0; i < playerList.length; i++){
-    if (playerList[i] == username) continue;
+    theName = playerList[i];
+    if (theName == username){
+      $('#MyQuote').empty().append(currentStatements[username].quote);
+      $('#MyCite').empty().append(theName);
+      continue;
+    }
     row++;
-    var theStatement = currentStatements[playerList[i]].quote;
+    var theStatement = currentStatements[theName].quote;
     $('#voterow' + row).removeClass('hidden');
     $('#votequote' + row).empty().text(theStatement);
-    $('#quotecite' + row).empty().text(playerList[i]);
-    $('#mostwrong' + row).attr('name',playerList[i]);
-    $('#leastwrong' + row).attr('name',playerList[i]);
+    $('#quotecite' + row).empty().text(theName);
+    $('#mostwrong' + row).attr('name',theName);
+    $('#leastwrong' + row).attr('name',theName);
   }
   //hide rows with no data
   for(row++; row <= 7; row++){
@@ -791,17 +775,11 @@ socket.on('receivevote', function(data){
 
 //received at the end of a round
 socket.on('roundend', function(data){
-  $('#VotingBooth').addClass('hidden');
-  
   //Next line temporarily commented out by Dole
   //$('#ScoreSheet').removeClass('hidden');
   //$('#scoreDiv').show();
   var gameData = data.gameData;
   var playerData = data.playerData;
-
-  for(var player in playerData){
-    playerScores[player] = playerData[player].newScore;
-  }
 
   //After the first round, add the spans to display score
   if(gameData.round == 1){
@@ -811,12 +789,29 @@ socket.on('roundend', function(data){
     }
   }
 
-  //reset player div colors
+  var theName, row = 0;
+  //reset player div colors and show score changes
   for(var i = 1; i <= playerList.length; i++){
     $('#player' + i).removeClass('completed');
+    theName = playerList[i-1];
+    playerScores[theName] = playerData[theName].newScore;
+    if(theName == username){
+      $('#MyScoreChange').empty().append('+' + playerData[theName].scoreChange);
+      continue;
+    }
+    row++;
+    $('#ScoreChange' + row).empty().append('+' + playerData[theName].scoreChange);
   }
   //Reset Voting Booth colors.
   $('#VotingBooth tr').removeClass('most-wrong least-wrong');
+  $('#WaitingAtBoothBecause').text('Round ' + gameData.round + ' complete! Next round begins in 7 seconds.');
+  $('#VotingBooth').toggleClass('show-scores');
+  setTimeout(function(){
+    $('#WaitingAtBoothBecause').text('').addClass('hidden');
+    $('#VotingBooth').toggleClass('show-scores');
+    $('#VotingBooth').addClass('hidden');
+    $('#GameView').removeClass('hidden');
+  },7000);
 });
 
 socket.on('gameover', function(data){
