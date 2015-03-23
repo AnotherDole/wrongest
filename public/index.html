@@ -834,18 +834,19 @@ socket.on('roundend', function(data){
     }
   }
 
-  var theName, row = 0;
+  var theName, row = 0, changeString;
   //reset player div colors and show score changes
   for(var i = 1; i <= playerList.length; i++){
     $('#player' + i).removeClass('completed');
     theName = playerList[i-1];
+    changeString = playerData[theName].scoreChange == 0 ? '' : ('+' + playerData[theName].scoreChange);
     playerScores[theName] = playerData[theName].newScore;
     if(theName == username){
-      $('#MyScoreChange').empty().append('+' + playerData[theName].scoreChange);
+      $('#MyScoreChange').empty().append(changeString);
       continue;
     }
     row++;
-    $('#ScoreChange' + row).empty().append('+' + playerData[theName].scoreChange);
+    $('#ScoreChange' + row).empty().append(changeString);
   }
   //Reset Voting Booth colors.
   $('#VotingBooth tr').removeClass('most-wrong least-wrong');
