@@ -1,6 +1,8 @@
 section.vote { padding: 0;
   &:not(.hidden) { position: absolute; top:0; right:0; bottom:0; left:0; overflow: hidden; }
   .statement-holder { position:absolute; top:0; right:0; bottom:0; left:0; overflow:auto; padding-bottom:70px; }
+  
+  .my-statement { display: none; }
 
   blockquote { font-family:$font; font-size:1.4em; padding:1em 0 0 0; text-align:center;
     &:before { content:"\201C"; }
@@ -70,5 +72,7 @@ section.vote { padding: 0;
     .player-score { display: block; position: absolute; top:0; right:0; bottom: 0; left: 0; text-align: left;  padding-top: 2em;
       .inner:not(:empty) { background-color: $blue; color: white; display: inline-block; width: 2em; text-align: center; border-radius: 50%; height: 2em; padding-top: 0.4em; font-weight:$bold; }
     }
+    
+    .my-statement { display: table-header-group; }
   }
 }
