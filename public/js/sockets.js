@@ -228,6 +228,9 @@ socket.on('newdefendcount',function(newCount,stopClock){
     $('#VotingBooth').children().removeClass('chosen');
     $('#SendVotesButton').addClass('hidden');
     $('#voteResult').empty();
+    $('.button-holder').addClass('hidden');
+    $('input[Value="LeastWrong"]').prop('checked',false);
+    $('input[Value="MostWrong"]').prop('checked',false);
     updateVoteSelectors();
   }
   $('.active').removeClass('active');
