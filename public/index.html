@@ -1,35 +1,58 @@
 <!DOCTYPE html>
-<html>
-  <title>The Wrongest Words v0.1</title>
-  <link href='http://fonts.googleapis.com/css?family=Comfortaa:400,700,300' rel='stylesheet' type='text/css'>
-  <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
-  <link href="css/wrongest.css" rel="stylesheet" />
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>The Wrongest Words v0.1.0</title>
+    <link href='http://fonts.googleapis.com/css?family=Comfortaa:400,700,300' rel='stylesheet' type='text/css'>
+    <link href="css/wrongest.css" rel="stylesheet" />
+    
+    <!-- Begin favicons -->
+    <link rel="apple-touch-icon" sizes="57x57" href="/apple-touch-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="/apple-touch-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="/apple-touch-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/apple-touch-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/apple-touch-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/apple-touch-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-180x180.png">
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="/android-chrome-192x192.png" sizes="192x192">
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96">
+    <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="msapplication-TileColor" content="#ef4d79">
+    <meta name="msapplication-TileImage" content="/mstile-144x144.png">
+    <meta name="theme-color" content="#ef4d79">
+    <!-- End Favicons -->
+  </head>
   <body>
 
+    <!-- PREGAME screen (mostly lobby setup) -->
     <section id="RoomSetup" class="setup screen">
-      
+
       <img src="svg/logo2.svg" class="game-logo" />
       
+      <!-- New user -->
       <div class="starting-screen" id='startDiv'>
-        
         <summary class="game-explanation">
           Here will be some text that explains how the game works. It will include a link to some other resource, like a page of text or maybe a video?
         </summary>
-        
-        <input type="text" id='createUsernameInput' maxlength="50" placeholder="Your Name">
+        <input type="text" data-holds="playerName" id='createUsernameInput' maxlength="50" placeholder="Your Name">
         <div class="button-holder">
           <button  id='createroombutton' onclick='createroom();'>CREATE game</button>
         </div>
-        
       </div>
-
+      
+      <!-- Join room screen -->
       <div class="join-screen hidden" id="joinDiv">
         <div class="room-details">
-          <ol class="players" id='joinRoomMembers'>Not in a room yet.</ol>
+          <ol class="players" id='joinRoomMembers'>Retrieving the player list...</ol>
         </div>
         <div class="inputs">
           <div class="username row">
-            <input type='text' id='joinUsernameInput' maxlength='50' placeholder="Your Name">
+            <input type='text' data-holds="playerName" id='joinUsernameInput' maxlength='50' placeholder="Your Name">
             <input type='text' id='joinRoomName' class='hidden'>
           </div>
         </div>
@@ -38,53 +61,50 @@
         </div>
       </div>
 
+      <!-- Game is paused. -->
       <div class="pause-screen hidden" id="pauseDiv">
-
-	<p>The number of active players in the room dropped below 3 and so the game was paused.</p>
-	<p>When the number of players in the room reaches 3 or more again, the leader can restart the game.</p>
-
+        <p>The number of active players in the room dropped below 3 and so the game was paused.</p>
+        <p>When the number of players in the room reaches 3 or more again, the leader can restart the game.</p>
         <figure>
           <figcaption>Copy and paste:</figcaption>
-          <!-- <div id='roomLink'></div> -->
           <input type="url" readonly id="pauseRoomURL" />
         </figure>
-
         <div class="lobby-box">
           <ol class="players" id="pauseRoomMembers"></ol>
         </div>
-	
-	<div class="button-holder hidden" id='restartOption'>
-	  <button id="restartButton" onclick="socket.emit('restartgame');">Restart Game</button>
-	</div>
-
+        <div class="button-holder hidden" id='restartOption'>
+          <button id="RestartButton" onclick="socket.emit('restartgame');">Restart Game</button>
+          <span id="RestartGameBother">You need at least 3 players. Go bug your friends!</span>
+        </div>
       </div>
-
+      
+      <!-- The lobby screen. People are in a room, but the game hasn't started yet. -->
       <div class="room-details hidden" id="roomDiv">
 
-	<div class="hidden" id="waitingDiv">
-	  <p>You have joined a game in progress. When the current round ends, you will be able to start playing.</p>
-	</div>
-        
+        <!-- only if you're waiting for the round to end -->
+        <div class="hidden" id="waitingDiv">
+          <p>You have joined a game in progress. When the current round ends, you will be able to start playing.</p>
+        </div>
+
         <figure>
           <figcaption>Copy and paste:</figcaption>
-          <!-- <div id='roomLink'></div> -->
           <input type="url" readonly id="roomURL" />
         </figure>
-        
         <div class="lobby-box">
-          <ol class="players" id='detailsRoomMembers'>Not in a room yet.</ol>
-          <!-- <button id='leaveroom' onclick='leaveroom();'>Leave Current Room</button> -->
+          <ol class="players" id='detailsRoomMembers'>Retrieving player list...</ol>
         </div>
-        
         <div class="button-holder admin-options">
-          <button id='startgamebutton' onclick='startgame();'>Start Game</button>
+          <button id="StartGameButton" onclick="startgame();">Start Game</button>
+          <span id="StartGameBother">You need at least 3 players. Go bug your friends!</span>
         </div>
         
+        <!-- Game Settings for the lobby leader -->
         <div class="settings-toggle admin-options">
           <span>settings</span>
-          <i class="fa fa-cog"></i>
+          <a class="icon">
+            <svg class="icon-gear icon-settings" viewBox="0 0 100 100"><use xlink:href="#Icon-Gear" /></svg>
+          </a>
         </div>
-        
         <ul class="admin-options hidden" id="leaderControls" style="display:none;">
           <li class="option">
             <label for="deck"><span>Deck:</span></label>
@@ -117,40 +137,56 @@
         </ul>
       </div>
       
+      <p style="padding-top:12px;">DEBUG MODE: <a style="color:yellow; text-decoration:underline; cursor:pointer" onclick="$('#GameOverScreen').removeClass('hidden').siblings('section').addClass('hidden');">This link should show the game over screen</a>, in it's current state. Once you're there, you've gotta refresh.</p>
+      <ul id="SetupToasts"></ul>
     </section>
-    
-    <section id="GameView" class="order screen">
 
-      <div class="clock-holder hidden">
-        <div class="your-clock" id="GameClock"></div>
+    <!-- GAMEPLAY screen (includes order and playing card -->
+    <section id="GameView" class="order screen">
+      <!-- Stopclock -->
+      <div class="knob-holder hidden">
+        <input class="knob knobtext" data-height="120" data-width="120" type="text" id="GameClock" />
       </div>
-      
+      <!-- Player Order -->
       <div id='orderDiv'>
         <ol class="player-order">
-          <li id="player1"></li>
-          <li id="player2"></li>
-          <li id="player3"></li>
-          <li id="player4"></li>
-          <li id="player5"></li>
-          <li id="player6"></li>
-          <li id="player7"></li>
-          <li id="player8"></li>
+          <li id="player1">
+            <span id="playerName1" class="player-name"></span>
+          </li>
+          <li id="player2">
+            <span id="playerName2" class="player-name"></span>
+          </li>
+          <li id="player3">
+            <span id="playerName3" class="player-name"></span>
+          </li>
+          <li id="player4">
+            <span id="playerName4" class="player-name"></span>
+          </li>
+          <li id="player5">
+            <span id="playerName5" class="player-name"></span>
+          </li>
+          <li id="player6">
+            <span id="playerName6" class="player-name"></span>
+          </li>
+          <li id="player7">
+            <span id="playerName7" class="player-name"></span>
+          </li>
+          <li id="player8">
+            <span id="playerName8" class="player-name"></span>
+          </li>
         </ol>
         <div id='dealerControls' class="button-holder" style='display:none'>
           <button onclick='makeDefend();'>Deal a Card</button>
         </div>
       </div>
-      
+      <!-- Your Playing Card -->
       <div id='defendDiv' class="card" style='display:none'>
-        
         <div class="flip-container">
           <div class="flipper">
             <div class="front">
               <div class="inner">
+                <img src="svg/hard.svg" id="HardCardSticker" class="this-is-hard">
                 <blockquote id='statementDiv'></blockquote>
-                <!--<cite id='authorDiv'></cite>
-                <div id='sourceDiv'></div>
-                <div id='cardScoreDiv'></div> -->
                 <div class="button-holder">
                   <button onclick='donedefend()'>I'm done early.</button>
                 </div>
@@ -163,559 +199,295 @@
             </div>
           </div>
         </div>
-        
       </div>
-      
+
     </section>
-    
+
+    <!-- VOTING BOOTH screen (includes the ability to vote, as well as post-vote results) -->
     <section id="VotingBooth" class="vote screen hidden">
       <div class="statement-holder">
         <table>
-          <tr id="voterow1">
-            <td class="votebutton">
-              <label>
-            <i class="fa fa-thumbs-up"></i>
-            <input id='mostwrong1' type="radio" name="player1" value="LeastWrong" />
-              </label>
-            </td>
-            <td>
-              <blockquote id='votequote1'></blockquote>
-            </td>
-            <td class="votebutton">
-              <label>
-            <i class="fa fa-thumbs-down"></i>
-            <input id='leastwrong1' type="radio" name="player1" value="MostWrong" />
-              </label>
-            </td>
-          </tr>
-          <tr id="voterow2">
-            <td class="votebutton">
-              <label>
-            <i class="fa fa-thumbs-up"></i>
-            <input id='mostwrong2' type="radio" name="player2" value="LeastWrong" />
-              </label>
-            </td>
-            <td>
-              <blockquote id='votequote2'></blockquote>
-            </td>
-            <td class="votebutton">
-              <label>
-            <i class="fa fa-thumbs-down"></i>
-            <input id='leastwrong2' type="radio" name="player2" value="MostWrong" />
-              </label>
-            </td>
-          </tr>
-          <tr id="voterow3">
-            <td class="votebutton">
-              <label>
-            <i class="fa fa-thumbs-up"></i>
-            <input id='mostwrong3' type="radio" name="player3" value="LeastWrong" />
-              </label>
-            </td>
-            <td>
-              <blockquote id='votequote3'></blockquote>
-            </td>
-            <td class="votebutton">
-              <label>
-            <i class="fa fa-thumbs-down"></i>
-            <input id='leastwrong3' type="radio" name="player3" value="MostWrong" />
-              </label>
-            </td>
-          </tr>
-          <tr id="voterow4">
-            <td class="votebutton">
-              <label>
-            <i class="fa fa-thumbs-up"></i>
-            <input id='mostwrong4' type="radio" name="player4" value="LeastWrong" />
-              </label>
-            </td>
-            <td>
-              <blockquote id='votequote4'></blockquote>
-            </td>
-            <td class="votebutton">
-              <label>
-            <i class="fa fa-thumbs-down"></i>
-            <input id='leastwrong4' type="radio" name="player4" value="MostWrong" />
-              </label>
-            </td>
-          </tr>
-          <tr id="voterow5">
-            <td class="votebutton">
-              <label>
-            <i class="fa fa-thumbs-up"></i>
-            <input id='mostwrong5' type="radio" name="player5" value="LeastWrong" />
-              </label>
-            </td>
-            <td>
-              <blockquote id='votequote5'></blockquote>
-            </td>
-            <td class="votebutton">
-              <label>
-            <i class="fa fa-thumbs-down"></i>
-            <input id='leastwrong5' type="radio" name="player5" value="MostWrong" />
-              </label>
-            </td>
-          </tr>
-          <tr id="voterow6">
-            <td class="votebutton">
-              <label>
-            <i class="fa fa-thumbs-up"></i>
-            <input id='mostwrong6' type="radio" name="player6" value="LeastWrong" />
-              </label>
-            </td>
-            <td>
-              <blockquote id='votequote6'></blockquote>
-            </td>
-            <td class="votebutton">
-              <label>
-            <i class="fa fa-thumbs-down"></i>
-            <input id='leastwrong6' type="radio" name="player6" value="MostWrong" />
-              </label>
-            </td>
-          </tr>
-          <tr id="voterow7">
-            <td class="votebutton">
-              <label>
-            <i class="fa fa-thumbs-up"></i>
-            <input id='mostwrong7' type="radio" name="player7" value="LeastWrong" />
-              </label>
-            </td>
-            <td>
-              <blockquote id='votequote7'></blockquote>
-            </td>
-            <td class="votebutton">
-              <label>
-            <i class="fa fa-thumbs-down"></i>
-            <input id='leastwrong7' type="radio" name="player7" value="MostWrong" />
-              </label>
-            </td>
-          </tr>
+          <thead class="my-statement">
+            <tr>
+              <td class="votebutton"></td>
+              <td>
+                <blockquote id="MyQuote"></blockquote>
+                <cite><span id="MyCite"></span></cite>
+              </td>
+              <td class="votebutton">
+                <div class="player-score">
+                  <span class="inner" id="MyScoreChange"></span>
+                </div>
+              </td>
+            </tr>
+          </thead>
+          <tbody id="VotingOptions">
+            <tr id="voterow1">
+              <td class="votebutton">
+                <label>
+                  <a class="vote-button least-wrong-button">
+                    <svg viewBox="0 0 100 100"><use xlink:href="#Icon-ThumbsUp" /></svg>
+                  </a>
+                  <input id='mostwrong1' type="radio" name="player1" value="LeastWrong" />
+                </label>
+              </td>
+              <td>
+                <blockquote id='votequote1'></blockquote>
+                <cite><span id="quotecite1"></span></cite>
+              </td>
+              <td class="votebutton">
+                <div class="player-score">
+                  <span class="inner" id="ScoreChange1"></span>
+                </div>
+                <label>
+                  <a class="vote-button most-wrong-button">
+                    <svg viewBox="0 0 100 100"><use xlink:href="#Icon-ThumbsDown" /></svg>
+                  </a>
+                  <input id='leastwrong1' type="radio" name="player1" value="MostWrong" />
+                </label>
+              </td>
+            </tr>
+            <tr id="voterow2">
+              <td class="votebutton">
+                <label>
+                  <a class="vote-button least-wrong-button">
+                    <svg viewBox="0 0 100 100"><use xlink:href="#Icon-ThumbsUp" /></svg>
+                  </a>
+                  <input id='mostwrong2' type="radio" name="player2" value="LeastWrong" />
+                </label>
+              </td>
+              <td>
+                <blockquote id='votequote2'></blockquote>
+                <cite><span id="quotecite2"></span></cite>
+              </td>
+              <td class="votebutton">
+                <div class="player-score">
+                  <span class="inner" id="ScoreChange2"></span>
+                </div>
+                <label>
+                  <a class="vote-button most-wrong-button">
+                    <svg viewBox="0 0 100 100"><use xlink:href="#Icon-ThumbsDown" /></svg>
+                  </a>
+                  <input id='leastwrong2' type="radio" name="player2" value="MostWrong" />
+                </label>
+              </td>
+            </tr>
+            <tr id="voterow3">
+              <td class="votebutton">
+                <label>
+                  <a class="vote-button least-wrong-button">
+                    <svg viewBox="0 0 100 100"><use xlink:href="#Icon-ThumbsUp" /></svg>
+                  </a>
+                  <input id='mostwrong3' type="radio" name="player3" value="LeastWrong" />
+                </label>
+              </td>
+              <td>
+                <blockquote id='votequote3'></blockquote>
+                <cite><span id="quotecite3"></span></cite>
+              </td>
+              <td class="votebutton">
+                <div class="player-score">
+                  <span class="inner" id="ScoreChange3"></span>
+                </div>
+                <label>
+                  <a class="vote-button most-wrong-button">
+                    <svg viewBox="0 0 100 100"><use xlink:href="#Icon-ThumbsDown" /></svg>
+                  </a>
+                  <input id='leastwrong3' type="radio" name="player3" value="MostWrong" />
+                </label>
+              </td>
+            </tr>
+            <tr id="voterow4">
+              <td class="votebutton">
+                <label>
+                  <a class="vote-button least-wrong-button">
+                    <svg viewBox="0 0 100 100"><use xlink:href="#Icon-ThumbsUp" /></svg>
+                  </a>
+                  <input id='mostwrong4' type="radio" name="player4" value="LeastWrong" />
+                </label>
+              </td>
+              <td>
+                <blockquote id='votequote4'></blockquote>
+                <cite><span id="quotecite4"></span></cite>
+              </td>
+              <td class="votebutton">
+                <div class="player-score">
+                  <span class="inner" id="ScoreChange4"></span>
+                </div>
+                <label>
+                  <a class="vote-button most-wrong-button">
+                    <svg viewBox="0 0 100 100"><use xlink:href="#Icon-ThumbsDown" /></svg>
+                  </a>
+                  <input id='leastwrong4' type="radio" name="player4" value="MostWrong" />
+                </label>
+              </td>
+            </tr>
+            <tr id="voterow5">
+              <td class="votebutton">
+                <label>
+                  <a class="vote-button least-wrong-button">
+                    <svg viewBox="0 0 100 100"><use xlink:href="#Icon-ThumbsUp" /></svg>
+                  </a>
+                  <input id='mostwrong5' type="radio" name="player5" value="LeastWrong" />
+                </label>
+              </td>
+              <td>
+                <blockquote id='votequote5'></blockquote>
+                <cite><span id="quotecite5"></span></cite>
+              </td>
+              <td class="votebutton">
+                <div class="player-score">
+                  <span class="inner" id="ScoreChange5"></span>
+                </div>
+                <label>
+                  <a class="vote-button most-wrong-button">
+                    <svg viewBox="0 0 100 100"><use xlink:href="#Icon-ThumbsDown" /></svg>
+                  </a>
+                  <input id='leastwrong5' type="radio" name="player5" value="MostWrong" />
+                </label>
+              </td>
+            </tr>
+            <tr id="voterow6">
+              <td class="votebutton">
+                <label>
+                  <a class="vote-button least-wrong-button">
+                    <svg viewBox="0 0 100 100"><use xlink:href="#Icon-ThumbsUp" /></svg>
+                  </a>
+                  <input id='mostwrong6' type="radio" name="player6" value="LeastWrong" />
+                </label>
+              </td>
+              <td>
+                <blockquote id='votequote6'></blockquote>
+                <cite><span id="quotecite6"></span></cite>
+              </td>
+              <td class="votebutton">
+                <div class="player-score">
+                  <span class="inner" id="ScoreChange6"></span>
+                </div>
+                <label>
+                  <a class="vote-button most-wrong-button">
+                    <svg viewBox="0 0 100 100"><use xlink:href="#Icon-ThumbsDown" /></svg>
+                  </a>
+                  <input id='leastwrong6' type="radio" name="player6" value="MostWrong" />
+                </label>
+              </td>
+            </tr>
+            <tr id="voterow7">
+              <td class="votebutton">
+                <label>
+                  <a class="vote-button least-wrong-button">
+                    <svg viewBox="0 0 100 100"><use xlink:href="#Icon-ThumbsUp" /></svg>
+                  </a>
+                  <input id='mostwrong7' type="radio" name="player7" value="LeastWrong" />
+                </label>
+              </td>
+              <td>
+                <blockquote id='votequote7'></blockquote>
+                <cite><span id="quotecite7"></span></cite>
+              </td>
+              <td class="votebutton">
+                <div class="player-score">
+                  <span class="inner" id="ScoreChange7"></span>
+                </div>
+                <label>
+                  <a class="vote-button most-wrong-button">
+                    <svg viewBox="0 0 100 100"><use xlink:href="#Icon-ThumbsDown" /></svg>
+                  </a>
+                  <input id='leastwrong7' type="radio" name="player7" value="MostWrong" />
+                </label>
+              </td>
+            </tr>
+          </tbody>
         </table>
       </div>
-
       <div class="button-holder hidden">
-	<button id="SubmitVotes">Submit Votes</button>
+        <button id="SubmitVotes">Submit Votes</button>
+        <summary id="WaitingAtBoothBecause" class="hidden"></summary>
       </div>
+    </section>
+
+    <!-- GAME OVER screen -->
+    <section id="GameOverScreen" class="game-over screen hidden">
+      <figure class="wrongest-reveal">
+        <figcaption>The (actual) Wrongest Words</figcaption>
+        <div class="quote-holder">
+          <blockquote id="WrongestQuote">Sed at fringilla sem. Praesent cursus feugiat eros, sit amet mollis velit aliquam a.</blockquote>
+          <cite><span id="WrongestCite">Ol Dirty Bastard</span></cite>
+        </div>
+        <span id="WrongestScore" class="card-score score">-6</span>
+      </figure>
+      <ol class="player-final-scores">
+        <li id="place1">
+          <span id="namePlace1" class="player-name">BBoy360</span>
+          <span id="scorePlace1" class="player-score">99k</span>
+        </li>
+        <li id="place2">
+          <span id="namePlace2" class="player-name">Bob</span>
+          <span id="scorePlace2" class="player-score">13</span>
+        </li>
+        <li id="place3">
+          <span id="namePlace3" class="player-name">Dickhead</span>
+          <span id="scorePlace3" class="player-score">13</span>
+        </li>
+        <li id="place4">
+          <span id="namePlace4" class="player-name">Dominique</span>
+          <span id="scorePlace4" class="player-score">10</span>
+        </li>
+        <li id="place5">
+          <span id="namePlace5" class="player-name">Jeff</span>
+          <span id="scorePlace5" class="player-score">7</span>
+        </li>
+        <li id="place6">
+          <span id="namePlace6" class="player-name">skunk skunk spray me now</span>
+          <span id="scorePlace6" class="player-score">4</span>
+        </li>
+        <li id="place7">
+          <span id="namePlace7" class="player-name">Tony Todd</span>
+          <span id="scorePlace6" class="player-score">1</span>
+        </li>
+        <li id="place8">
+          <span id="namePlace8" class="player-name">a</span>
+          <span id="scorePlace6" class="player-score">0</span>
+        </li>
+      </ol>
+      <div class="button-holder">
+        <button id="PlayAgain">Play again?</button>
+      </div>
+      <p>Did you find a bug? <a href="https://github.com/AnotherDole/wrongest/issues">Submit an issue</a> to our GitHub repo</p>
+      <p>Want to suggest additional Wrong Words? <a href="">Use the spreadsheet</a> I can't find a link for right now.</p>
     </section>
     
-    <section id="ScoreSheet" class="score screen hidden">
-      <div id='roundText'></div>
-      <div class="button-holder">
-        <button onclick='$("#ScoreSheet").addClass("hidden");'>Got it, thanks.</button>
-      </div>
-    </section>
-
-    <script src="https://cdn.socket.io/socket.io-1.3.2.js"></script>
-    <script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
-    <script src="http://flipclockjs.com/_themes/flipclockjs/js/flipclock/flipclock.js"></script>
-    <script src="js/min/wrongest.min.js"></script>
-    <script>
-      $('.fa-thumbs-up').click(function() {
-	  $(this).siblings('input').prop('checked',true);
-	  $(this).parent().parent().parent().addClass('least-wrong');
-	  $(this).parent().parent().parent().siblings().removeClass('least-wrong');
-	  $(this).parent().parent().parent().siblings().find('input[value="LeastWrong"]').prop('checked',false);
-	  showButton();
-      });
-
-      $('.fa-thumbs-down').click(function() {
-	  $(this).siblings('input').prop('checked',true);
-	  $(this).parent().parent().parent().addClass('most-wrong');
-	  $(this).parent().parent().parent().siblings().removeClass('most-wrong');
-	  $(this).parent().parent().parent().siblings().find('input[value="MostWrong"]').prop('checked',false);
-	  showButton();
-      });
-
-      function showButton() {
-	if ( $('input[value="LeastWrong"]:checked').length > 0 && $('input[value="MostWrong"]:checked').length > 0 ) {
-	  $('.button-holder').removeClass('hidden');
-	} else {
-	  $('.button-holder').addClass('hidden');
-	}
-      }
-
-      $('#SubmitVotes').click(function() {
-	  socket.emit('playervotes',
-		      $('input[value="MostWrong"]:checked').attr('name'),
-		      $('input[value="LeastWrong"]:checked').attr('name'));
-      });
-
-    //location.reload();
-      var socket;
-      if(location.hostname.indexOf('rhcloud.com') > -1){
-        socket = io(location.hostname + ':8000');
-      }
-      else{
-        socket = io();
-      }
-
-      var username = "";
-      var deckData;
-      var currentStatements;
-      var playerList;
-      var meDefending = false;
-      var meDealer = false;
+    <!-- Footer contains javascripts and SVG references -->
+    <footer class="hidden">
+      <script src="https://cdn.socket.io/socket.io-1.3.2.js"></script>
+      <script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
+      <script src="js/vendor/jquery.knob.min.js"></script>
+      <script src="js/sockets.js"></script>
+      <script src="js/functions.js"></script>
+      <script src="js/actions.js"></script>
       
-      var clock = $('.your-clock').FlipClock(10, {
-        clockFace: 'MinuteCounter',
-        countdown: true,
-        autoStart: false,
-        callbacks: {
-          stop: function() {
-            $('.clock-holder').addClass('hidden');
-            //$('.button-holder').removeClass('hidden')
-	    if(meDefending){
-	      donedefend();
-	    }
-          }
-        }
-      });
-
-      function showCreate(){
-        $('#startDiv').hide();
-        $('#createDiv').show();
-      }
-
-      function showJoin(){
-        $('#startDiv').hide();
-        $('#joinDiv').show();
-        //updaterooms();
-      }
-
-      socket.on('pausegame', function(){
-	  $('#GameView').addClass('hidden');
-	  $('#VotingBooth').addClass('hidden');
-	  $('#RoomSetup').removeClass('hidden');
-	  $('#pauseDiv').removeClass('hidden');
-      });
-
-      //received after creating or joining a room
-      socket.on('deckdata',function(data){
-        deckData = data;
-        $('#deck').empty();
-        for(var deck in data){
-          $('#deck').append($('<option/>', {text: deck, value: deck}));
-        }
-        updateDeckDescription();
-      });
-
-      function updateDeckDescription(){
-        var theDeck = deckData[$('#deck').val()];
-        $('#deckdescription').empty().append(theDeck.description + ' Cards: ' + theDeck.numCards);
-      }
-
-      //send username, room name, password 
-      function createroom(){
-        socket.emit('createroom',$('#createUsernameInput').val());
-      }
-
-      //received after emitting createroom
-      socket.on('createresult',function(data){
-        if(data.success){
-          $('#roomresult').text('Room created!');
-          username = data.playerName;
-          $('#roomLink').text(data.link);
-          $('#roomURL').add('#pauseRoomURL').val(data.link);
-          $('#createDiv').hide();
-          $('#roomDiv').show();
-          $('#startDiv').hide();
-        }
-        else{
-          $('#createResult').text(data.message);
-        }	
-      });
-
-      //send username, room name, password 
-      function joinroom(){
-        socket.emit('requestjoin',$('#joinUsernameInput').val(),
-                    $('#joinRoomName').val());
-      }
-
-      //received after emitting requestjoin
-      socket.on('joinresult',function(data){
-        if(data.success){
-          $('#roomresult').text('Successfully joined room');
-          $('#joinDiv').hide();
-          $('#roomDiv').show();
-          $('#startDiv').hide();
-          $('#roomURL').add('#pauseRoomURL').val(data.link);
-          username = data.playerName;
-	  socket.emit('requestroomdata',data.roomName);
-	  if(data.waiting){
-	    $('#waitingDiv').removeClass('hidden');
-	  }
-        }
-        else{
-          $('#joinResult').text(data.message);
-        }
-      });
-
-      //send request to leave current room. 
-      function leaveroom(){
-        socket.emit('requestleave');
-      }	
-
-      //received after leaving a room
-      socket.on('leaveresult',function(data){
-        if(data.success){
-          username = false;
-          $('#roomDiv').hide();
-          $('#orderDiv').hide();
-          $('#statementsDiv').hide();
-          $('#voteDiv').hide();
-          $('#voteResult').hide();
-          $('#startDiv').show();
-        }	
-      });
-
-      //received whenever someone in the current room leaves or joins
-      socket.on('updatecurrentroom', function(players, leader, dealer){
-	playerList = players;
-	//this is so lazy
-        var $toChange = $('#joinRoomMembers').add('#pauseRoomMembers').add('#detailsRoomMembers');
-	var $theDiv;
-	/*
-	if($('#joinDiv').is(':hidden')){
-	  $toChange = $('#detailsRoomMembers');
-	}
-	*/
-        $toChange.empty();
-
-        $toChange.append('Currently in the room:');
-        for (var i = 0; i < players.length; i++){
-          if(players[i] == leader){
-            $toChange.append('<li class="leader">'+players[i]+'</li>');
-          } else {
-            $toChange.append('<li>'+players[i]+'</li>');
-          }
-	  $theDiv = $('#player' + (i+1)).removeClass('hidden');
-	  $theDiv.empty().append(players[i]);
-	  if(players[i] == dealer){
-	    $theDiv.addClass('dealer');
-	  }
-	  else{
-	    $theDiv.removeClass('dealer');
-	  }
-        }
-	for(var i = players.length+1; i <=8; i++){
-	  $('#player' + i).addClass('hidden');
-	}
-        if(leader == username){
-          $('.admin-options').show();
-	  $('#restartOption').removeClass('hidden');
-        }
-        else{
-          $('.admin-options').hide();
-	  $('#restartOption').addClass('hidden');
-        }
-        if(dealer == username){
-	  meDealer = true;
-          $('#dealerControls').show();
-        }
-        else{
-	  meDealer = false;
-          $('#dealerControls').hide();
-        }	
-      });
-
-      //Request to start the game. Only works if you are the leader of the room
-      function startgame(){
-        socket.emit('requeststart',$('#deck').val(),
-                    $('#timeLimit').val(),
-                    $('#allowRedraw').val(),
-                    $('#dealerSelect').val());
-      }
-
-      socket.on('startresult', function(data){
-        if(data.success){
-          $('#startresult').text('Game Started');
-          $('#RoomSetup').addClass('hidden');
-          $('#GameView').removeClass('hidden');
-        }
-        else{
-          $('#startresult').text(data.message);
-        }
-      });
-
-      //Receive the statments that everyone will be defending this round.
-      //Automatically sent out at the start of a new round
-      socket.on('getstatements', function(data){
-        //alert('hello!');
-        $('#roomDiv').hide();
-        $('#voteDiv').hide();
-        currentStatements = data;
-        // getStatements();
-	$('#waitingDiv').addClass('hidden');
-        $('#RoomSetup').addClass('hidden');
-        $('#GameView').removeClass('hidden');
-        $('#orderDiv').show();
-      });
-
-/*
-      //Received at the start of a round
-      //Includes the order for the current round and the dealer
-      socket.on('roundorder', function(list,dealer){
-        if(dealer == username){
-	  meDealer = true;
-          $('#dealerControls').show();
-        }
-        else{
-	  meDealer = false;
-          $('#dealerControls').hide();
-        }
-        for (var i = 0; i < list.length; i++){
-          var $theDiv = $('#player' + (i+1)).removeClass('hidden');
-          $theDiv.empty().append(list[i]);
-          if(list[i] == dealer){
-            $theDiv.addClass('dealer');
-          }
-	  else{
-	    $theDiv.removeClass('dealer');
-	  }
-        }
-        for(var i = list.length+1; i <= 8; i++){
-          $('#player' + i).addClass('hidden');
-        }
-      });
-*/
-
-      function makeDefend(){
-	$('#dealerControls').hide();
-        socket.emit('makedefend');
-      }
-
-      socket.on('timetodefend',function(player,time){
-        if(player == username){
-          meDefending = true;
-          $('#defendDiv').show();
-          $('#orderDiv').hide();
-          var myStatement = currentStatements[username];
-          $('#statementDiv').empty().text(myStatement.quote);
-          $('#authorDiv').empty().text(myStatement.author);
-          $('#sourceDiv').empty().text(myStatement.source);
-          $('#cardScoreDiv').empty().text('Score: ' + myStatement.score);
-        }	
-        //alert(time);
-        clock.setTime(time);
-        $('.clock-holder').removeClass('hidden');
-        clock.start();
-      })
-
-      //Tell server you are done defending your statement
-      function donedefend(){
-        $('#defendDiv').hide();
-        socket.emit('donedefending');
-	meDefending = false;
-      }
-
-      //received when anyone in the room says they are done defending
-      //data is the # of people who are not done
-      socket.on('newdefendcount',function(newCount,stopClock){
-	if(stopClock){
-	  clock.stop();
-	}
-	if(meDealer){
-	  $('#dealerControls').show();
-	}
-        $('#orderDiv').show();
-        if(newCount > 0){
-          var playersDone = playerList.length - newCount;
-          for(var i = 1; i <= 8; i++){
-	    if(i <= playersDone){
-	      $('#player' + i).addClass('completed');
-	    }
-	    else{
-	      $('#player' + i).removeClass('completed');
-	    }
-          }
-        }
-        else{
-          //$('#orderDiv').hide();
-          //$('#voteDiv').show();
-          $('#GameView').addClass('hidden');
-          $('#VotingBooth').removeClass('hidden');
-          $('#VotingBooth').children().removeClass('chosen');
-          $('#SendVotesButton').addClass('hidden');
-          $('#voteResult').empty();
-          updateVoteSelectors();
-        }
-      });
-
-      function updateVoteSelectors(){
-	var row = 0;
-        for(var i = 0; i < playerList.length; i++){
-          if (playerList[i] == username) continue;
-	  row++;
-          var theStatement = currentStatements[playerList[i]].quote;
-	  $('#voterow' + row).removeClass('hidden');
-	  $('#votequote' + row).empty().text(theStatement);
-	  $('#mostwrong' + row).attr('name',playerList[i]);
-	  $('#leastwrong' + row).attr('name',playerList[i]);
-        }
-	//hide rows with no data
-	for(row++; row <= 7; row++){
-	  $('#voterow' + row).addClass('hidden');
-	}
-      }
-
-      //received if your attempt to say you are done voting failed for some reason
-      socket.on('donefailed',function(data){
-        $('#votestatus').text(data);
-      });
-      
-      //received if the submitted votes were invalid
-      socket.on('votefailed', function(data){
-        $('#voteResult').append(data + "<br>");	
-      });
-
-      //received when someone else in the same room has voted
-      socket.on('receivevote', function(data){
-        $('#voteResult').show();
-        var whoVoted = data.voter;
-        var most = data.mostName;
-        var least = data.leastName;
-      });
-
-      //received at the end of a round
-      socket.on('roundend', function(data){
-        $('#VotingBooth').addClass('hidden');
-	//Next line temporarily commented out by Dole
-        //$('#ScoreSheet').removeClass('hidden');
-        //$('#scoreDiv').show();
-        var $resultDiv = $('#roundText');
-        var gameData = data.gameData;
-        var playerData = data.playerData;
-
-        $resultDiv.empty();
-        $resultDiv.append('<b>End of round ' + gameData.round + '</b>');
-	console.log(playerData);
-        for(var player in playerData){
-          $resultDiv.append('<br>' + player + ' gains ' + playerData[player].scoreChange + ' points. Current Score: ' + playerData[player].newScore);
-        }
-        $resultDiv.append('<br>Cards left: ' + gameData.cardsLeft + '<br><b> Defend your next point. </b>');
-
-        //reset player div colors
-        for(var i = 1; i <= playerList.length; i++){
-          //$('#player' + i).css('background-color','white');
-          $('#player' + i).removeClass('completed');
-        }
-        //Reset Voting Booth colors.
-        $('#VotingBooth tr').removeClass('most-wrong least-wrong');
-      });
-
-      socket.on('gameover', function(data){
-        var $resultDiv = $('#voteResult');
-        $resultDiv.empty().append('<b>Game Over!</b><br>');
-        $resultDiv.append('Winner: ' + data.player + ' with a score of ' + data.playerScore + '.<br>');
-        $resultDiv.append('Wrongest Words: ' + data.card + ' with a score of ' + data.cardScore);
-      });
-
-      if(location.pathname.length > 1){
-        $('#startDiv').hide();
-        $('#joinDiv').show();
-        $('#joinRoomName').val(location.pathname.substr(1));
-        socket.emit('requestroomdata',location.pathname.substr(1));
-      }
-    </script>
+      <!-- BELOW: SVG icon definitions for use in the project -->
+      <?xml version="1.0" encoding="utf-8"?>
+      <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+      <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 100 100" enable-background="new 0 0 100 100" xml:space="preserve">
+        <defs>
+          <g id="Icon-Hard">
+            <polygon fill="#C1272D" points="43.6,74.5 46.8,74.5 45.2,70.3"/>
+            <path fill="#C1272D" d="M60.9,71.6c0-0.6-0.2-1.2-0.7-1.6c-0.4-0.4-1-0.7-1.6-0.7h-2.3v4.6h2.3c0.6,0,1.2-0.2,1.6-0.7C60.7,72.8,60.9,72.2,60.9,71.6z"/>
+            <path fill="#C1272D" d="M71,69.3h-1.7v9.1H71c1.3,0,2.3-0.4,3.2-1.3c0.9-0.9,1.3-2,1.3-3.2c0-1.3-0.4-2.3-1.3-3.2S72.2,69.3,71,69.3z"/>
+            <path fill="#C1272D" d="M51,3.9C25.7,3.9,5.1,24.5,5.1,49.8S25.7,95.7,51,95.7s45.9-20.5,45.9-45.9S76.4,3.9,51,3.9z M50.3,16 c4-1.8,13.5-1.6,14.8,13.5c1.3,15.1-7.4,23.1-7.4,23.1c-2.9-1.2-4.9-3.7-4.9-3.7c10.2-8.7,6.8-29.1,1.1-28 c-6.3,1.2-8.1,10.3-8.1,10.3c-3.2,0.2-4.3,0.4-6.7,1.2C40.6,23.1,46.3,17.7,50.3,16z M35.1,79c0,0.2-0.1,0.3-0.2,0.4 c-0.1,0.1-0.2,0.2-0.4,0.2s-0.3-0.1-0.4-0.2C34,79.3,34,79.2,34,79v-4.6h-5.7V79c0,0.2-0.1,0.3-0.2,0.4c-0.1,0.1-0.2,0.2-0.4,0.2 s-0.3-0.1-0.4-0.2c-0.1-0.1-0.2-0.2-0.2-0.4V68.8c0-0.2,0.1-0.3,0.2-0.4c0.1-0.1,0.2-0.2,0.4-0.2s0.3,0.1,0.4,0.2 c0.1,0.1,0.2,0.2,0.2,0.4v4.6H34v-4.6c0-0.2,0.1-0.3,0.2-0.4c0.1-0.1,0.2-0.2,0.4-0.2s0.3,0.1,0.4,0.2c0.1,0.1,0.2,0.2,0.2,0.4V79 z M49.5,79.4c-0.1,0.1-0.2,0.2-0.4,0.2s-0.3-0.1-0.4-0.2c-0.1-0.1-0.1-0.1-0.1-0.2l-1.4-3.6h-4.1l-1.4,3.6c0,0.1-0.1,0.1-0.1,0.2 c-0.1,0.1-0.2,0.2-0.4,0.2s-0.3-0.1-0.4-0.2c-0.1-0.1-0.2-0.2-0.2-0.4c0-0.1,0-0.2,0-0.2l4-10.2c0-0.1,0.1-0.2,0.1-0.2 c0.1-0.1,0.2-0.2,0.4-0.2c0.2,0,0.3,0.1,0.4,0.2c0.1,0.1,0.1,0.1,0.1,0.2l4,10.2c0,0.1,0,0.2,0,0.2C49.7,79.2,49.7,79.3,49.5,79.4 z M28.3,59.4C22,53.8,23,44.2,30.5,38.1c11.1-9.2,27.8-4.3,27.8-4.3c-0.2,3.5-1.1,5.9-1.1,5.9c-17.5-6.1-30.6,6.2-26.5,13.5 C34.8,60.4,46,54,46,54c1.6,1.8,2.8,2.7,4.7,4.2C42.2,63.7,33.3,64,28.3,59.4z M62.5,79.4c-0.1,0.1-0.2,0.2-0.4,0.2 c-0.2,0-0.4-0.1-0.5-0.3L58.9,75c-0.1,0-0.2,0-0.2,0h-2.3v4c0,0.2-0.1,0.3-0.2,0.4c-0.1,0.1-0.2,0.2-0.4,0.2 c-0.2,0-0.3-0.1-0.4-0.2c-0.1-0.1-0.2-0.2-0.2-0.4V68.8c0-0.2,0.1-0.3,0.2-0.4c0.1-0.1,0.2-0.2,0.4-0.2h2.8c0.9,0,1.7,0.3,2.4,1 c0.7,0.7,1,1.5,1,2.4c0,0.9-0.3,1.7-1,2.4c-0.3,0.3-0.6,0.5-1,0.7l2.5,4c0.1,0.1,0.1,0.2,0.1,0.3C62.6,79.2,62.6,79.3,62.5,79.4z M75,77.9c-1.1,1.1-2.5,1.7-4,1.7h-2.3c-0.2,0-0.3-0.1-0.4-0.2c-0.1-0.1-0.2-0.2-0.2-0.4V68.8c0-0.2,0.1-0.3,0.2-0.4 c0.1-0.1,0.2-0.2,0.4-0.2H71c1.6,0,2.9,0.6,4,1.7c1.1,1.1,1.7,2.5,1.7,4C76.7,75.5,76.1,76.8,75,77.9z M58.5,61.1 C43.2,54.2,39.6,41,39.6,41s1.5-1.5,6-1.7c1.4,6.7,6.8,12.6,14.9,16c7.7,3.3,12.2,0.3,11.4-3.5c-1-4.8-7.3-8.5-7.3-8.5 c0.7-1.9,1.3-3.6,1.6-6.2C89,53.2,73.4,67.9,58.5,61.1z"/>
+          </g>
+          <g id="Icon-Gear">
+            <path fill="#2D2929" d="M83.6,39.1c-0.5-1.9-1.3-3.8-2.4-5.9c2-2.7,4.2-5.4,6.2-8.4c0.6-0.8,0.6-1.8,0-2.7 c-2.5-3.6-6.6-7.3-10-10.2c-0.8-0.8-2-0.8-2.9-0.1l-8.7,6.4c-1.7-0.8-3.6-1.5-5.4-2.3L58.8,5c-0.1-1.1-0.9-1.9-2.2-1.9H43.2 c-1.2,0-2.1,0.7-2.3,1.8c-0.8,3.5-1.2,7.5-1.7,11.1c-1.9,0.6-3.7,1.3-5.4,2.4L25.6,12c-0.5-0.4-1.2-0.7-1.7-0.7 c-2.1,0-10.1,9-11.7,11c-0.8,1-0.7,1.7,0.1,2.8c2.2,2.9,4.3,5.6,6.4,8.4c-0.9,2-1.7,3.5-2.3,5.6L5.1,40.6c-0.9,0.2-1.7,1.3-1.7,2.4 v13.3c0,1,0.7,2,1.8,2.2l11,1.8c0.5,1.9,1.4,3.8,2.4,5.8c-2,2.8-4.1,5.4-6.2,8.4c-0.6,0.9-0.5,1.9,0,2.7c2.6,3.6,6.6,7.3,10,10.3 c0.9,0.8,2,0.8,2.9,0.2l8.7-6.4c1.8,0.8,3.6,1.5,5.4,2.2L41,94.4c0.1,0.9,1,1.9,2.3,1.9h13.4c1.2,0,1.9-0.7,2.2-1.8 c0.9-3.5,1.3-7.5,1.8-11.1c1.9-0.6,3.7-1.4,5.5-2.3l8.4,6.5c0.5,0.4,1.1,0.5,1.7,0.5c2,0,10.1-9.1,11.7-11.1 c0.6-0.8,0.5-1.7-0.2-2.7c-2.2-3-4.3-5.7-6.4-8.7c0.9-1.7,1.7-3.3,2.4-5.4l11.1-1.7c1-0.1,1.8-1.2,1.8-2.1V43.1 c0-0.9-0.7-2-1.8-2.3L83.6,39.1z M49.9,65.2c-8.5,0-15.4-6.9-15.4-15.4c0-8.7,6.9-15.6,15.4-15.6c8.6,0,15.5,6.9,15.5,15.6 C65.4,58.2,58.4,65.2,49.9,65.2z"/>
+          </g>
+          <g id="Icon-ThumbsDown">
+            <path fill="#C1272D" d="M48.3,31.4 c1.6,1.6,1.6,3.5-0.1,4.8c-1.2,0.9-2,1.1-6.5,1.1c-4.7,0-5.3-0.1-6.3-1.2c-1.4-1.5-1.4-3.2,0.1-4.7c1.2-1.2,1.6-1.2,6.4-1.2 C46.7,30.1,47.2,30.2,48.3,31.4z M30.8,31c0.4,0.8,0.3,3.7-0.2,6.6c-0.1,0.6-1,1.6-2,2.2c-1.1,0.7-2,1.8-2.5,3.2 c-0.8,2.1-0.8,2.3,0.3,5.1c1.1,2.9,1.1,3,0.2,5.5c-1.2,3.2-0.8,6,1.2,8.8c1.5,2,1.5,2.4,1.2,5.2c-0.3,2.6-0.2,3.3,0.8,4.8 c0.6,1,1.8,4.1,2.6,7c1.2,4.3,1.5,6.2,1.5,10.3c0,0,0.2,2.5-0.4,3.9c-0.3,0.7-1.3,2.9-1.3,2.9c-1.5,1.5-2,1.7-4.4,1.7 c-2.3,0-2.8-0.2-4.4-1.7c-1.3-1.3-1.7-2.2-1.7-3.5c0-3.1-1.9-11.6-3.3-14.4c-1.4-2.9-4.3-5.7-7.6-7.4c-3.6-1.8-5.2-3.4-6.8-6.6 c-1.9-4.3-1.8-9-1.6-13.6c0-11.9,0.2-12.9,4.1-17c3-3.3,5.2-3.8,15.5-3.8C29.5,30.1,30.3,30.2,30.8,31z M54.6,41.8 c2.9,2.3,2.9,5.2,0.1,7.4c-2.3,0.9-2.1,1.2-11.5,1.3c-4.2,0.1-13.8-0.4-13.9-5c-0.1-4.5,9.1-4.5,13.3-4.4 C49.4,40.9,53.9,41,54.6,41.8z M55.8,54.6c0.9,0.7,1.3,1.9,1.3,2.8c0,1.4-1.6,3.2-2.7,3.4c-1.3,0.1-6,0-10.9,0 c-7.2-0.1-13.8-0.3-14.6-3.9c0.4-2.5,2.7-3.2,14.7-3.2C53.8,53.5,54.6,53.6,55.8,54.6z M50.7,65.8c1.4,2.4,1.4,3.1,0.2,5 c0,0-1.1,1.1-1.7,1.3c-1.9,0.8-7,0.4-7,0.4c-8.5-0.2-9.4-2.3-9.4-4.5c-0.1-4.4,5.8-4.4,9.5-4.4c0,0,5.1,0.2,6.9,0.9 C49.9,64.9,50.7,65.8,50.7,65.8z"/>
+          </g>
+          <g id="Icon-ThumbsUp">
+            <path fill="#50B848" d="M51.2,69 c-1.6-1.6-1.6-3.5,0.1-4.8c1.2-0.9,2.1-1.1,6.6-1.1c4.8,0,5.3,0.1,6.3,1.2c1.5,1.6,1.4,3.2-0.1,4.7c-1.2,1.2-1.6,1.3-6.4,1.3 C52.8,70.3,52.3,70.2,51.2,69z M68.9,69.4c-0.5-0.8-0.3-3.7,0.3-6.6c0.1-0.6,1-1.6,2-2.2c1.2-0.7,2-1.8,2.6-3.2 c0.8-2.1,0.8-2.3-0.3-5.2c-1.1-2.9-1.1-3.1-0.2-5.5c1.2-3.3,0.8-6-1.2-8.8c-1.5-2-1.6-2.4-1.3-5.3c0.3-2.6,0.2-3.3-0.8-4.8 c-0.6-1-1.8-4.2-2.6-7.1c-1.2-4.3-1.5-6.3-1.5-10.4c0,0-0.2-2.5,0.4-3.9c0.3-0.7,1.4-2.9,1.4-2.9C69,2,69.6,1.8,71.9,1.8 c2.3,0,2.9,0.2,4.4,1.7C77.6,4.8,78,5.7,78,7c0,3.2,2,11.7,3.3,14.5c1.4,2.9,4.4,5.8,7.7,7.4c3.6,1.8,5.3,3.4,6.9,6.6 c2,4.3,1.9,9,1.6,13.7c0,12-0.3,13-4.1,17.2c-3.1,3.3-5.3,3.9-15.7,3.9C70.2,70.3,69.3,70.2,68.9,69.4z M44.8,58.5 c-3-2.3-3-5.2-0.1-7.4c2.3-0.9,2.1-1.2,11.6-1.3c4.3-0.1,13.9,0.4,14,5.1c0.1,4.6-9.2,4.5-13.4,4.4C50.1,59.4,45.6,59.4,44.8,58.5 z M43.6,45.7c-0.9-0.7-1.3-1.9-1.3-2.8c0-1.4,1.6-3.3,2.7-3.4c1.3-0.1,6.1,0,11,0c7.3,0.1,14,0.3,14.8,3.9 c-0.4,2.5-2.8,3.2-14.8,3.2C45.6,46.8,44.9,46.7,43.6,45.7z M48.8,34.4c-1.4-2.4-1.5-3.1-0.2-5c0,0,1.1-1.1,1.7-1.4 c1.9-0.8,7.1-0.5,7.1-0.5c8.6,0.2,9.5,2.3,9.5,4.6c0.1,4.4-5.8,4.4-9.5,4.5c0,0-5.2-0.2-7-0.9C49.6,35.3,48.8,34.4,48.8,34.4z"/>
+          </g>
+        </defs>
+      </svg>
+    </footer>
   </body>
 </html>

@@ -157,11 +157,13 @@ exports.setClient = function(newClient){
 
 //Create a new room. playerID is the requestor, name is requested name
 exports.createRoom = function(playerName,UID,callback){
+  if(playerName == null || playerName.trim() == ""){
+    return callback(null,{success: false, message: "Please enter a name."});
+  }
   var trimPlayer = playerName.trim();
   if(!isValidName(trimPlayer)){
     return callback(null,{success: false, message: "Invalid name."});
   }
-
   client.incr('roomsCreated', function(err, data) {
     if(err){
       return callback(true,null);
@@ -217,11 +219,13 @@ exports.getPlayersIn = function(roomName, callback){
 
 //playerName requests to join roomName
 exports.joinRequest = function(roomName,playerName,UID,callback){
+  if (playerName == null || playerName.trim() == ""){
+    return callback(null, {success:false,message:"Please enter a name."});
+  }
   var trimPlayer = playerName.trim();
   if(!isValidName(trimPlayer)){
     return callback(null,{success:false,message:'Invalid name'});
   }
-
   client.exists(roomDataKey(roomName),function(err, data){
     if(data == false){
       return callback(null,{success:false,message:'Room does not exist.'});

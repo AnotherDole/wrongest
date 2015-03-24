@@ -19,7 +19,6 @@
   .lobby-box { margin-bottom: 5vh; }
   figure {
     figcaption { font-weight: 100; text-transform: lowercase; color:$yellow; line-height:95%; }
-    //#roomLink { background-color:$white; color:$blue; border:1px solid black; padding: 0.25em; text-align: center; }
     input[type=url] { display: block; width: 100%; text-align: center; padding: 0.25em; border:2px solid $blue; color:$blue; font-size:1.3em; }
   }
   
@@ -30,15 +29,16 @@
   }
   
   .settings-toggle { text-align:right; position: absolute; right:1vw; bottom:1vh; left:1vw; @include transition();
-    .fa { font-size:4em;
-      &.spin { @include animation(rotate, 4s, infinite, linear); }
+    a.icon { display: inline-block;
+      &.spin { animation: rotate 6s infinite linear; }
     }
+    .icon-gear { width:4em; height:4em; }
     &.expanded { @include translateY(-220px); }
   }
   
 }
 
-.admin-options { 
+.admin-options { background-color:$black;
   li { padding-bottom: 0.5em; }
   label { display: block; }
   select { display: block; width: 100%; }
@@ -49,13 +49,26 @@
   &.visible { height: 220px; }
 }
 
-
-@keyframes rotate {
-  0% { @include rotate(0); }
-100% { @include rotate(360deg); }
+ul#SetupToasts {
+  li { display: block; margin-top: 1em; text-align: center; padding: 0.2em; border-radius: 0.2em; animation-fill-mode: forwards; animation: toastIn 5s ease; -webkit-animation-fill-mode: forwards;
+    &.alert { background-color:lighten($red,40%); color:darken($red,20%);  }
+    &.info { background-color:lighten($yellow,25%); color:darken($yellow,50%); }
+    &.success { background-color:lighten($green,35%); color:darken($green,25%); }
+  }
 }
 
-@-webkit-keyframes rotate {
-  0% { @include rotate(0); }
-100% { @include rotate(360deg); }
+@keyframes toastIn {
+  0% { opacity: 0; transform:translateY(200%); }
+  3% { opacity: 0; transform:translateY(200%); }
+  26% { opacity: 1; transform:translateY(-20%); }
+  30% { opacity: 1; transform:translateY(0); }
+  80% { opacity: 1; transform:translateY(0); } 
+  99% { opacity: 0; transform:translateY(-200%); }
+  100% { opacity: 0; transform:translateY(-200%); }
+}
+
+
+@keyframes rotate {
+  0% { transform: rotate(0deg); }
+100% { transform: rotate(360deg); }
 }

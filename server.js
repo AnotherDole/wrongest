@@ -4,7 +4,7 @@ var server = require('http').createServer(app);
 var io = require('socket.io')(server);
 var port = process.env.OPENSHIFT_NODEJS_PORT || 3000;
 var server_ip_address = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1';
-var server_address = process.env.OPENSHIFT_APP_DNS || ('localhost:'+port);
+var server_address = process.env.OPENSHIFT_APP_DNS ? 'www.wrongest.net' : ('localhost:'+port);
 
 var redis = require('redis');
 var client = redis.createClient();
@@ -136,9 +136,8 @@ io.on('connection', function (socket){
 	socket.roomName = roomName;
 	result.link = 'http://' + server_address + '/' + result.roomName;
       }
-      socket.emit('joinresult',result);
     });
-  });
+  })
 
   //data isn't necessary 
   socket.on('requestleave', function(data){

@@ -1,12 +1,23 @@
-section.order { background-color:$white; }
+section.order { background-color:$white; position: relative; }
 
-.player-order { font-family: $font; padding:2em 0.5em; font-size:1.5em; counter-reset: ol-counter; margin-bottom:0; 
+.player-order { font-family: $font; padding:0.5em; font-size:1.5em; counter-reset: ol-counter; margin-bottom:0; 
   li { font-weight:700; border:1px solid $black; margin-bottom:0.4em; padding:0.5em; background-color:#fff; position:relative; padding-left:2.2em; overflow:hidden;
     &:before { content: counter(ol-counter); counter-increment: ol-counter; background-color:$black; position:absolute; top:0; left:0; height:100%; width:1.5em; padding-top:0.5em; text-align:center; color:#fff; }
-    &.active { box-shadow:.05em .05em .05em rgba($black,0.6); background-color:$white; text-shadow:.1em .1em .1em rgba($black,0.3); color:#050643; }
+    &.active { box-shadow:.05em .05em .05em rgba($black,0.6);
+      span.player-name { font-size:150%; }
+      &:before { line-height: 200%; }
+    }
+    &.dealer, &.has-score {
+      &:after { content:''; position:absolute; top:-1.3em; right:-1.3em; height:2.6em; width:2.6em; transform: rotate(45deg); transform-origin: center; z-index:2; }
+    }
+    &.has-score {
+      &:after { background-color:$grey; }
+    }
     &.dealer {
-      &:after { content:'D'; position:absolute; top:-1em; right:-1em; height:2em; width:2em; transform: rotate(45deg); transform-origin: center; background-color:$black; color:$black; }
+      &:after { background-color:desaturate($blue,50%); }
     }
     &.completed { opacity:.6; }
+    
+    span.player-score {position: absolute; top: 0.2em; right: 0; z-index: 3; font-size: 0.65em; width: 1.6em; text-align: center; color: $white; }
   }
 }

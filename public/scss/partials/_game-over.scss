@@ -1,0 +1,64 @@
+.game-over { background-color:$black; color: $white;
+  p { padding-top: 1em;
+    a { color:$blue; }
+  }
+}
+.wrongest-reveal { position: relative; 
+  figcaption { text-transform: uppercase; font-weight:$light; color:$yellow; text-align: center; font-size:1.15em; }
+  .quote-holder { background-color:lighten($yellow,30%); border:1px solid darken($yellow,20%); border-radius: 6px; color:$black; padding: 1em; }
+  blockquote { font-size:1.4em; text-align:center;
+    &:before { content:"\201C"; }
+    &:after { content:"\201D"; }
+  }
+  cite { display: block; text-align: right; font-size:1.2em; padding-right: 1.5em;
+    span {
+      &:before { content:'\2014 \00A0' }
+    }
+  }
+  .score {
+    position: absolute;
+    right: -0.5em;
+    top: 0.3em;
+    font-size: 1.6em;
+    font-weight: 700;
+    background-color: $red;
+    color: $white;
+    border: 1px solid darken($red,20%);
+    height: 1.7em;
+    width: 1.7em;
+    text-align: center;
+    border-radius: 50%;
+    padding-top: 0.2em;
+    transform: rotate(-30deg);
+  }
+}
+
+.player-final-scores { padding:1em 0.5em; font-size:1.5em; counter-reset: ol-counter; margin-bottom:0; 
+  li { font-weight:700; border:1px solid $white; margin-bottom:0.4em; padding:0.3em; background-color:$black; position:relative; padding-left:2.2em; overflow:hidden;
+    &:before { content:'#' counter(ol-counter); font-size:0.8em; counter-increment: ol-counter; border-right: 1px solid $white; position:absolute; top:0; left:0; height:100%; width:2em; padding-top:0.4em; text-align:center; }
+    &:after { content:''; position:absolute; top:-1.3em; right:-1.3em; height:2.6em; width:2.6em; transform: rotate(45deg); transform-origin: center; z-index:2; background-color:$black; }
+    .player-name { max-width: 12.5em; display: block; @extend %truncate; }
+    span.player-score {position: absolute; top: 0.2em; right: 0; z-index: 3; font-size: 0.65em; width: 1.6em; text-align: center; color: $white; }
+    
+    &:nth-child(1) { border-color: $green;
+      &:before { border-color: $green; }
+      &:after { background-color:$green; }
+      span.player-score { color:$black; }
+    }
+    &:nth-child(2) { border-color: $blue; 
+      &:before { border-color: $blue; }
+      &:after { background-color:$blue; }
+      span.player-score { color:$black; }
+    }
+    &:nth-child(3) { border-color: $yellow;
+      &:before { border-color: $yellow; }
+      &:after { background-color:$yellow; }
+      span.player-score { color:$black; }
+    }
+    &:nth-child(4) { border-color: $pink;
+      &:before { border-color: $pink; }
+      &:after { background-color:$pink; }
+      span.player-score { color:$black; }
+    }
+  }
+}
