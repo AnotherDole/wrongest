@@ -263,8 +263,8 @@ socket.on('roundend', function(data){
   var playerData = data.playerData;
 
   //After the first round, add the spans to display score
-  if(gameData.round == 1){
-    for(var i = 1; i <=8; i++){
+  if (gameData.round == 1){
+    for (var i = 1; i <=8; i++){
       $('#player' + i).addClass('has-score');
       $('#player' + i).append('<span class="player-score" id="playerScore' + i + '"></span>');
     }
@@ -286,9 +286,19 @@ socket.on('roundend', function(data){
   }
   //Reset Voting Booth colors.
   $('#VotingBooth tr').removeClass('most-wrong least-wrong');
-  $('#WaitingAtBoothBecause').text('Round ' + gameData.round + ' complete! Next round begins in 7 seconds.');
+  // NEXT ROUND TIMER....
+  var nextRoundIn = 8;
+  var nextRoundInMS = (nextRoundIn * 1000);
+  var nrs = nextRoundIn;
+  $('#WaitingAtBoothBecause').html('<span class="next-round-in">Next round in </span> <input class="tiny-knob knobtext" type="text" value="'+nextRoundIn+'" data-max="'+nextRoundIn+'" data-bgcolor="#eae6e6" data-fgcolor="#7a6969" data-inputcolor="#7a6969" data-min="0" data-width="48" data-height="48" />');
+  $('.tiny-knob').knob();
   $('#VotingBooth').toggleClass('show-scores');
+  var nextRoundClock = setInterval(function(){ 
+    nrs--;
+    $('.tiny-knob').val(nrs).trigger('change');
+  }, 1000);
   setTimeout(function(){
+    window.clearInterval(nextRoundClock);
     $('#WaitingAtBoothBecause').text('').addClass('hidden');
     $('#VotingBooth').toggleClass('show-scores');
     $('#VotingBooth').addClass('hidden');
@@ -298,7 +308,7 @@ socket.on('roundend', function(data){
     else{
       $('#GameOverScreen').removeClass('hidden').siblings('section').addClass('hidden'); 
     }
-  },7000);
+  },nextRoundInMS);
 });
 
 socket.on('gameover', function(data){
