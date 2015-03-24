@@ -183,17 +183,16 @@ socket.on('timetodefend',function(player,time){
       break;
     }
   }
-  //alert(time);
-  clock.setTime(time);
-  $('.clock-holder').removeClass('hidden');
-  clock.start();
+  startTimer();
+  $('.knob-holder').removeClass('hidden');
 });
 
 //received when anyone in the room says they are done defending
 //data is the # of people who are not done
 socket.on('newdefendcount',function(newCount,stopClock){
   if(stopClock){
-    clock.stop();
+    window.clearInterval(clockTick);
+    $('.knob-holder').addClass('hidden');
   }
   if(meDealer){
     $('#dealerControls').show();

@@ -23,3 +23,5 @@
 #SendVotes { position: absolute; width: auto; top:45vh; margin-left: 40vw; display: none;
   &.visible { display: block; }
 }
+.knob-holder { text-align: center; }
+.knobtext { font-family:$font !important; }
