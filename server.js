@@ -202,7 +202,7 @@ io.on('connection', function (socket){
     logic.processVote(socket.roomName,socket.username,most,least,function(err,result){
       if (result){
 	//tell everyone in room about vote
-	io.to(socket.roomName).emit('receivevote',result);
+	//io.to(socket.roomName).emit('receivevote',result);
 	if(result.votesNeeded == 0){
 	  //add players from the waiting list
 	  if(result.socketsToAdd.length > 0){

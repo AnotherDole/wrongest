@@ -432,7 +432,7 @@ exports.processVote = function(roomName,playerName,mostWrong,leastWrong,callback
       return callback(null, toReturn);
     }
     toReturn.socketsToAdd = result[6];
-    toReturn.gameData = {round: result[1],cardsLeft:result[2]}
+    toReturn.gameData = {round: (result[1]-1),cardsLeft:result[2]}
     toReturn.playerData = {}
     for(var i = 0; i < result[3].length; i++){
       toReturn.playerData[result[3][i]] = {newScore: result[4][i], scoreChange: result[5][i]};
