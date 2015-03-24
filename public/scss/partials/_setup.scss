@@ -29,9 +29,10 @@
   }
   
   .settings-toggle { text-align:right; position: absolute; right:1vw; bottom:1vh; left:1vw; @include transition();
-    .fa { font-size:4em;
-      &.spin { @include animation(rotate, 4s, infinite, linear); }
+    a.icon { display: inline-block;
+      &.spin { animation: rotate 6s infinite linear; }
     }
+    .icon-gear { width:4em; height:4em; }
     &.expanded { @include translateY(-220px); }
   }
   

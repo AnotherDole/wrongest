@@ -29,7 +29,7 @@ $('#roomURL').click(function() {
 
 $('.settings-toggle').click(function() {
   $(this).toggleClass('expanded');
-  $(this).children('.fa').toggleClass('spin');
+  $(this).children('.icon').toggleClass('spin');
   $('#leaderControls').toggleClass('hidden visible');
 });
 
@@ -45,6 +45,10 @@ $('.least-wrong-button').click(function() {
     $l = $(this).parent().parent().siblings('.votebutton').children('label');
     $(this).siblings('input').prop('checked',true);
     $r.addClass('least-wrong');
+    // remove the least wrong property on this row's siblings.
+    $r.siblings('tr').removeClass('least-wrong');
+    $r.siblings('tr').find('input[value="LeastWrong"]').prop('checked', false);
+    $r.siblings('tr').find('.least-wrong-button').removeClass('active');
     if ( $r.hasClass('most-wrong') ) {
       $r.removeClass('most-wrong');
       $l.children('input').prop('checked',false);
@@ -64,6 +68,10 @@ $('.most-wrong-button').click(function() {
     $l = $(this).parent().parent().siblings('.votebutton').children('label');
     $(this).siblings('input').prop('checked',true);
     $r.addClass('most-wrong');
+    // remove the most wrong property on this row's siblings.
+    $r.siblings('tr').removeClass('most-wrong');
+    $r.siblings('tr').find('input[value="MostWrong"]').prop('checked', false);
+    $r.siblings('tr').find('.most-wrong-button').removeClass('active');
     if ( $r.hasClass('least-wrong') ) {
       $r.removeClass('least-wrong');
       $l.children('input').prop('checked',false);
