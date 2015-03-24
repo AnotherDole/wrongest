@@ -191,7 +191,7 @@ socket.on('timetodefend',function(player,time){
       break;
     }
   }
-  startTimer();
+  startTimer(time);
   $('.knob-holder').removeClass('hidden');
 });
 
