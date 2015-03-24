@@ -203,7 +203,7 @@
             <tr id="voterow1">
               <td class="votebutton">
                 <label>
-                  <i class="fa fa-thumbs-up"></i>
+                  <i class="fa fa-thumbs-up vote-button least-wrong-button"></i>
                   <input id='mostwrong1' type="radio" name="player1" value="LeastWrong" />
                 </label>
               </td>
@@ -216,7 +216,7 @@
                   <span class="inner" id="ScoreChange1"></span>
                 </div>
                 <label>
-                  <i class="fa fa-thumbs-down"></i>
+                  <i class="fa fa-thumbs-down vote-button most-wrong-button"></i>
                   <input id='leastwrong1' type="radio" name="player1" value="MostWrong" />
                 </label>
               </td>
@@ -224,7 +224,7 @@
             <tr id="voterow2">
               <td class="votebutton">
                 <label>
-                  <i class="fa fa-thumbs-up"></i>
+                  <i class="fa fa-thumbs-up vote-button least-wrong-button"></i>
                   <input id='mostwrong2' type="radio" name="player2" value="LeastWrong" />
                 </label>
               </td>
@@ -237,7 +237,7 @@
                   <span class="inner" id="ScoreChange2"></span>
                 </div>
                 <label>
-                  <i class="fa fa-thumbs-down"></i>
+                  <i class="fa fa-thumbs-down vote-button most-wrong-button"></i>
                   <input id='leastwrong2' type="radio" name="player2" value="MostWrong" />
                 </label>
               </td>
@@ -245,7 +245,7 @@
             <tr id="voterow3">
               <td class="votebutton">
                 <label>
-                  <i class="fa fa-thumbs-up"></i>
+                  <i class="fa fa-thumbs-up vote-button least-wrong-button"></i>
                   <input id='mostwrong3' type="radio" name="player3" value="LeastWrong" />
                 </label>
               </td>
@@ -258,7 +258,7 @@
                   <span class="inner" id="ScoreChange3"></span>
                 </div>
                 <label>
-                  <i class="fa fa-thumbs-down"></i>
+                  <i class="fa fa-thumbs-down vote-button most-wrong-button"></i>
                   <input id='leastwrong3' type="radio" name="player3" value="MostWrong" />
                 </label>
               </td>
@@ -266,7 +266,7 @@
             <tr id="voterow4">
               <td class="votebutton">
                 <label>
-                  <i class="fa fa-thumbs-up"></i>
+                  <i class="fa fa-thumbs-up vote-button least-wrong-button"></i>
                   <input id='mostwrong4' type="radio" name="player4" value="LeastWrong" />
                 </label>
               </td>
@@ -279,7 +279,7 @@
                   <span class="inner" id="ScoreChange4"></span>
                 </div>
                 <label>
-                  <i class="fa fa-thumbs-down"></i>
+                  <i class="fa fa-thumbs-down vote-button most-wrong-button"></i>
                   <input id='leastwrong4' type="radio" name="player4" value="MostWrong" />
                 </label>
               </td>
@@ -287,7 +287,7 @@
             <tr id="voterow5">
               <td class="votebutton">
                 <label>
-                  <i class="fa fa-thumbs-up"></i>
+                  <i class="fa fa-thumbs-up vote-button least-wrong-button"></i>
                   <input id='mostwrong5' type="radio" name="player5" value="LeastWrong" />
                 </label>
               </td>
@@ -300,7 +300,7 @@
                   <span class="inner" id="ScoreChange5"></span>
                 </div>
                 <label>
-                  <i class="fa fa-thumbs-down"></i>
+                  <i class="fa fa-thumbs-down vote-button most-wrong-button"></i>
                   <input id='leastwrong5' type="radio" name="player5" value="MostWrong" />
                 </label>
               </td>
@@ -308,7 +308,7 @@
             <tr id="voterow6">
               <td class="votebutton">
                 <label>
-                  <i class="fa fa-thumbs-up"></i>
+                  <i class="fa fa-thumbs-up vote-button least-wrong-button"></i>
                   <input id='mostwrong6' type="radio" name="player6" value="LeastWrong" />
                 </label>
               </td>
@@ -321,7 +321,7 @@
                   <span class="inner" id="ScoreChange6"></span>
                 </div>
                 <label>
-                  <i class="fa fa-thumbs-down"></i>
+                  <i class="fa fa-thumbs-down vote-button most-wrong-button"></i>
                   <input id='leastwrong6' type="radio" name="player6" value="MostWrong" />
                 </label>
               </td>
@@ -329,7 +329,7 @@
             <tr id="voterow7">
               <td class="votebutton">
                 <label>
-                  <i class="fa fa-thumbs-up"></i>
+                  <i class="fa fa-thumbs-up vote-button least-wrong-button"></i>
                   <input id='mostwrong7' type="radio" name="player7" value="LeastWrong" />
                 </label>
               </td>
@@ -342,7 +342,7 @@
                   <span class="inner" id="ScoreChange7"></span>
                 </div>
                 <label>
-                  <i class="fa fa-thumbs-down"></i>
+                  <i class="fa fa-thumbs-down vote-button most-wrong-button"></i>
                   <input id='leastwrong7' type="radio" name="player7" value="MostWrong" />
                 </label>
               </td>
@@ -413,21 +413,6 @@
     <script src="http://flipclockjs.com/_themes/flipclockjs/js/flipclock/flipclock.js"></script>
     <script src="js/min/wrongest.min.js"></script>
     <script>
-$('.fa-thumbs-up').click(function() {
-  $(this).siblings('input').prop('checked',true);
-  $(this).parent().parent().parent().addClass('least-wrong');
-  $(this).parent().parent().parent().siblings().removeClass('least-wrong');
-  $(this).parent().parent().parent().siblings().find('input[value="LeastWrong"]').prop('checked',false);
-  showButton();
-});
-
-$('.fa-thumbs-down').click(function() {
-  $(this).siblings('input').prop('checked',true);
-  $(this).parent().parent().parent().addClass('most-wrong');
-  $(this).parent().parent().parent().siblings().removeClass('most-wrong');
-  $(this).parent().parent().parent().siblings().find('input[value="MostWrong"]').prop('checked',false);
-  showButton();
-});
 
 function showButton() {
   if ( $('input[value="LeastWrong"]:checked').length > 0 && $('input[value="MostWrong"]:checked').length > 0 ) {
@@ -648,11 +633,12 @@ socket.on('updatecurrentroom', function(players, leader, dealer){
 
 //Request to start the game. Only works if you are the leader of the room
 function startgame(){
-  socket.emit('requeststart',$('#deck').val(),
-              $('#timeLimit').val(),
-              $('#allowRedraw').val(),
-              $('#dealerSelect').val()
-             );
+  socket.emit('requeststart',
+    $('#deck').val(),
+    $('#timeLimit').val(),
+    $('#allowRedraw').val(),
+    $('#dealerSelect').val()
+  );
 }
 
 socket.on('startresult', function(data){

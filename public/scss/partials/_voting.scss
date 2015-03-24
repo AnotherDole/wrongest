@@ -19,21 +19,21 @@ section.vote { padding: 0;
     label { display:block; cursor:pointer; opacity: 1; transition:opacity 0.5s ease; }
     i { font-size:38px; }
     input { display:block; visibility:hidden; }
-    .fa-thumbs-down { color:$red; transition: all 0.5s; }
-    .fa-thumbs-up { color:$green; transition: all 0.5s; }
-    .fa { opacity:0.35; }
+    .most-wrong-button { color:$red; transition: all 0.5s; }
+    .least-wrong-button { color:$green; transition: all 0.5s; }
+    .vote-button { opacity:0.35; }
   }
 
   .least-wrong {
     td { background-color:$green; }
     .votebutton {
-      .fa-thumbs-up { color:$black; opacity:1; transform: scale(1.35); }
+      .least-wrong-button { color:$black; opacity:1; transform: scale(1.35); }
     }
   }
   .most-wrong {
     td { background-color:$red; color:$white; }
     .votebutton {
-      .fa-thumbs-down { color:$white; opacity:1; transform: scale(1.35); }
+      .most-wrong-button { color:$white; opacity:1; transform: scale(1.35); }
     }
   }
 
