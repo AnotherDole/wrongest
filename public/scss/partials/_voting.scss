@@ -46,7 +46,7 @@ section.vote { padding: 0;
       &:active { box-shadow:inset 4px 4px 0 $black; }
       &.hidden { transform:scale(0); }
     }
-    summary { transition:transform 0.5s ease; display: block; transform:translateY(-180%);
+    summary { transition:transform 0.5s ease; display: block; transform:translateY(-110%);
       &.hidden { transform: translateY(60%); }
     }
   }
