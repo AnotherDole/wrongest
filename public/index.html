@@ -442,8 +442,8 @@
       <script src="https://cdn.socket.io/socket.io-1.3.2.js"></script>
       <script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
       <script src="js/vendor/jquery.knob.min.js"></script>
-      <script src="js/functions.js"></script>
       <script src="js/sockets.js"></script>
+      <script src="js/functions.js"></script>
       <script src="js/actions.js"></script>
       
       <!-- BELOW: SVG icon definitions for use in the project -->
@@ -469,24 +469,5 @@
         </defs>
       </svg>
     </footer>
-    <script>
-var username = "";
-var deckData;
-var currentStatements;
-var playerList;
-var playerScores = {};
-var meDefending = false;
-var meDealer = false;
-var gameOver = false;
-
-
-
-if(location.pathname.length > 1){
-  $('#startDiv').hide();
-  $('#joinDiv').show();
-  $('#joinRoomName').val(location.pathname.substr(1));
-  socket.emit('requestroomdata',location.pathname.substr(1));
-}
-    </script>
   </body>
 </html>

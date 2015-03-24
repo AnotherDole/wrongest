@@ -94,3 +94,10 @@ $('#SubmitVotes').click(function() {
     $('input[value="LeastWrong"]:checked').attr('name')
   );
 });
+
+if(location.pathname.length > 1){
+  $('#startDiv').hide();
+  $('#joinDiv').show();
+  $('#joinRoomName').val(location.pathname.substr(1));
+  socket.emit('requestroomdata',location.pathname.substr(1));
+}

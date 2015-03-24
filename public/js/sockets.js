@@ -1,13 +1,21 @@
 // jshint -W117
 
+var username = "";
+var deckData;
+var currentStatements;
+var playerList;
+var playerScores = {};
+var meDefending = false;
+var meDealer = false;
+var gameOver = false;
 var socket;
+
 if(location.hostname.indexOf('wrongest.net') > -1){
   socket = io(location.hostname + ':8000');
 }
 else{
   socket = io();
 }
-
 
 socket.on('pausegame', function(){
   $('#GameView').addClass('hidden');
