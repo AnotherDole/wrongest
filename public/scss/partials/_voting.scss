@@ -60,10 +60,10 @@ section.vote { padding: 0;
     }
     
     .least-wrong {
-      td { background-color: transparent; color:$red; }
+      td { background-color: transparent; color:darken($green,10%); }
     }
     .most-wrong { 
-      td { background-color: transparent; color:darken($green,10%); }
+      td { background-color: transparent; color:$red; }
     }
     .votebutton {
       label { opacity: 0; }
