@@ -161,7 +161,8 @@ function everySecond() {
   $('.knob').val(timer.current).trigger('change');
 }
 
-function startTimer() {
+function startTimer(time) {
+  timer.total = time;
   $('input.knob').val(timer.total).trigger('change');
   $(".knob").knob({
     'min': 0,
