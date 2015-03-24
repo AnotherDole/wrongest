@@ -123,10 +123,12 @@ io.on('connection', function (socket){
   socket.on('requestjoin', function(playerName,roomName){
     logic.joinRequest(roomName,playerName, socket.id,function(err,result){
       if (result.success){
+	result.link = 'http://' + server_address + '/' + result.roomName;
 	if(!result.waiting){
 	  //join socket.io room
 	  socket.join(roomName);
 	  //tell everyone in same room to update display
+	  socket.emit('joinresult',result);
 	  logic.getPlayersIn(roomName,function (err,blar){
 	    io.to(roomName).emit('updatecurrentroom',blar.players,blar.leader,blar.dealer);
 	  });
@@ -134,7 +136,9 @@ io.on('connection', function (socket){
 	//socket.emit('deckdata',logic.getDeckData());
 	socket.username = playerName;
 	socket.roomName = roomName;
-	result.link = 'http://' + server_address + '/' + result.roomName;
+      }
+      else{
+	socket.emit('joinresult',result);
       }
     });
   })
