@@ -47,12 +47,15 @@ if numPlayers == 0 then
   return toReturn
 end
 
+local roomData = redis.call('hmget', KEYS[4],'dealer','gameState','votesReceived','whosUp')
+
 --mark their card as no longer in play
-local whichCard = redis.call('hget',KEYS[3],'card')
-redis.call('hset','card:' .. ARGV[2] .. ':' .. whichCard,'inPlay',0)
+if roomData[2] ~= '0' then
+  local whichCard = redis.call('hget',KEYS[3],'card')
+  redis.call('hset','card:' .. ARGV[2] .. ':' .. whichCard,'inPlay',0)
+end
 
 -- still players left, find new dealer
-local roomData = redis.call('hmget', KEYS[4],'dealer','gameState','votesReceived','whosUp')
 if roomData[1] == ARGV[1] then
   local newDealer = playerList[(playerIndex % numPlayers) + 1]
   redis.call('hset',KEYS[4],'dealer',newDealer)
