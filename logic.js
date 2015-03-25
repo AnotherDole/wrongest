@@ -13,7 +13,7 @@ var rooms = {}, decks = {}, deckData = {};
 var client = null;
 var gamesCreated = 0;
 
-var ROUND_LIMIT = 5;
+var ROUND_LIMIT = 2;
 
 var MIN_PLAYERS = 3;
 var MAX_PLAYERS = 8;
@@ -338,6 +338,9 @@ exports.getStatements = function(roomName,callback){
   //run lua script
   //result[0] is array of player names, result[1] is array of selected cards, result[2] is array of scores, result[3] is deck name
   scriptManager.run('getStatements',[roomDataKey(roomName),roomPlayersKey(roomName)],[ROUND_LIMIT,roomName,seed],function(err,result){
+    if(result == null){
+      return callback(null,false);
+    }
     var theDeck = decks[result[3]];
     var toReturn = {};
     for (var i = 0; i < result[0].length; i++){
@@ -365,27 +368,19 @@ exports.getWhosUp = function(roomName,playerName,callback){
   })
 }
 
-exports.getWinner = function(roomName){
-  var theRoom = rooms[roomName];
-  theRoom.gameState = GAME_FINISHED;
-  var result = {};
-  var wPlayer, playerScore = -1, wCard, cardScore = 99999, i;
-  for (i = 0; i < theRoom.players.length; i++){
-    var thePlayer = theRoom.players[i];
-    if(thePlayer.score > playerScore){
-      playerScore = thePlayer.score;
-      wPlayer = thePlayer.name;
+exports.getWinner = function(roomName,callback){
+  var seed = Math.floor(Math.random() * Math.pow(2,32));
+  //data[0] is card number, data[1] is its score, data[2] is the deck name
+  scriptManager.run('getWinner',[roomDataKey(roomName)],[roomName,seed],function (err,data){
+    if (err) {
+      console.log(err);
+      return callback(err,null);
     }
-  }
-  for(i = 0; i < theRoom.deck.length; i++){
-    var theCard = theRoom.deck[i];
-    if(theCard.score < cardScore){
-      cardScore = theCard.score;
-      wCard = theCard.masterCard.quote;
-    }
-  }
-  //console.log("Game in " + roomName + " is over.");
-  return {player: wPlayer, playerScore: playerScore, card: wCard, cardScore: cardScore};
+    var cardNum = parseInt(data[0]), cardScore = parseInt(data[1]);
+    var theDeck = decks[data[2]];
+    var toReturn = {card: theDeck.cards[cardNum].quote, cardScore: cardScore};
+    return callback(null,toReturn);
+  })
 }
 
 //playerName is done defending their statement

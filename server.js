@@ -44,9 +44,10 @@ app.get('/:id',function(req,res){
 function getAndSendStatements(roomName,callback){
   logic.getStatements(roomName,function(err,result){
     if(result == false){
-      result = logic.getWinner(roomName);
-      io.to(roomName).emit('gameover',result);
-      return callback(false);
+      logic.getWinner(roomName,function(err,data){
+	io.to(roomName).emit('gameover',data);
+	return callback(false);
+      })
     }
     else{
       io.to(roomName).emit('getstatements',result);
