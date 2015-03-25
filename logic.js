@@ -7,7 +7,8 @@ var path = require('path');
 var Hashids = require('hashids');
 var Scripto = require('redis-scripto');
 var scriptManager = null;
-var hashids = new Hashids(Math.random().toString());
+var secret = process.env.HASHID_SECRET || Math.random().toString();
+var hashids = new Hashids(secret);
 
 var rooms = {}, decks = {}, deckData = {};
 var client = null;

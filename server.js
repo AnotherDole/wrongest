@@ -2,12 +2,22 @@ var express = require('express');
 var app = express();
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);
-var port = process.env.OPENSHIFT_NODEJS_PORT || 3000;
-var server_ip_address = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1';
-var server_address = process.env.OPENSHIFT_APP_DNS ? 'www.wrongest.net' : ('localhost:'+port);
 
 var redis = require('redis');
 var client = redis.createClient();
+
+var redisHost = process.env.REDIS_HOST || '127.0.0.1';
+var redisPort = process.env.REDIS_PORT || '6379';
+var redisPass = process.env.REDIS_PASS || '';
+
+var adapter = require('socket.io-redis');
+var pub = redis.createClient(redisPort, redisHost, { auth_pass: redisPass});
+var sub = redis.createClient(redisPort, redisHost, { detect_buffers: true, auth_pass: redisPass});
+io.adapter(adapter({pubClient: pub, subClient: sub}));
+
+var port = process.env.OPENSHIFT_NODEJS_PORT || 3000;
+var server_ip_address = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1';
+var server_address = process.env.OPENSHIFT_APP_DNS ? 'www.wrongest.net' : ('localhost:'+port);
 
 var logic = require('./logic.js');
 logic.setClient(client);
