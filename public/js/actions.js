@@ -38,6 +38,13 @@ $('.settings-toggle').click(function() {
 // GAMEPLAY ACTIONS
 ////////////////////////////////////////////////
 
+$('#DoneEarlyButton').click(function() {
+  window.clearInterval(clockTick);
+  console.log('done early: '+timer.total);
+  ga('send', 'event', { eventCategory: 'player action', eventAction: 'defended', eventLabel: 'done early', eventValue: timer.total });
+  donedefend();
+});
+
 $('.least-wrong-button').click(function() {
   $(this).toggleClass('active');
   if ( $(this).hasClass('active') ) {

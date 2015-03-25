@@ -73,6 +73,9 @@ function leaveroom(){
 
 //Request to start the game. Only works if you are the leader of the room
 function startgame(){
+  var v = playerList.length;
+  console.log(v);
+  ga('send', 'event', { eventCategory: 'player action', eventAction: 'start game', eventLabel: 'players', eventValue: v });
   socket.emit('requeststart',
     $('#deck').val(),
     $('#timeLimit').val(),
@@ -137,6 +140,8 @@ function everySecond() {
   if (timer.current <= 0) {
     window.clearInterval(clockTick);
       if(meDefending){
+        console.log('time up: '+timer.total);
+        ga('send', 'event', { eventCategory: 'player action', eventAction: 'defended', eventLabel: 'time up', eventValue: timer.total });
         donedefend();
       }
     return;
