@@ -4,11 +4,11 @@ var server = require('http').createServer(app);
 var io = require('socket.io')(server);
 
 var redis = require('redis');
-var client = redis.createClient();
 
 var redisHost = process.env.REDIS_HOST || '127.0.0.1';
 var redisPort = process.env.REDIS_PORT || '6379';
 var redisPass = process.env.REDIS_PASS || '';
+var client = redis.createClient(redisPort, redisHost, {auth_pass: redisPass});
 
 var adapter = require('socket.io-redis');
 var pub = redis.createClient(redisPort, redisHost, { auth_pass: redisPass});
