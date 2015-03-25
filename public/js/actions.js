@@ -13,6 +13,19 @@ $('#JoinRoomButton').click(function() {
   $('.join-screen').removeClass('hidden');
 });
 
+  // We wanna trigger the join or create buttons upon hitting Enter 
+$('#createUsernameInput').keyup(function(e) {
+  if(e.keyCode == 13){
+    $("#CreateRoomButton").click();
+  }
+});
+$('#joinUsernameInput').keyup(function(e) {
+  if(e.keyCode == 13){
+    $("#JoinRoomButton").click();
+  }
+});
+
+
 $('#createPasswordInput').keyup(function() {
   console.log($(this).val());
   if ( $(this).val() === "") {

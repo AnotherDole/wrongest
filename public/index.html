@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <title>The Wrongest Words v0.1.0</title>
-    <link href='http://fonts.googleapis.com/css?family=Comfortaa:400,700,300' rel='stylesheet' type='text/css'>
+    <link href="http://fonts.googleapis.com/css?family=Comfortaa:400,700,300" rel="stylesheet" type="text/css">
     <link href="css/wrongest.css" rel="stylesheet" />
     
     <!-- Begin favicons -->
@@ -35,29 +35,29 @@
       <img src="svg/logo2.svg" class="game-logo" />
       
       <!-- New user -->
-      <div class="starting-screen" id='startDiv'>
+      <div class="starting-screen" id="startDiv">
         <summary class="game-explanation">
           Here will be some text that explains how the game works. It will include a link to some other resource, like a page of text or maybe a video?
         </summary>
-        <input type="text" data-holds="playerName" id='createUsernameInput' maxlength="50" placeholder="Your Name">
+        <input type="text" data-holds="playerName" id="createUsernameInput" maxlength="50" placeholder="Your Name">
         <div class="button-holder">
-          <button  id='createroombutton' onclick='createroom();'>CREATE game</button>
+          <button id="CreateRoomButton" onclick="createroom();">CREATE game</button>
         </div>
       </div>
       
       <!-- Join room screen -->
       <div class="join-screen hidden" id="joinDiv">
         <div class="room-details">
-          <ol class="players" id='joinRoomMembers'>Retrieving the player list...</ol>
+          <ol class="players" id="joinRoomMembers">Retrieving the player list...</ol>
         </div>
         <div class="inputs">
           <div class="username row">
-            <input type='text' data-holds="playerName" id='joinUsernameInput' maxlength='50' placeholder="Your Name">
-            <input type='text' id='joinRoomName' class='hidden'>
+            <input type="text" data-holds="playerName" id="joinUsernameInput" maxlength="50" placeholder="Your Name">
+            <input type="text" id="joinRoomName" class="hidden">
           </div>
         </div>
         <div class="button-holder">
-          <button type="submit" id='joinroombutton' onclick='joinroom();'>JOIN!</button>
+          <button type="submit" id="JoinRoomButton" onclick="joinroom();">JOIN!</button>
         </div>
       </div>
 
@@ -72,7 +72,7 @@
         <div class="lobby-box">
           <ol class="players" id="pauseRoomMembers"></ol>
         </div>
-        <div class="button-holder hidden" id='restartOption'>
+        <div class="button-holder hidden" id="restartOption">
           <button id="RestartButton" onclick="socket.emit('restartgame');">Restart Game</button>
           <span id="RestartGameBother">You need at least 3 players. Go bug your friends!</span>
         </div>
@@ -91,7 +91,7 @@
           <input type="url" readonly id="roomURL" />
         </figure>
         <div class="lobby-box">
-          <ol class="players" id='detailsRoomMembers'>Retrieving player list...</ol>
+          <ol class="players" id="detailsRoomMembers">Retrieving player list...</ol>
         </div>
         <div class="button-holder admin-options">
           <button id="StartGameButton" onclick="startgame();">Start Game</button>
@@ -102,38 +102,38 @@
         <div class="settings-toggle admin-options">
           <span>settings</span>
           <a class="icon">
-            <svg class="icon-gear icon-settings" viewBox="0 0 100 100"><use xlink:href="#Icon-Gear" /></svg>
+            <svg class="icon-gear icon-settings" viewbox="0 0 100 100"><use xlink:href="#Icon-Gear" /></svg>
           </a>
         </div>
         <ul class="admin-options hidden" id="leaderControls" style="display:none;">
           <li class="option">
             <label for="deck"><span>Deck:</span></label>
-            <select id='deck' onchange='updateDeckDescription();'></select>
-            <summary id='deckdescription'></summary>
+            <select id="deck" onchange="updateDeckDescription();"></select>
+            <summary id="deckdescription"></summary>
           </li>
           <li class="option">
             <label for="timeLimit">Time Limit:</label>
-            <select id='timeLimit'>
-              <option value='30'>30 seconds</option>
-              <option value='60'>60 seconds</option>
-              <option value='90'>90 seconds</option>
+            <select id="timeLimit">
+              <option value="30">30 seconds</option>
+              <option value="60">60 seconds</option>
+              <option value="90">90 seconds</option>
             </select>
           </li>
           <li class="option">
             <label for="allowRedraw">Redraw same card?</label>
-            <select id='allowRedraw'>
-              <option value='no'>No</option>
-              <option value='yes'>Yes</option>
+            <select id="allowRedraw">
+              <option value="no">No</option>
+              <option value="yes">Yes</option>
             </select>
           </li>
           <li class="option">
             <label for="dealerSelect">Dealer defends...</label>
             <select id="dealerSelect">
-              <option value='last'>Last</option>
-              <option value='first'>First</option>
+              <option value="last">Last</option>
+              <option value="first">First</option>
             </select>
           </li>
-          <li id='startresult'></li>
+          <li id="startresult"></li>
         </ul>
       </div>
       
@@ -148,7 +148,7 @@
         <input class="knob knobtext" data-height="120" data-width="120" type="text" id="GameClock" />
       </div>
       <!-- Player Order -->
-      <div id='orderDiv'>
+      <div id="orderDiv">
         <ol class="player-order">
           <li id="player1">
             <span id="playerName1" class="player-name"></span>
@@ -175,18 +175,18 @@
             <span id="playerName8" class="player-name"></span>
           </li>
         </ol>
-        <div id='dealerControls' class="button-holder" style='display:none'>
-          <button onclick='makeDefend();'>Deal a Card</button>
+        <div id="dealerControls" class="button-holder" style="display:none">
+          <button onclick="makeDefend();">Deal a Card</button>
         </div>
       </div>
       <!-- Your Playing Card -->
-      <div id='defendDiv' class="card" style='display:none'>
+      <div id="defendDiv" class="card" style="display:none">
         <div class="flip-container">
           <div class="flipper">
             <div class="front">
               <div class="inner">
                 <img src="svg/hard.svg" id="HardCardSticker" class="this-is-hard">
-                <blockquote id='statementDiv'></blockquote>
+                <blockquote id="statementDiv"></blockquote>
                 <div class="button-holder">
                   <button id="DoneEarlyButton">I'm done early.</button>
                 </div>
@@ -194,7 +194,7 @@
             </div>
             <div class="back">
               <div class="inner">
-                <div id='votestatus'>It is not time to vote yet.</div>
+                <div id="votestatus">It is not time to vote yet.</div>
               </div>
             </div>
           </div>
@@ -226,13 +226,13 @@
               <td class="votebutton">
                 <label>
                   <a class="vote-button least-wrong-button">
-                    <svg viewBox="0 0 100 100"><use xlink:href="#Icon-ThumbsUp" /></svg>
+                    <svg viewbox="0 0 100 100"><use xlink:href="#Icon-ThumbsUp" /></svg>
                   </a>
-                  <input id='mostwrong1' type="radio" name="player1" value="LeastWrong" />
+                  <input id="mostwrong1" type="radio" name="player1" value="LeastWrong" />
                 </label>
               </td>
               <td>
-                <blockquote id='votequote1'></blockquote>
+                <blockquote id="votequote1"></blockquote>
                 <cite><span id="quotecite1"></span></cite>
               </td>
               <td class="votebutton">
@@ -241,9 +241,9 @@
                 </div>
                 <label>
                   <a class="vote-button most-wrong-button">
-                    <svg viewBox="0 0 100 100"><use xlink:href="#Icon-ThumbsDown" /></svg>
+                    <svg viewbox="0 0 100 100"><use xlink:href="#Icon-ThumbsDown" /></svg>
                   </a>
-                  <input id='leastwrong1' type="radio" name="player1" value="MostWrong" />
+                  <input id="leastwrong1" type="radio" name="player1" value="MostWrong" />
                 </label>
               </td>
             </tr>
@@ -251,13 +251,13 @@
               <td class="votebutton">
                 <label>
                   <a class="vote-button least-wrong-button">
-                    <svg viewBox="0 0 100 100"><use xlink:href="#Icon-ThumbsUp" /></svg>
+                    <svg viewbox="0 0 100 100"><use xlink:href="#Icon-ThumbsUp" /></svg>
                   </a>
-                  <input id='mostwrong2' type="radio" name="player2" value="LeastWrong" />
+                  <input id="mostwrong2" type="radio" name="player2" value="LeastWrong" />
                 </label>
               </td>
               <td>
-                <blockquote id='votequote2'></blockquote>
+                <blockquote id="votequote2"></blockquote>
                 <cite><span id="quotecite2"></span></cite>
               </td>
               <td class="votebutton">
@@ -266,9 +266,9 @@
                 </div>
                 <label>
                   <a class="vote-button most-wrong-button">
-                    <svg viewBox="0 0 100 100"><use xlink:href="#Icon-ThumbsDown" /></svg>
+                    <svg viewbox="0 0 100 100"><use xlink:href="#Icon-ThumbsDown" /></svg>
                   </a>
-                  <input id='leastwrong2' type="radio" name="player2" value="MostWrong" />
+                  <input id="leastwrong2" type="radio" name="player2" value="MostWrong" />
                 </label>
               </td>
             </tr>
@@ -276,13 +276,13 @@
               <td class="votebutton">
                 <label>
                   <a class="vote-button least-wrong-button">
-                    <svg viewBox="0 0 100 100"><use xlink:href="#Icon-ThumbsUp" /></svg>
+                    <svg viewbox="0 0 100 100"><use xlink:href="#Icon-ThumbsUp" /></svg>
                   </a>
-                  <input id='mostwrong3' type="radio" name="player3" value="LeastWrong" />
+                  <input id="mostwrong3" type="radio" name="player3" value="LeastWrong" />
                 </label>
               </td>
               <td>
-                <blockquote id='votequote3'></blockquote>
+                <blockquote id="votequote3"></blockquote>
                 <cite><span id="quotecite3"></span></cite>
               </td>
               <td class="votebutton">
@@ -291,9 +291,9 @@
                 </div>
                 <label>
                   <a class="vote-button most-wrong-button">
-                    <svg viewBox="0 0 100 100"><use xlink:href="#Icon-ThumbsDown" /></svg>
+                    <svg viewbox="0 0 100 100"><use xlink:href="#Icon-ThumbsDown" /></svg>
                   </a>
-                  <input id='leastwrong3' type="radio" name="player3" value="MostWrong" />
+                  <input id="leastwrong3" type="radio" name="player3" value="MostWrong" />
                 </label>
               </td>
             </tr>
@@ -301,13 +301,13 @@
               <td class="votebutton">
                 <label>
                   <a class="vote-button least-wrong-button">
-                    <svg viewBox="0 0 100 100"><use xlink:href="#Icon-ThumbsUp" /></svg>
+                    <svg viewbox="0 0 100 100"><use xlink:href="#Icon-ThumbsUp" /></svg>
                   </a>
-                  <input id='mostwrong4' type="radio" name="player4" value="LeastWrong" />
+                  <input id="mostwrong4" type="radio" name="player4" value="LeastWrong" />
                 </label>
               </td>
               <td>
-                <blockquote id='votequote4'></blockquote>
+                <blockquote id="votequote4"></blockquote>
                 <cite><span id="quotecite4"></span></cite>
               </td>
               <td class="votebutton">
@@ -316,9 +316,9 @@
                 </div>
                 <label>
                   <a class="vote-button most-wrong-button">
-                    <svg viewBox="0 0 100 100"><use xlink:href="#Icon-ThumbsDown" /></svg>
+                    <svg viewbox="0 0 100 100"><use xlink:href="#Icon-ThumbsDown" /></svg>
                   </a>
-                  <input id='leastwrong4' type="radio" name="player4" value="MostWrong" />
+                  <input id="leastwrong4" type="radio" name="player4" value="MostWrong" />
                 </label>
               </td>
             </tr>
@@ -326,13 +326,13 @@
               <td class="votebutton">
                 <label>
                   <a class="vote-button least-wrong-button">
-                    <svg viewBox="0 0 100 100"><use xlink:href="#Icon-ThumbsUp" /></svg>
+                    <svg viewbox="0 0 100 100"><use xlink:href="#Icon-ThumbsUp" /></svg>
                   </a>
-                  <input id='mostwrong5' type="radio" name="player5" value="LeastWrong" />
+                  <input id="mostwrong5" type="radio" name="player5" value="LeastWrong" />
                 </label>
               </td>
               <td>
-                <blockquote id='votequote5'></blockquote>
+                <blockquote id="votequote5"></blockquote>
                 <cite><span id="quotecite5"></span></cite>
               </td>
               <td class="votebutton">
@@ -341,9 +341,9 @@
                 </div>
                 <label>
                   <a class="vote-button most-wrong-button">
-                    <svg viewBox="0 0 100 100"><use xlink:href="#Icon-ThumbsDown" /></svg>
+                    <svg viewbox="0 0 100 100"><use xlink:href="#Icon-ThumbsDown" /></svg>
                   </a>
-                  <input id='leastwrong5' type="radio" name="player5" value="MostWrong" />
+                  <input id="leastwrong5" type="radio" name="player5" value="MostWrong" />
                 </label>
               </td>
             </tr>
@@ -351,13 +351,13 @@
               <td class="votebutton">
                 <label>
                   <a class="vote-button least-wrong-button">
-                    <svg viewBox="0 0 100 100"><use xlink:href="#Icon-ThumbsUp" /></svg>
+                    <svg viewbox="0 0 100 100"><use xlink:href="#Icon-ThumbsUp" /></svg>
                   </a>
-                  <input id='mostwrong6' type="radio" name="player6" value="LeastWrong" />
+                  <input id="mostwrong6" type="radio" name="player6" value="LeastWrong" />
                 </label>
               </td>
               <td>
-                <blockquote id='votequote6'></blockquote>
+                <blockquote id="votequote6"></blockquote>
                 <cite><span id="quotecite6"></span></cite>
               </td>
               <td class="votebutton">
@@ -366,9 +366,9 @@
                 </div>
                 <label>
                   <a class="vote-button most-wrong-button">
-                    <svg viewBox="0 0 100 100"><use xlink:href="#Icon-ThumbsDown" /></svg>
+                    <svg viewbox="0 0 100 100"><use xlink:href="#Icon-ThumbsDown" /></svg>
                   </a>
-                  <input id='leastwrong6' type="radio" name="player6" value="MostWrong" />
+                  <input id="leastwrong6" type="radio" name="player6" value="MostWrong" />
                 </label>
               </td>
             </tr>
@@ -376,13 +376,13 @@
               <td class="votebutton">
                 <label>
                   <a class="vote-button least-wrong-button">
-                    <svg viewBox="0 0 100 100"><use xlink:href="#Icon-ThumbsUp" /></svg>
+                    <svg viewbox="0 0 100 100"><use xlink:href="#Icon-ThumbsUp" /></svg>
                   </a>
-                  <input id='mostwrong7' type="radio" name="player7" value="LeastWrong" />
+                  <input id="mostwrong7" type="radio" name="player7" value="LeastWrong" />
                 </label>
               </td>
               <td>
-                <blockquote id='votequote7'></blockquote>
+                <blockquote id="votequote7"></blockquote>
                 <cite><span id="quotecite7"></span></cite>
               </td>
               <td class="votebutton">
@@ -391,9 +391,9 @@
                 </div>
                 <label>
                   <a class="vote-button most-wrong-button">
-                    <svg viewBox="0 0 100 100"><use xlink:href="#Icon-ThumbsDown" /></svg>
+                    <svg viewbox="0 0 100 100"><use xlink:href="#Icon-ThumbsDown" /></svg>
                   </a>
-                  <input id='leastwrong7' type="radio" name="player7" value="MostWrong" />
+                  <input id="leastwrong7" type="radio" name="player7" value="MostWrong" />
                 </label>
               </td>
             </tr>
@@ -443,11 +443,11 @@
         </li>
         <li id="place7">
           <span id="namePlace7" class="player-name">Tony Todd</span>
-          <span id="scorePlace6" class="player-score">1</span>
+          <span id="scorePlace7" class="player-score">1</span>
         </li>
         <li id="place8">
           <span id="namePlace8" class="player-name">a</span>
-          <span id="scorePlace6" class="player-score">0</span>
+          <span id="scorePlace8" class="player-score">0</span>
         </li>
       </ol>
       <div class="button-holder">
@@ -468,9 +468,7 @@
       <script src="js/analytics.js"></script>
       
       <!-- BELOW: SVG icon definitions for use in the project -->
-      <?xml version="1.0" encoding="utf-8"?>
-      <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-      <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 100 100" enable-background="new 0 0 100 100" xml:space="preserve">
+      <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewbox="0 0 100 100" enable-background="new 0 0 100 100" xml:space="preserve">
         <defs>
           <g id="Icon-Hard">
             <polygon fill="#C1272D" points="43.6,74.5 46.8,74.5 45.2,70.3"/>
