@@ -271,6 +271,10 @@ exports.leaveRequest = function(roomName,playerName,callback){
 	      roomDataKey(roomName),roomAllKey(roomName)];
   var args = [playerName,roomName];
   scriptManager.run('leaveRequest',keys,args,function(err,result){
+    if(err){
+      console.log(err);
+      return callback(err,null);
+    }
     var toReturn = {};
     toReturn.fromWaiting = (result[0] != null);
     toReturn.roomDeleted = (result[1] != null);

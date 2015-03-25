@@ -30,8 +30,10 @@ if numPlayers == 0 then
   redis.call('del',KEYS[1])
 
   local deckLength = redis.call('hget',KEYS[4],'deckLength')
-  for i = 1,deckLength,1 do
-    redis.call('del', 'card:' .. ARGV[2] .. ':' .. i)
+  if deckLength ~= false then
+    for i = 1,deckLength,1 do
+      redis.call('del', 'card:' .. ARGV[2] .. ':' .. i)
+    end
   end
 
   redis.call('del',KEYS[4])
