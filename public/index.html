@@ -99,42 +99,54 @@
         </div>
         
         <!-- Game Settings for the lobby leader -->
-        <div class="settings-toggle admin-options">
-          <span>settings</span>
-          <a class="icon">
-            <svg class="icon-gear icon-settings" viewbox="0 0 100 100"><use xlink:href="#Icon-Gear" /></svg>
-          </a>
-        </div>
-        <ul class="admin-options hidden" id="leaderControls" style="display:none;">
-          <li class="option">
-            <label for="deck"><span>Deck:</span></label>
-            <select id="deck" onchange="updateDeckDescription();"></select>
-            <summary id="deckdescription"></summary>
-          </li>
-          <li class="option">
-            <label for="timeLimit">Time Limit:</label>
-            <select id="timeLimit">
-              <option value="30">30 seconds</option>
-              <option value="60">60 seconds</option>
-              <option value="90">90 seconds</option>
-            </select>
-          </li>
-          <li class="option">
-            <label for="allowRedraw">Redraw same card?</label>
-            <select id="allowRedraw">
-              <option value="no">No</option>
-              <option value="yes">Yes</option>
-            </select>
-          </li>
-          <li class="option">
-            <label for="dealerSelect">Dealer defends...</label>
-            <select id="dealerSelect">
-              <option value="last">Last</option>
-              <option value="first">First</option>
-            </select>
-          </li>
-          <li id="startresult"></li>
-        </ul>
+        <dl class="admin-options">
+          <dt class="settings-toggle">
+            <span>settings</span>
+            <a class="icon">
+              <svg class="icon-gear icon-settings" viewbox="0 0 100 100"><use xlink:href="#Icon-Gear" /></svg>
+            </a>
+          </dt>
+          <dd>
+            <ul class="admin-options" id="leaderControls">
+              <li class="option">
+                <label for="deck"><span>Deck:</span></label>
+                <div class="select-holder">
+                  <select id="deck" onchange="updateDeckDescription();"></select>
+                </div>
+                <summary id="deckdescription"></summary>
+              </li>
+              <li class="option">
+                <label for="timeLimit">Time Limit:</label>
+                <div class="select-holder">
+                  <select id="timeLimit">
+                    <option value="30">30 seconds</option>
+                    <option value="60">60 seconds</option>
+                    <option value="90">90 seconds</option>
+                  </select>
+                </div>
+              </li>
+              <li class="option">
+                <label for="allowRedraw">Redraw same card?</label>
+                <div class="select-holder">
+                  <select id="allowRedraw">
+                    <option value="no">No</option>
+                    <option value="yes">Yes</option>
+                  </select>
+                </div>
+              </li>
+              <li class="option">
+                <label for="dealerSelect">Dealer defends...</label>
+                <div class="select-holder">
+                  <select id="dealerSelect">
+                    <option value="last">Last</option>
+                    <option value="first">First</option>
+                  </select>
+                </div>
+              </li>
+              <li id="startresult"></li>
+            </ul>
+          </dd>
+        </dl>
       </div>
       
       <p style="padding-top:12px;">DEBUG MODE: <a style="color:yellow; text-decoration:underline; cursor:pointer" onclick="$('#GameOverScreen').removeClass('hidden').siblings('section').addClass('hidden');">This link should show the game over screen</a>, in it's current state. Once you're there, you've gotta refresh.</p>

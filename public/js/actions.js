@@ -42,9 +42,8 @@ $('#roomURL').click(function() {
 });
 
 $('.settings-toggle').click(function() {
-  $(this).toggleClass('expanded');
   $(this).children('.icon').toggleClass('spin');
-  $('#leaderControls').toggleClass('hidden visible');
+  $(this).siblings('dd').slideToggle(500);
 });
 
 

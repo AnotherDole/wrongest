@@ -12,5 +12,6 @@ section { width: 100%; height:100%; overflow-x: hidden; overflow-y: auto;  paddi
 
 
 @media (min-width:$desktop-min) {
+  body { background-image: url(../img/eight_horns.png); background-repeat: repeat; }
   section { max-width:480px; margin-left:auto; margin-right:auto; }
 }

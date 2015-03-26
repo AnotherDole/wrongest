@@ -28,26 +28,27 @@
     }
   }
   
-  .settings-toggle { text-align:right; position: absolute; right:1vw; bottom:1vh; left:1vw; @include transition();
+  .settings-toggle { text-align:right; padding-right: 10px; padding-bottom: 10px;
     a.icon { display: inline-block;
       &.spin { animation: rotate 6s infinite linear; }
     }
     .icon-gear { width:4em; height:4em; }
-    &.expanded { @include translateY(-220px); }
+    //&.expanded { @include translateY(-220px); }
   }
-  
 }
 
-.admin-options { background-color:$black;
-  li { padding-bottom: 0.5em; }
-  label { display: block; }
-  select { display: block; width: 100%; }
-}
-
-#leaderControls { position: absolute; right:1vw; bottom:1vh; left:1vw; overflow: hidden; @include transition();
-  &.hidden { height:1px; }
-  &.visible { height: 220px; }
-}
+dl.admin-options { position: absolute; right:0; bottom:0; left: 0;
+    dd { background-color:$white; padding: 20px; display: none;
+      ul { }
+      li { @extend %clearfix; }
+      label, .select-holder { float: left; display: block; }
+      label { color:$pink; text-align: right; padding-right: 0.5em; width:44%; padding-top: 0.25em; }
+      .select-holder { text-align: left; padding-left: 0.5em; width: 56%;
+        select { width:100%; padding: 0.25em 0.5em; background-color:$pink; color:$white; }
+      }
+      summary { color:$grey; font-size: 0.85em; @extend %clearfix; display: block; padding-top: 0.7em; padding-bottom: 1em; }
+    }
+  }
 
 ul#SetupToasts {
   li { display: block; margin-top: 1em; text-align: center; padding: 0.2em; border-radius: 0.2em; animation-fill-mode: forwards; animation: toastIn 5s ease; -webkit-animation-fill-mode: forwards;
