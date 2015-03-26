@@ -1,4 +1,4 @@
--- KEYS[1] is room data key
+-- KEYS[1] is room data key, KEYS[2] is player list key
 -- ARGV[1] is room name, ARGV[2] is random seed
 
 math.randomseed(tonumber(ARGV[2]))
@@ -27,7 +27,14 @@ end
 
 local selected = candidates[math.random(1,table.getn(candidates))]
 local deckName = redis.call('hget',KEYS[1],'masterDeck')
+local playerList = redis.call('lrange',KEYS[2],0,-1);
+local whoHad = {}
+for i, name in ipairs(playerList) do
+  if redis.call('sismember','player:previous:' .. ARGV[1] .. ':' .. name,selected) == 1 then
+    table.insert(whoHad,name)
+  end
+end
 
-local toReturn = {selected, bestCardScore, deckName}
+local toReturn = {selected, bestCardScore, deckName, whoHad}
 
 return toReturn

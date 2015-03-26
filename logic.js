@@ -386,15 +386,16 @@ exports.getWhosUp = function(roomName,playerName,callback){
 
 exports.getWinner = function(roomName,callback){
   var seed = Math.floor(Math.random() * Math.pow(2,32));
-  //data[0] is card number, data[1] is its score, data[2] is the deck name
-  scriptManager.run('getWinner',[roomDataKey(roomName)],[roomName,seed],function (err,data){
+  //data[0] is card number, data[1] is its score, data[2] is the deck name, data[3] is players who had that card
+  scriptManager.run('getWinner',[roomDataKey(roomName),roomPlayersKey(roomName)],[roomName,seed],function (err,data){
     if (err) {
       console.log(err);
       return callback(err,null);
     }
     var cardNum = parseInt(data[0]), cardScore = parseInt(data[1]);
     var theDeck = decks[data[2]];
-    var toReturn = {card: theDeck.cards[cardNum], cardScore: cardScore};
+    var playerString = "", i;
+    var toReturn = {card: theDeck.cards[cardNum-1], cardScore: cardScore, players: data[3]};
     return callback(null,toReturn);
   })
 }

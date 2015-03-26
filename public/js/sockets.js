@@ -303,16 +303,16 @@ socket.on('roundend', function(data){
   },nextRoundInMS);
 });
 
-socket.on('gameover', function(data){
+socket.on('gameover', function(card,cardScore,players){
   gameOver = true;
-  var scoresArray = [];
-  for(var i = 0; i < playerList.length; i++){
+  var scoresArray = [], i;
+  for(i = 0; i < playerList.length; i++){
     scoresArray.push( {name: playerList[i] , score: playerScores[playerList[i]]} );
   }
   scoresArray.sort( function (a,b){
     return b.score - a.score;
   });
-  for(var i = 0; i < playerList.length; i++){
+  for(i = 0; i < playerList.length; i++){
     $('#place' + (i+1)).removeClass('hidden');
     $('#namePlace' + (i+1)).text(scoresArray[i].name);
     $('#scorePlace' + (i+1)).text(scoresArray[i].score);
@@ -320,6 +320,20 @@ socket.on('gameover', function(data){
   for(i++; i <=8; i++){
     $('#place' + i).addClass('hidden');
   }
-  $('#WrongestQuote').text(data.card);
-  $('#WrongestScore').text(data.cardScore);
+  $('#WrongestQuote').text(card);
+  $('#WrongestScore').text(cardScore);
+  var playerString = '';
+  if(players.length == 1){
+    playerString = players[0];
+  }
+  else if (players.length == 2){
+    playerString = players[0] + ' and ' + players[1];
+  }
+  else{
+    for (i = 0; i < players.length - 1; i++){
+      playerString = playerString + players[i] + ', ';
+    }
+    playerString = playerString + 'and ' + players[i];
+  }
+  $('#WrongestCite').text(playerString);
 });

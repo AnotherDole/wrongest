@@ -20,7 +20,7 @@ for key,value in pairs(playerData) do
   local possible = {}
   --create lookup table for previous cards
   --TODO don't do this if not necessary
-  local tmpPrevious = redis.call('lrange','player:previous:' .. ARGV[2] .. ':' .. value,0,-1)
+  local tmpPrevious = redis.call('smembers','player:previous:' .. ARGV[2] .. ':' .. value)
   local previous = {}
   for i,v in ipairs(tmpPrevious) do
     previous[v] = i
@@ -38,7 +38,7 @@ for key,value in pairs(playerData) do
   local selected = possible[math.random(1,table.getn(possible))]
   cardData[selected][1] = 1
   redis.call('hmset','card:' .. ARGV[2] .. ':' .. selected,'inPlay',1,'mostVotes',0,'leastVotes',0)
-  redis.call('rpush','player:previous:' .. ARGV[2] .. ':' .. value,selected)
+  redis.call('sadd','player:previous:' .. ARGV[2] .. ':' .. value,selected)
   redis.call('hset','player:data:' .. ARGV[2] .. ':' .. value,'card',selected)
   table.insert(toReturn[1],value)
   table.insert(toReturn[2],selected)

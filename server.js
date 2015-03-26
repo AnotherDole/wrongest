@@ -55,7 +55,7 @@ function getAndSendStatements(roomName,callback){
   logic.getStatements(roomName,function(err,result){
     if(result == false){
       logic.getWinner(roomName,function(err,data){
-	io.to(roomName).emit('gameover',data);
+	io.to(roomName).emit('gameover',data.card,data.cardScore,data.players);
 	return callback(false);
       })
     }
