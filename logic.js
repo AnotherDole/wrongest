@@ -236,7 +236,6 @@ exports.joinRequest = function(roomName,playerName,UID,callback){
       .lrange(roomWaitingKey(roomName),0,-1)
       .hget(roomDataKey(roomName),'gameState')
       .get(roomLeaversKey(roomName,trimPlayer))
-      .sadd(roomAllKey(roomName),trimPlayer)
       .exec(function(err, data){
 	var currentPlayers = data[0];
 	var waitingPlayers = data[1];
@@ -249,7 +248,10 @@ exports.joinRequest = function(roomName,playerName,UID,callback){
 	if((currentPlayers.indexOf(trimPlayer) != -1) || (waitingPlayers.indexOf(trimPlayer) != -1)){
 	  return callback(null,{success:false, message:'That name is already taken.'});
 	}
-	client.hmset(playerDataKey(roomName,trimPlayer),'uid',UID,'score',previousScore,'card',-1,'voted',0,function(err,data){
+	client.multi()
+	.hmset(playerDataKey(roomName,trimPlayer),'uid',UID,'score',previousScore,'card',-1,'voted',0)
+	.sadd(roomAllKey(roomName,trimPlayer),trimPlayer)
+	.exec(function(err,data){
 	  if(gameState > GAME_NOT_STARTED){
 	    client.rpush(roomWaitingKey(roomName),trimPlayer,function(err,data){
 	      callback(null,{success: true,waiting: true, roomName: roomName, playerName:trimPlayer});
@@ -262,7 +264,7 @@ exports.joinRequest = function(roomName,playerName,UID,callback){
 	  }
 	})
       })
-  })
+    })
 }
 
 //playerName requests to leave their current room
@@ -331,6 +333,9 @@ exports.tryRestartGame = function(roomName,playerName,callback){
   var keys = [roomDataKey(roomName),roomPlayersKey(roomName)];
   var args = [playerName,roomName];
   scriptManager.run('tryRestart',keys,args,function(err,result){
+    if(err){
+      console.log(err);
+    }
     callback(null,(result != null));
   });
 }
@@ -343,6 +348,9 @@ exports.getStatements = function(roomName,callback){
   //run lua script
   //result[0] is array of player names, result[1] is array of selected cards, result[2] is array of scores, result[3] is deck name
   scriptManager.run('getStatements',[roomDataKey(roomName),roomPlayersKey(roomName)],[ROUND_LIMIT,roomName,seed],function(err,result){
+    if(err){
+      console.log(err);
+    }
     if(result == null){
       return callback(null,false);
     }
@@ -359,6 +367,9 @@ exports.getStatements = function(roomName,callback){
 //adjust the play order for the given room
 exports.adjustOrder = function(roomName,callback){
   scriptManager.run('adjustOrder',[roomDataKey(roomName),roomPlayersKey(roomName)],[],function(err,result){
+    if(err){
+      console.log(err);
+    }
     exports.getPlayersIn(roomName,callback);
   })
 }
@@ -366,6 +377,9 @@ exports.adjustOrder = function(roomName,callback){
 //only called when there is a request to make someone defend
 exports.getWhosUp = function(roomName,playerName,callback){
   scriptManager.run('getWhosUp',[roomDataKey(roomName),roomPlayersKey(roomName)],[playerName],function(err,result){
+    if(err){
+      console.log(err);
+    }
     if(result == null){
       return callback(null,false)
     }

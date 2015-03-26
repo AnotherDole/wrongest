@@ -52,12 +52,17 @@ local roomData = redis.call('hmget', KEYS[4],'dealer','gameState','votesReceived
 --mark their card as no longer in play
 if roomData[2] ~= '0' then
   local whichCard = redis.call('hget',KEYS[3],'card')
-  redis.call('hset','card:' .. ARGV[2] .. ':' .. whichCard,'inPlay',0)
+  if whichCard ~= '-1' then
+    redis.call('hset','card:' .. ARGV[2] .. ':' .. whichCard,'inPlay',0)
+  end
 end
 
 -- still players left, find new dealer
 if roomData[1] == ARGV[1] then
-  local newDealer = playerList[(playerIndex % numPlayers) + 1]
+  local newDealer = playerList[1]
+  if newDealer == ARGV[1] then
+    newDealer = playerList[2]
+  end
   redis.call('hset',KEYS[4],'dealer',newDealer)
 end
 
@@ -84,6 +89,12 @@ end
 if roomData[2] == '3' then
   toReturn[3] = true
   toReturn[6] = true
+  local cardNum;
+  --need to clear all previous votes
+  for i = 1, table.getn(playerList), 1 do
+    cardNum =redis.call('hget',('player:data:' .. ARGV[2] .. ':' .. playerList[i]),'card')
+    redis.call('hmset',('card:' .. ARGV[2] .. ':' .. cardNum),'mostVotes',0,'leastVotes',0)
+  end
 end
 
 -- record their score so they get it back if they return

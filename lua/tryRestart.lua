@@ -19,8 +19,10 @@ redis.call('hmset',KEYS[1],'votesReceived',0,'gameState',1)
 for i, name in pairs(playerList) do
   local theKey = 'player:data:' .. ARGV[2] .. ':' .. ARGV[1]
   local cardNum = redis.call('hget',theKey,'card')
-  local cardKey = 'card:' .. ARGV[2] .. ':' .. cardNum
-  redis.call('hmset',cardKey,'inPlay',0,'mostVotes',0,'leastVotes',0)
+  if cardNum ~= '-1' then
+    local cardKey = 'card:' .. ARGV[2] .. ':' .. cardNum
+    redis.call('hmset',cardKey,'inPlay',0,'mostVotes',0,'leastVotes',0)
+  end
   redis.call('hset',theKey,'card',-1)
 end
 
