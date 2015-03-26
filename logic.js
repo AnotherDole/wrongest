@@ -41,9 +41,8 @@ function makeDecks(list){
       theFile = theFile.toString().split('\n');
       var theName = theFile[0].trim();
       decks[theName] = new masterDeck(theName,theFile[1].trim());
-      for(var j = 3; j < theFile.length; j+=4){
-	decks[theName].cards.push(new masterCard(theFile[j].trim(),
-	      theFile[j+1].trim(),theFile[j+2].trim()));
+      for(var j = 3; j < theFile.length; j+=2){
+	decks[theName].cards.push(new masterCard(theFile[j].trim()));
       }
     }
     catch(err){
@@ -64,10 +63,8 @@ function masterDeck(name, description){
   this.cards = [];
 }
 
-function masterCard(quote, author, source){
+function masterCard(quote){
   this.quote = quote;
-  this.author = author;
-  this.source = source;
 }
 
 function gameCard(number,masterCard) {
@@ -358,7 +355,7 @@ exports.getStatements = function(roomName,callback){
     var toReturn = {};
     for (var i = 0; i < result[0].length; i++){
       var theCard = theDeck.cards[result[1][i] - 1]
-      toReturn[result[0][i]] = {quote: theCard.quote, author: theCard.author, source: theCard.source, score: result[2][i]};
+      toReturn[result[0][i]] = {quote: theCard.quote, score: result[2][i]};
     }
     callback(err,toReturn);
   })
