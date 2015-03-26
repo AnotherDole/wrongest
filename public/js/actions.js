@@ -36,7 +36,8 @@ $('#createPasswordInput').keyup(function() {
 });
 
 $('#roomURL').click(function() {
-  $(this).select();
+  this.selectionStart=0;
+  this.selectionEnd=this.value.length;
   return false;
 });
 

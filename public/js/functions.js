@@ -145,10 +145,6 @@ function everySecond() {
         donedefend();
       }
     return;
-  }
-  if (timer.current > timer.notice) {
-    timer.knobColor = '#38A4DC';
-    timer.knobTextColor = '#2d2929';
   } else if (timer.current > timer.warning) {
     timer.knobColor = '#7a6969';
     timer.knobTextColor = '#2d2929';
@@ -168,15 +164,19 @@ function everySecond() {
 
 function startTimer(time) {
   timer.total = time;
-  $('input.knob').val(timer.total).trigger('change');
   $(".knob").knob({
     'min': 0,
     'max': timer.total,
     'readOnly': true,
-    'fgColor': '#38A4DC',
+    'fgColor': '#7a6969',
     'bgColor': '#eae6e6',
     'dynamicDraw': true,
     'thickness': 0.5,
+    
+  });
+  $('.knob').val(timer.total).trigger('change');
+  $('.knob').trigger('configure', {
+    'fgColor': '#7a6969',
     'inputColor':"#2d2929"
   });
   $('.knob-holder').removeClass('hidden');

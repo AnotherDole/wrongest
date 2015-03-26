@@ -41,13 +41,11 @@ section.vote { padding: 0;
 
   .button-holder { position:absolute; right:0; bottom:0; left:0; text-align:center; height:70px; padding:10px; background-color:$white; border-top:2px solid $black; transform: translateY(0); transition: all 1s;
     &.hidden { transform: translateY(70px); }
-    button { font-family:$font; background-color:$black; color:$white; display:inline-block; border:2px solid $black; font-size:26px; padding:0.25em .75em; cursor:pointer; outline:none; transform:scale(1); transition:transform 0.5s ease;
-      &:hover { background-color:$white; color:$black; }
-      &:active { box-shadow:inset 4px 4px 0 $black; }
+    button { transform:scale(1); transition:transform 0.5s ease;
       &.hidden { transform:scale(0); }
     }
-    summary { transition:transform 0.5s ease; display: block; transform:translateY(-110%);
-      &.hidden { transform: translateY(60%); }
+    summary { transition:transform 0.5s ease; display: block; transform:translateY(0); height: 100%;
+      &.hidden { transform: translateY(100%); }
     }
   }
   
@@ -72,7 +70,7 @@ section.vote { padding: 0;
   
   &.show-scores {
     .player-score { display: block; position: absolute; top:0; right:0; bottom: 0; left: 0; text-align: left;  padding-top: 2em;
-      .inner:not(:empty) { background-color: $blue; color: white; display: inline-block; width: 2em; text-align: center; border-radius: 50%; height: 2em; padding-top: 0.4em; font-weight:$bold; }
+      .inner:not(:empty) { background-color: $green; color: white; display: inline-block; width: 2em; text-align: center; border-radius: 50%; height: 2em; padding-top: 0.4em; font-weight:$bold; }
     }
     
     .my-statement { display: table-header-group; }
