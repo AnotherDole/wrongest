@@ -61,10 +61,7 @@ end
 
 -- still players left, find new dealer
 if roomData[1] == ARGV[1] then
-  local newDealer = playerList[1]
-  if newDealer == ARGV[1] then
-    newDealer = playerList[2]
-  end
+  local newDealer = playerList[(playerIndex % (numPlayers + 1)) + 1]
   redis.call('hset',KEYS[4],'dealer',newDealer)
 end
 
