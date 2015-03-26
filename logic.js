@@ -8,7 +8,7 @@ var Hashids = require('hashids');
 var Scripto = require('redis-scripto');
 var scriptManager = null;
 var secret = process.env.HASHID_SECRET || Math.random().toString();
-var hashids = new Hashids(secret);
+var hashids = new Hashids(secret,0,'ABCDEFGHIJKLMNOPQRSTUVWXYZ');
 
 var rooms = {}, decks = {}, deckData = {};
 var client = null;
@@ -169,7 +169,7 @@ exports.createRoom = function(playerName,UID,callback){
     if(err){
       return callback(true,null);
     }
-    var roomName = hashids.encode(data + 1000000000);
+    var roomName = hashids.encode(data + 1000);
     client.multi()
       .hmset([playerDataKey(roomName,trimPlayer),'uid',UID,'score',0,'card',-1,'voted',0])
       .hmset([roomDataKey(roomName),'dealer',trimPlayer,'gameState',GAME_NOT_STARTED,
