@@ -10,4 +10,5 @@ Project uses:
 * [socket.io](http://socket.io/)
 * [redis](http://redis.io/)
 * [jQuery](https://jquery.com/)
+* [jQuery Knob](http://anthonyterrien.com/knob/)
 * [OpenShift](https://www.openshift.com/)
