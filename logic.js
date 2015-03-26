@@ -168,6 +168,7 @@ exports.createRoom = function(playerName,UID,callback){
     }
     var roomName = hashids.encode(data + 1000);
     client.multi()
+      .incr('activeRooms')
       .hmset([playerDataKey(roomName,trimPlayer),'uid',UID,'score',0,'card',-1,'voted',0])
       .hmset([roomDataKey(roomName),'dealer',trimPlayer,'gameState',GAME_NOT_STARTED,
 		'votesReceived',0,'masterDeck','','timeLimit',-1,'allowRedraw',-1,'dealerFirst',1,
@@ -178,7 +179,7 @@ exports.createRoom = function(playerName,UID,callback){
 	if(err){
 	  return callback(err,null)
 	}
-	//console.log("Created room " + roomName + " with leader " + trimPlayer);
+	console.log('Active rooms: ' + data[0]);
 	callback(null, {success: true, roomName:roomName, playerName: trimPlayer});
       });
   });
@@ -283,6 +284,9 @@ exports.leaveRequest = function(roomName,playerName,callback){
     toReturn.duringVote = (result[5] != null);
     toReturn.newNeeded = parseInt(result[6]);
     toReturn.theRoom = roomName;
+    if(toReturn.roomDeleted){
+      console.log('Active rooms: ' + result[7]);
+    }
     callback(err,toReturn)
   })
 }

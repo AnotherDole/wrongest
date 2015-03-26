@@ -3,8 +3,9 @@
 -- ARGV[1] is the player name, ARGV[2] is room name
 -- toReturn: 1 = fromWaiting, 2 = roomDeleted, 3 = duringGame, 
 -- 4 = duringArg, 5 = defenderLeft, 6 = duringVote 7 = new needed
+-- 8 = new active room count
 
-local toReturn = {false,false,false,false,false,false, 0}
+local toReturn = {false,false,false,false,false,false, 0, 0}
 local playerList = redis.call('lrange',KEYS[1],0,-1)
 local playerIndex = -1
 for i = 1, table.getn(playerList), 1 do
@@ -44,6 +45,7 @@ if numPlayers == 0 then
   end
   redis.call('del',KEYS[5])
   toReturn[2] = true
+  toReturn[8] = redis.call('decr','activeRooms')
   return toReturn
 end
 
