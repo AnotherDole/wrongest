@@ -2,10 +2,25 @@ var express = require('express');
 var app = express();
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);
-var logic = require('./logic.js');
+
+var redis = require('redis');
+
+var redisHost = process.env.REDIS_HOST || '127.0.0.1';
+var redisPort = process.env.REDIS_PORT || '6379';
+var redisPass = process.env.REDIS_PASS || '';
+var client = redis.createClient(redisPort, redisHost, {auth_pass: redisPass});
+
+var adapter = require('socket.io-redis');
+var pub = redis.createClient(redisPort, redisHost, { auth_pass: redisPass});
+var sub = redis.createClient(redisPort, redisHost, { detect_buffers: true, auth_pass: redisPass});
+io.adapter(adapter({pubClient: pub, subClient: sub}));
+
 var port = process.env.OPENSHIFT_NODEJS_PORT || 3000;
 var server_ip_address = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1';
 var server_address = process.env.OPENSHIFT_APP_DNS ? 'www.wrongest.net' : ('localhost:'+port);
+
+var logic = require('./logic.js');
+logic.setClient(client);
 
 /************** Variables for testing **********/
 var connected = 0,playing=0;
@@ -17,210 +32,229 @@ if(process.argv[2] == 'test'){
 }
 /************** End testing variables *********/
 
-
 server.listen(port,server_ip_address, function(){
   console.log('Server listening on ' + server_ip_address + ' on port ' + port);
 });
 
 app.use(express.static(__dirname + '/public'));
 app.get('/:id',function(req,res){
-  if(logic.roomExists(req.params.id)){
-    //	res.location('../'+req.params.id);
-    res.sendFile(__dirname + '/public/index.html');
-  }
-  else{
-    res.redirect('../error.html');
-  }
+  logic.roomExists(req.params.id,function(err,data){
+    if(data == true){
+      res.sendFile(__dirname + '/public/index.html');
+    }
+    else{
+      res.redirect('../error.html');
+    }
+  })
 });
 
 //call logic to assign statements to everyone
 //receive a summary to send to everyone in room
 //Or declare a winner
-function getAndSendStatements(roomName){
-  var result = logic.getStatements(roomName);
-  if(result === false){
-    result = logic.getWinner(roomName);
-    io.to(roomName).emit('gameover',result);
-  }
-  else{
-    io.to(roomName).emit('getstatements',result);
-  }
+function getAndSendStatements(roomName,callback){
+  logic.getStatements(roomName,function(err,result){
+    if(result == false){
+      logic.getWinner(roomName,function(err,data){
+	io.to(roomName).emit('gameover',data);
+	return callback(false);
+      })
+    }
+    else{
+      io.to(roomName).emit('getstatements',result);
+      return callback(true);
+    }
+  });
 }
 
 //Common code for when a player leaves or disconnects
 function leaveOrDisconnect(result){
   if(result.roomDeleted || result.fromWaiting) return;
 
-  var playerList = logic.getPlayersIn(result.theRoom);
-  if(!result.duringGame){
-    io.to(result.theRoom).emit('updatecurrentroom',playerList.players,playerList.leader,playerList.dealer);
-    return;
-  }
-  if(playerList.players.length <= 2){
-    logic.pauseGame(result.theRoom);
-    io.to(result.theRoom).emit('pausegame');
-    //this is necessary because waiting players may have been added
-    var newList = logic.getPlayersIn(result.theRoom);
-    io.to(result.theRoom).emit('updatecurrentroom',newList.players,newList.leader,newList.dealer);
-    return;
-  }
-  io.to(result.theRoom).emit('updatecurrentroom', playerList.players, playerList.leader, playerList.dealer);
-  /*
-     var newOrder = logic.getOrder(result.theRoom);
-     io.to(result.theRoom).emit('roundorder',newOrder.order,newOrder.dealer);
-     */
-  if(result.newNeeded == 0){
-    logic.prepareForVotes(result.theRoom);
-  }
-  //if the person who left was defending
-  if((result.duringArg && result.defenderLeft) || result.newNeeded == 0){
-    io.to(result.theRoom).emit('newdefendcount',result.newNeeded,true);
-  }
-  else{
-    io.to(result.theRoom).emit('newdefendcount',result.newNeeded,false);
-  }
-  if(result.duringVote){
-    //For now, just call for a new vote
-    logic.prepareForVotes(result.theRoom);
-    io.to(result.theRoom).emit('newdefendcount',0,false);
-  }
+  logic.getPlayersIn(result.theRoom,function(err,playerList){
+    if(!result.duringGame){
+      io.to(result.theRoom).emit('updatecurrentroom',playerList.players,playerList.leader,playerList.dealer);
+      return;
+    }
+    if(playerList.players.length <= 2){
+      io.to(result.theRoom).emit('pausegame');
+      //this is necessary because waiting players may have been added
+      logic.getPlayersIn(result.theRoom,function(err,newList){
+	io.to(result.theRoom).emit('updatecurrentroom',newList.players,newList.leader,newList.dealer);
+	return;
+      })
+    }
+    io.to(result.theRoom).emit('updatecurrentroom', playerList.players, playerList.leader, playerList.dealer);
+    //if the person who left was defending
+    if((result.duringArg && result.defenderLeft) || result.newNeeded == 0){
+      io.to(result.theRoom).emit('newdefendcount',result.newNeeded,true);
+    }
+    else{
+      io.to(result.theRoom).emit('newdefendcount',result.newNeeded,false);
+    }
+    if(result.newNeeded == 0){
+      logic.prepareForVotes(result.theRoom,function(err,result){
+      })
+    }
+    else if(result.duringVote){
+      //For now, just call for a new vote
+      logic.prepareForVotes(result.theRoom,function(er,result){
+	io.to(result.theRoom).emit('newdefendcount',0,false);
+      })
+    }
+  })
 }
+
 
 io.on('connection', function (socket){
   //data is the requested room name
   socket.on('createroom', function(playerName){
-    var result = logic.createRoom(playerName, socket.id);
-    if(result.success){
-      //join the socket.io room
-      socket.username = result.playerName;
-      socket.roomName = result.roomName;
-      socket.join(result.roomName);
-      result.link = server_address + '/' + result.roomName;
-      socket.emit('createresult',result);
-      socket.emit('deckdata',logic.getDeckData());
-      var blar = logic.getPlayersIn(result.roomName);
-      io.to(result.roomName).emit('updatecurrentroom',blar.players,blar.leader,blar.dealer);
-    }
-    else{
-      socket.emit('createresult',result);
-    }
+    logic.createRoom(playerName, socket.id,function(err,result){
+      if(!err){
+	//join the socket.io room
+	socket.username = result.playerName;
+	socket.roomName = result.roomName;
+	socket.join(result.roomName);
+	result.link = 'http://' + server_address + '/' + result.roomName;
+	socket.emit('createresult',result);
+	socket.emit('deckdata',logic.getDeckData());
+	var blar = logic.getPlayersIn(result.roomName,function(err,blar){;
+	  io.to(result.roomName).emit('updatecurrentroom',blar.players,blar.leader,blar.dealer);
+	});
+      }
+    });
   });
 
   socket.on('requestroomdata', function(roomName){
-    var result = logic.getPlayersIn(roomName);
-    socket.emit('updatecurrentroom',result.players,result.leader,result.dealer);
+    logic.getPlayersIn(roomName, function(err,result){
+      socket.emit('updatecurrentroom',result.players,result.leader,result.dealer);
+    });
   });
 
   // data is requested room name
   socket.on('requestjoin', function(playerName,roomName){
-    var result = logic.joinRequest(playerName, socket.id, roomName);
-    if (result.success){
-      if(!result.waiting){
-	//join socket.io room
-	socket.join(roomName);
-	//tell everyone in same room to update display
-	var blar = logic.getPlayersIn(roomName);
-	io.to(roomName).emit('updatecurrentroom',blar.players,blar.leader,blar.dealer);
+    logic.joinRequest(roomName,playerName, socket.id,function(err,result){
+      if (result.success){
+	result.link = 'http://' + server_address + '/' + result.roomName;
+	if(!result.waiting){
+	  //join socket.io room
+	  socket.join(roomName);
+	  //tell everyone in same room to update display
+	  socket.emit('joinresult',result);
+	  logic.getPlayersIn(roomName,function (err,blar){
+	    io.to(roomName).emit('updatecurrentroom',blar.players,blar.leader,blar.dealer);
+	  });
+	}
+	//socket.emit('deckdata',logic.getDeckData());
+	socket.username = playerName;
+	socket.roomName = roomName;
       }
-      //socket.emit('deckdata',logic.getDeckData());
-      socket.username = playerName;
-      socket.roomName = roomName;
-      result.link =  server_address + '/' + result.roomName;
-    }
-    socket.emit('joinresult',result);
-  });
+      else{
+	socket.emit('joinresult',result);
+      }
+    });
+  })
 
   //data isn't necessary 
   socket.on('requestleave', function(data){
-    var result = logic.leaveRequest(socket.username,socket.roomName);
-    if (result){
-      socket.leave(socket.roomName);
-      delete socket.username;
-      delete socket.roomName;
-      leaveOrDisconnect(result);
-    }
-    socket.emit('leaveresult',result);
+    logic.leaveRequest(socket.roomName,socket.username,function(err,result){
+      if (result){
+	socket.leave(socket.roomName);
+	delete socket.username;
+	delete socket.roomName;
+	leaveOrDisconnect(result);
+      }
+      socket.emit('leaveresult',result);
+    });
   });
 
   //request to start a game with certain options
   socket.on('requeststart', function(deckName, time, allowRedraw, dealerFirstOrLast){
     var options = {deckName: deckName, time: time, allowRedraw: allowRedraw, dealerFirstOrLast: dealerFirstOrLast};
-    var result = logic.startRequest(socket.username,socket.roomName,options);
-    socket.emit('startresult',result);
-    //time to start game, send out the first statements
-    if(result.success){
-      getAndSendStatements(socket.roomName);
-      var order = logic.adjustOrder(socket.roomName);
-      io.to(socket.roomName).emit('updatecurrentroom',order.players,order.leader,order.dealer);
-    }
+    logic.startRequest(socket.username,socket.roomName,options,function(err,result){
+      socket.emit('startresult',result);
+      //time to start game, send out the first statements
+      if(result.success){
+	getAndSendStatements(socket.roomName,function(uh){
+	  logic.adjustOrder(socket.roomName,function(err,order){
+	    io.to(socket.roomName).emit('updatecurrentroom',order.players,order.leader,order.dealer);
+	  });
+	})
+      }
+    });
   });
 
   socket.on('makedefend', function(){
-    var result = logic.getWhosUp(socket.roomName, socket.username);
-    if(result){
-      io.to(socket.roomName).emit('timetodefend',result.player,result.time);
-    }
+    logic.getWhosUp(socket.roomName, socket.username,function(err,result){
+      if(result){
+	io.to(socket.roomName).emit('timetodefend',result.player,result.time);
+      }
+    })
   });
 
   socket.on('donedefending', function(data){
-    var result = logic.doneDefending(socket.roomName, socket.username);
-    if(result.success){
-      //tell everyone in room new votesNeeded
-      io.to(socket.roomName).emit('newdefendcount',result.votesNeeded,true);
-      if(result.votesNeeded <= 0){
-	logic.prepareForVotes(socket.roomName);
+    logic.doneDefending(socket.roomName, socket.username,function(err,result){
+      if(result.success){
+	//tell everyone in room new votesNeeded
+	io.to(socket.roomName).emit('newdefendcount',result.votesNeeded,true);
+	if(result.votesNeeded <= 0){
+	  logic.prepareForVotes(socket.roomName,function(err,result){
+	    //nothing yet
+	  })
+	}
       }
-    }
-    else{
-      //tell specific user they are stupid
-      socket.emit('donefailed', result.message);
-    }
+      else{
+	//tell specific user they are stupid
+	socket.emit('donefailed', 'no');
+      }
+    })
   });
 
   socket.on('playervotes',function(most,least){
-    var result = logic.processVote(socket.roomName,socket.username,most,least);
-    if (result.success){
-      //tell everyone in room about vote
-      io.to(socket.roomName).emit('receivevote',result);
-      if(result.votesNeeded == 0){
-	result = logic.endRound(socket.roomName);
-	//add players from the waiting list
-	if(result.socketsToAdd.length > 0){
-	  for(var i = 0; i < result.socketsToAdd.length; i++){
-	    io.sockets.connected[result.socketsToAdd[i]].join(socket.roomName);
+    logic.processVote(socket.roomName,socket.username,most,least,function(err,result){
+      if (result){
+	if(result.votesNeeded == 0){
+	  //add players from the waiting list
+	  if(result.socketsToAdd.length > 0){
+	    for(var i = 0; i < result.socketsToAdd.length; i++){
+	      io.sockets.connected[result.socketsToAdd[i]].join(socket.roomName);
+	    }
+	    //var blar = logic.getPlayersIn(socket.roomName);
+	    //io.to(socket.roomName).emit('updatecurrentroom',blar.players,blar.leader,blar.dealer);
 	  }
-	  var blar = logic.getPlayersIn(socket.roomName);
-	  io.to(socket.roomName).emit('updatecurrentroom',blar.players,blar.leader,blar.dealer);
+	  delete result.socketsToAdd;
+	  io.to(socket.roomName).emit('roundend',result);
+	  getAndSendStatements(socket.roomName,function(uh){
+	    logic.adjustOrder(socket.roomName,function(err,order){
+	      io.to(socket.roomName).emit('updatecurrentroom',order.players,order.leader,order.dealer);
+	    })
+	  })
 	}
-	delete result.socketsToAdd;
-	io.to(socket.roomName).emit('roundend',result);
-	getAndSendStatements(socket.roomName);
-	var order = logic.adjustOrder(socket.roomName);
-	io.to(socket.roomName).emit('updatecurrentroom',order.players,order.leader,order.dealer);
       }
-    }
-    else{
-      socket.emit('votefailed',result.message);
-    }
+      else{
+	socket.emit('votefailed');
+      }
+    })
   });
 
   socket.on('restartgame', function(data){
-    var result = logic.canRestartGame(socket.username,socket.roomName);
-    if(result){
-      var order = logic.adjustOrder(socket.roomName);
-      io.to(socket.roomName).emit('updatecurrentroom',order.players,order.leader,order.dealer);
-      io.to(socket.roomName).emit('newdefendcount',order.players.length,true);
-      getAndSendStatements(socket.roomName);
-    }
+    logic.tryRestartGame(socket.roomName,socket.username,function(err,result){
+      if(result){
+	logic.adjustOrder(socket.roomName,function(err,order){
+	  io.to(socket.roomName).emit('updatecurrentroom',order.players,order.leader,order.dealer);
+	  io.to(socket.roomName).emit('newdefendcount',order.players.length,true);
+	  getAndSendStatements(socket.roomName,function(uh){})
+	})
+      }
+    });
   });
 
   socket.on('disconnect', function(data){
-    var result = logic.leaveRequest(socket.username,socket.roomName);
-    if(result && !result.roomDeleted){
-      //io.to(result.theRoom).emit('updatecurrentroom',logic.getPlayersIn(result.theRoom));
-      leaveOrDisconnect(result);
-    }
-    if(testing) playing--;
+    logic.leaveRequest(socket.roomName,socket.username,function(err,result){
+      if(result && !result.roomDeleted){
+	leaveOrDisconnect(result);
+      }
+      if(testing) playing--;
+    })
   });
 
   /****************** Begin code for testing *************/

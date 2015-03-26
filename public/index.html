@@ -36,12 +36,9 @@
       
       <!-- New user -->
       <div class="starting-screen" id="startDiv">
-        <summary class="game-explanation">
-          Here will be some text that explains how the game works. It will include a link to some other resource, like a page of text or maybe a video?
-        </summary>
         <input type="text" data-holds="playerName" id="createUsernameInput" maxlength="50" placeholder="Your Name">
         <div class="button-holder">
-          <button id="CreateRoomButton" onclick="createroom();">CREATE game</button>
+          <button id="CreateRoomButton" onclick="createroom();">create game</button>
         </div>
       </div>
       
@@ -74,7 +71,7 @@
         </div>
         <div class="button-holder hidden" id="restartOption">
           <button id="RestartButton" onclick="socket.emit('restartgame');">Restart Game</button>
-          <span id="RestartGameBother">You need at least 3 players. Go bug your friends!</span>
+          <span id="RestartGameBother">You need at least 3 players; Give this URL to your friends.</span>
         </div>
       </div>
       
@@ -149,7 +146,7 @@
         </dl>
       </div>
       
-      <p style="padding-top:12px;">DEBUG MODE: <a style="color:yellow; text-decoration:underline; cursor:pointer" onclick="$('#GameOverScreen').removeClass('hidden').siblings('section').addClass('hidden');">This link should show the game over screen</a>, in it's current state. Once you're there, you've gotta refresh.</p>
+      <p class="help">Confused? <a href="http://www.wrongest.website/#HowToPlay">Get unconfused</a>.</p>
       <ul id="SetupToasts"></ul>
     </section>
 

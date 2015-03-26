@@ -1,9 +1,15 @@
-.setup { background-color:$black; color: $white; position: relative; }
+.setup { background-color:$black; color: $white; position: relative;
+  img { margin-bottom: 90px; }
+  
+  p.help { margin-top: 120px;
+    a { color:$yellow; }
+  }
+}
 
 .starting-screen {
   .game-explanation { text-align: center; padding-top: 1em; padding-bottom: 1em;}
-  input { padding: 0.4em; margin-bottom: 1em; display: block; width: 100%; font-size: 2em; }
-  button { font-size:7vw; display: block; width: 100%; padding:0.4em; }
+  input { padding: 0.4em; display: block; width: 100%; font-size: 2em; border:2px solid $grey; border-bottom:none; }
+  button { font-size:7vw; display: block; width: 100%; padding:0.4em; border:2px solid $grey; border-top:none; }
 }
 
 .create-screen { margin-top: 10vh; }

@@ -246,14 +246,6 @@ socket.on('votefailed', function(data){
   $('#voteResult').append(data + "<br>");	
 });
 
-//received when someone else in the same room has voted
-socket.on('receivevote', function(data){
-  $('#voteResult').show();
-  var whoVoted = data.voter;
-  var most = data.mostName;
-  var least = data.leastName;
-});
-
 //received at the end of a round
 socket.on('roundend', function(data){
   //Next line temporarily commented out by Dole
