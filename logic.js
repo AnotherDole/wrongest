@@ -42,7 +42,7 @@ function makeDecks(list){
       var theName = theFile[0].trim();
       decks[theName] = new masterDeck(theName,theFile[1].trim());
       for(var j = 3; j < theFile.length; j+=2){
-	decks[theName].cards.push(new masterCard(theFile[j].trim()));
+	decks[theName].cards.push(theFile[j].trim());
       }
     }
     catch(err){
@@ -61,10 +61,6 @@ function masterDeck(name, description){
   this.name = name;
   this.description = description;
   this.cards = [];
-}
-
-function masterCard(quote){
-  this.quote = quote;
 }
 
 function gameCard(number,masterCard) {
@@ -359,7 +355,7 @@ exports.getStatements = function(roomName,callback){
     var toReturn = {};
     for (var i = 0; i < result[0].length; i++){
       var theCard = theDeck.cards[result[1][i] - 1]
-      toReturn[result[0][i]] = {quote: theCard.quote, score: result[2][i]};
+      toReturn[result[0][i]] = {quote: theCard, score: result[2][i]};
     }
     callback(err,toReturn);
   })
@@ -398,7 +394,7 @@ exports.getWinner = function(roomName,callback){
     }
     var cardNum = parseInt(data[0]), cardScore = parseInt(data[1]);
     var theDeck = decks[data[2]];
-    var toReturn = {card: theDeck.cards[cardNum].quote, cardScore: cardScore};
+    var toReturn = {card: theDeck.cards[cardNum], cardScore: cardScore};
     return callback(null,toReturn);
   })
 }
