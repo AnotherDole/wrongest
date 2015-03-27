@@ -18,6 +18,6 @@ section.order { background-color:$white; position: relative; }
     }
     &.completed { opacity:.6; }
     
-    span.player-score {position: absolute; top: 0.2em; right: 0; z-index: 3; font-size: 0.65em; width: 1.6em; text-align: center; color: $white; }
+    span.player-score {position: absolute; top: 0.2em; right: 0; z-index: $z-player-score; font-size: 0.65em; width: 1.6em; text-align: center; color: $white; }
   }
 }

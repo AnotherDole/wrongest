@@ -36,7 +36,7 @@
 .player-final-scores { padding:1em 0.5em; font-size:1.5em; counter-reset: ol-counter; margin-bottom:0; 
   li { font-weight:700; border:1px solid $white; margin-bottom:0.4em; padding:0.3em; background-color:$black; position:relative; padding-left:2.2em; overflow:hidden;
     &:before { content:'#' counter(ol-counter); font-size:0.8em; counter-increment: ol-counter; border-right: 1px solid $white; position:absolute; top:0; left:0; height:100%; width:2em; padding-top:0.4em; text-align:center; }
-    &:after { content:''; position:absolute; top:-1.3em; right:-1.3em; height:2.6em; width:2.6em; transform: rotate(45deg); transform-origin: center; z-index:2; background-color:$black; }
+    &:after { content:''; position:absolute; top:-1.3em; right:-1.3em; height:2.6em; width:2.6em; transform: rotate(45deg); transform-origin: center; z-index:$z-player-notch; background-color:$black; }
     .player-name { max-width: 12.5em; display: block; @extend %truncate; }
     span.player-score {position: absolute; top: 0.2em; right: 0; z-index: 3; font-size: 0.65em; width: 1.6em; text-align: center; color: $white; }
     
