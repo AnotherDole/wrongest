@@ -67,8 +67,7 @@ socket.on('joinresult',function(data){
     }
   }
   else{
-    clearToast();
-    $('#SetupToasts').append('<li class="alert">' + data.message + '</li>');
+    makeToast('setup','alert',data.message);
   }
 });
 
@@ -219,6 +218,9 @@ socket.on('newdefendcount',function(newCount,stopClock){
   }
   else{
     //$('#orderDiv').hide();
+    if(!$('#VotingBooth').hasClass('hidden')){
+      makeToast('vote','info','Someone left the room. Please vote again.');
+    }
     $('#GameView').addClass('hidden');
     $('#VotingBooth').removeClass('revealed show-scores');
     $('#SubmitVotes').removeClass('hidden');
@@ -229,7 +231,8 @@ socket.on('newdefendcount',function(newCount,stopClock){
     $('#SendVotesButton').addClass('hidden');
     $('#voteResult').empty();
     $('.button-holder').addClass('hidden');
-    $('input[Value="LeastWrong"]').prop('checked',false);
+    $('.most-wrong').removeClass('most-wrong');
+    $('.least-wrong').removeClass('least-wrong');
     $('input[Value="MostWrong"]').prop('checked',false);
     updateVoteSelectors();
   }
