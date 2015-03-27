@@ -41,9 +41,9 @@ socket.on('createresult',function(data){
     username = data.playerName;
     $('#roomLink').text(data.link);
     $('#roomURL').add('#pauseRoomURL').val(data.link);
-    $('#createDiv').hide();
-    $('#roomDiv').show();
-    $('#startDiv').hide();
+    $('#createDiv').addClass('hidden');
+    $('#roomDiv').removeClass('hidden');
+    $('#startDiv').addClass('hidden');
   }
   else{
     clearToast();
@@ -54,12 +54,11 @@ socket.on('createresult',function(data){
 //received after emitting requestjoin
 socket.on('joinresult',function(data){
   if(data.success){
-    $('#joinDiv').hide();
-    $('#roomDiv').show();
-    $('#startDiv').hide();
+    $('#joinDiv').addClass('hidden');
+    $('#roomDiv').removeClass('hidden');
+    $('#startDiv').addClass('hidden');
     $('#roomURL').add('#pauseRoomURL').val(data.link);
     username = data.playerName;
-    socket.emit('requestroomdata',data.roomName);
     if(data.waiting){
       $('#waitingDiv').removeClass('hidden');
       for(var i = 1; i <= 8; i++){
@@ -110,7 +109,7 @@ socket.on('updatecurrentroom', function(players, leader, dealer){
     $('#playerName' + (i+1)).empty().append(players[i]);
     if ($theDiv.hasClass('has-score')){
       var theScore = playerScores[players[i]];
-      if (theScore === null) {theScore = 0;}
+      if (theScore == null) {theScore = 0;}
       $('#playerScore' + (i+1)).empty().append(theScore);
     }
   }
@@ -118,7 +117,7 @@ socket.on('updatecurrentroom', function(players, leader, dealer){
     $('#player' + i).addClass('hidden');
   }
   if(leader == username){
-    $('.admin-options').show();
+    $('.admin-options').removeClass('hidden');
     $('#restartOption').removeClass('hidden');
     if (players.length < 3){
       $('#RestartButton').addClass('hidden');
@@ -133,16 +132,16 @@ socket.on('updatecurrentroom', function(players, leader, dealer){
     }
   }
   else{
-    $('.admin-options').hide();
+    $('.admin-options').addClass('hidden');
     $('#restartOption').addClass('hidden');
   }
   if(dealer == username){
     meDealer = true;
-    $('#dealerControls').show();
+    $('#dealerControls').removeClass('hidden');
   }
   else{
     meDealer = false;
-    $('#dealerControls').hide();
+    $('#dealerControls').addClass('hidden');
   }	
 });
 
@@ -167,7 +166,7 @@ socket.on('getstatements', function(data){
     $('#waitingDiv').addClass('hidden');
     $('#RoomSetup').addClass('hidden');
     $('#GameView').removeClass('hidden');
-    $('#orderDiv').show();
+    $('#orderDiv').removeClass('hidden');
     $('#GameOverScreen').addClass('hidden');
   }
 });
@@ -175,8 +174,8 @@ socket.on('getstatements', function(data){
 socket.on('timetodefend',function(player,time){
   if(player == username){
     meDefending = true;
-    $('#defendDiv').show();
-    $('#orderDiv').hide();
+    $('#defendDiv').removeClass('hidden');
+    $('#orderDiv').addClass('hidden');
     var myStatement = currentStatements[username];
     $('#statementDiv').empty().text(myStatement.quote);
     if(myStatement.score < -1){
@@ -205,9 +204,9 @@ socket.on('newdefendcount',function(newCount,stopClock){
     $('.knob-holder').addClass('hidden');
   }
   if(meDealer){
-    $('#dealerControls').show();
+    $('#dealerControls').removeClass('hidden');
   }
-  $('#orderDiv').show();
+  $('#orderDiv').removeClass('hidden');
   if(newCount > 0){
     var playersDone = playerList.length - newCount;
     for(var i = 1; i <= 8; i++){

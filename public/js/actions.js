@@ -9,7 +9,7 @@ $('#CreateRoomButton').click(function() {
 });
 
 $('#JoinRoomButton').click(function() {
-  $('.lead-in').hide();
+  $('.lead-in').addClass('hidden');
   $('.create-or-join').addClass('hidden');
   $('.join-screen').removeClass('hidden');
 });
@@ -125,8 +125,8 @@ $('#SubmitVotes').click(function() {
 });
 
 if(location.pathname.length > 1){
-  $('#startDiv').hide();
-  $('#joinDiv').show();
+  $('#startDiv').addClass('hidden');
+  $('#joinDiv').removeClass('hidden');
   $('#joinRoomName').val(location.pathname.substr(1));
   socket.emit('requestroomdata',location.pathname.substr(1));
 }

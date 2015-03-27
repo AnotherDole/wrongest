@@ -145,7 +145,9 @@ io.on('connection', function (socket){
 	    io.to(roomName).emit('updatecurrentroom',blar.players,blar.leader,blar.dealer);
 	  });
 	}
-	//socket.emit('deckdata',logic.getDeckData());
+	else{
+	  socket.emit('joinresult',result);
+	}
 	socket.username = playerName;
 	socket.roomName = roomName;
       }

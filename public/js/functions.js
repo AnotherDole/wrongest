@@ -20,20 +20,20 @@
 
 // Show me the create screen
 function showCreate(){
-  $('#startDiv').hide();
-  $('#createDiv').show();
+  $('#startDiv').removeClass('hidden');
+  $('#createDiv').addClass('hidden');
 }
 
 // show me the join screen
 function showJoin(){
-  $('#startDiv').hide();
-  $('#joinDiv').show();
+  $('#startDiv').addClass('hidden');
+  $('#joinDiv').removeClass('hidden');
 }
 
 function getStatements() {
   $('#RoomSetup').addClass('hidden');
   $('#GameView').removeClass('hidden');
-  $('#orderDiv').show();
+  $('#orderDiv').removeClass('hidden');
 }
 
 function clearToast() {
@@ -72,14 +72,14 @@ function leaveroom(){
 }
 
 function makeDefend(){
-  $('#dealerControls').hide();
+  $('#dealerControls').addClass('hidden');
   socket.emit('makedefend');
 }
 
 //Tell server you are done defending your statement
 function donedefend(){
   $('.knob-holder').addClass('hidden');
-  $('#defendDiv').hide();
+  $('#defendDiv').addClass('hidden');
   socket.emit('donedefending');
   meDefending = false;
 }
