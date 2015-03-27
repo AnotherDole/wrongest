@@ -1,6 +1,6 @@
 .setup { background-color:$black; color: $white; position: relative;
   img { margin-bottom: 90px; }
-  
+
   p.help { margin-top: 120px;
     a { color:$yellow; }
   }
@@ -27,13 +27,13 @@
     figcaption { font-weight: 100; text-transform: lowercase; color:$yellow; line-height:95%; }
     input[type=url] { display: block; width: 100%; text-align: center; padding: 0.25em; border:2px solid $blue; color:$blue; font-size:1.3em; }
   }
-  
+
   .players { font-size:1.5em; padding-top: 1em; padding-bottom: 1em;
     li.leader {
       &:after { content:' (leader)'; }
     }
   }
-  
+
   .settings-toggle { text-align:right; padding-right: 10px; padding-bottom: 10px;
     a.icon { display: inline-block;
       &.spin { animation: rotate 6s infinite linear; }
@@ -44,23 +44,15 @@
 }
 
 dl.admin-options { position: absolute; right:0; bottom:0; left: 0;
-    dd { background-color:$white; padding: 20px; display: none;
-      ul { }
-      li { @extend %clearfix; }
-      label, .select-holder { float: left; display: block; }
-      label { color:$pink; text-align: right; padding-right: 0.5em; width:44%; padding-top: 0.25em; }
-      .select-holder { text-align: left; padding-left: 0.5em; width: 56%;
-        select { width:100%; padding: 0.25em 0.5em; background-color:$pink; color:$white; }
-      }
-      summary { color:$grey; font-size: 0.85em; @extend %clearfix; display: block; padding-top: 0.7em; padding-bottom: 1em; }
+  dd { background-color:$white; padding: 20px; display: none;
+    ul { }
+    li { @extend %clearfix; }
+    label, .select-holder { float: left; display: block; }
+    label { color:$pink; text-align: right; padding-right: 0.5em; width:44%; padding-top: 0.25em; }
+    .select-holder { text-align: left; padding-left: 0.5em; width: 56%;
+      select { width:100%; padding: 0.25em 0.5em; background-color:$pink; color:$white; }
     }
-  }
-
-ul#SetupToasts {
-  li { display: block; margin-top: 1em; text-align: center; padding: 0.2em; border-radius: 0.2em; animation-fill-mode: forwards; animation: toastIn 5s ease; -webkit-animation-fill-mode: forwards;
-    &.alert { background-color:lighten($red,40%); color:darken($red,20%);  }
-    &.info { background-color:lighten($yellow,25%); color:darken($yellow,50%); }
-    &.success { background-color:lighten($green,35%); color:darken($green,25%); }
+    summary { color:$grey; font-size: 0.85em; @extend %clearfix; display: block; padding-top: 0.7em; padding-bottom: 1em; }
   }
 }
 
@@ -77,5 +69,5 @@ ul#SetupToasts {
 
 @keyframes rotate {
   0% { transform: rotate(0deg); }
-100% { transform: rotate(360deg); }
+  100% { transform: rotate(360deg); }
 }

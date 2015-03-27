@@ -1,0 +1,9 @@
+ul.toasts {
+  li { display: block; margin-top: 1em; text-align: center; padding: 0.2em; border-radius: 0.2em; animation-fill-mode: forwards; animation: toastIn 5s ease; -webkit-animation-fill-mode: forwards;
+    &.alert { background-color:lighten($red,40%); color:darken($red,20%);  }
+    &.info { background-color:lighten($yellow,25%); color:darken($yellow,50%); }
+    &.success { background-color:lighten($green,35%); color:darken($green,25%); }
+  }
+  
+  &.vote { margin-top: 220px; }
+}

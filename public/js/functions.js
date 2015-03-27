@@ -36,8 +36,8 @@ function getStatements() {
   $('#orderDiv').removeClass('hidden');
 }
 
-function clearToast() {
-  setTimeout(function(){ $('#SetupToasts li:first-child').remove(); }, 5200);
+function clearToast(u) {
+  setTimeout(function(){ $('ul.toasts[data-toast="'+u+'"] li:first-child').remove(); }, 5200);
 }
 
 function showButton() {
