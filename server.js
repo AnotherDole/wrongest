@@ -83,23 +83,25 @@ function leaveOrDisconnect(result){
 	return;
       })
     }
-    io.to(result.theRoom).emit('updatecurrentroom', playerList.players, playerList.leader, playerList.dealer);
-    //if the person who left was defending
-    if((result.duringArg && result.defenderLeft) || result.newNeeded == 0){
-      io.to(result.theRoom).emit('newdefendcount',result.newNeeded,true);
-    }
     else{
-      io.to(result.theRoom).emit('newdefendcount',result.newNeeded,false);
-    }
-    if(result.newNeeded == 0){
-      logic.prepareForVotes(result.theRoom,function(err,result){
-      })
-    }
-    else if(result.duringVote){
-      //For now, just call for a new vote
-      logic.prepareForVotes(result.theRoom,function(er,result){
-	io.to(result.theRoom).emit('newdefendcount',0,false);
-      })
+      io.to(result.theRoom).emit('updatecurrentroom', playerList.players, playerList.leader, playerList.dealer);
+      //if the person who left was defending
+      if((result.duringArg && result.defenderLeft) || result.newNeeded == 0){
+	io.to(result.theRoom).emit('newdefendcount',result.newNeeded,true);
+      }
+      else{
+	io.to(result.theRoom).emit('newdefendcount',result.newNeeded,false);
+      }
+      if(result.newNeeded == 0){
+	logic.prepareForVotes(result.theRoom,function(err,result){
+	})
+      }
+      else if(result.duringVote){
+	//For now, just call for a new vote
+	logic.prepareForVotes(result.theRoom,function(er,result){
+	  io.to(result.theRoom).emit('newdefendcount',0,false);
+	})
+      }
     }
   })
 }
