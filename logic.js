@@ -406,7 +406,7 @@ exports.doneDefending = function(roomName,playerName,callback){
     if(data == null){
       return callback(null,false);
     }
-    callback(null,{success: true,roomName:roomName,votesNeeded:data});
+    callback(err,{success: true,roomName:roomName,votesNeeded:data});
   })
 }
 

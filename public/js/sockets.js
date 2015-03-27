@@ -201,10 +201,12 @@ socket.on('newdefendcount',function(newCount,stopClock){
     window.clearInterval(clockTick);
     $('.knob-holder').addClass('hidden');
   }
-  if(meDealer){
-    $('#dealerControls').removeClass('hidden');
+  if(!meDefending){
+    if(meDealer && stopClock){
+      $('#dealerControls').removeClass('hidden');
+    }
+    $('#orderDiv').removeClass('hidden');
   }
-  $('#orderDiv').removeClass('hidden');
   if(newCount > 0){
     var playersDone = playerList.length - newCount;
     for(var i = 1; i <= 8; i++){

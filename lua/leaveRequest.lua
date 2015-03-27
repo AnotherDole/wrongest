@@ -69,13 +69,20 @@ end
 if roomData[2] == '1' or roomData[2] == '2' then
   toReturn[3] = true
   toReturn[4] = true
+
+  local oldUp = tonumber(roomData[4])
+  local newUp = oldUp
+
+  if playerIndex < oldUp then
+    newUp = newUp - 1 
+  end
+
+  redis.call('hset',KEYS[4],'whosUp',newUp)
+
   local voted = redis.call('hget',KEYS[3],'voted')
   if voted == '1' then
     roomData[3] = redis.call('hincrby',KEYS[3],'votesReceived',-1)
-    local newUp = playerIndex - 1
-    if newUp == 0 then newUp = numPlayers - 1 end
-    redis.call('hset',KEYS[3],'whosUp',newUp)
-  elseif roomData[2] == '2' and roomData[4] == playerIndex then
+  elseif roomData[2] == '2' and oldUp == playerIndex then
     -- if they were the one defending
     redis.call('hset',KEYS[3],'gameState',1)
     toReturn[5] = true
