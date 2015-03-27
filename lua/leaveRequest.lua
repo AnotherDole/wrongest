@@ -102,7 +102,7 @@ redis.call('set','room:leaveScore:' .. ARGV[2] .. ':' .. ARGV[1],theirScore)
 
 -- if there are only 2 active players, pause the game
 -- -1 = game paused
-if numPlayers == 2 then
+if numPlayers == 2 and tonumber(roomData[2]) > 0 then
   redis.call('hset', KEYS[4],'gameState',-1)
   local waitingPlayers = redis.call('lrange', KEYS[2],0,-1)
   for k, name in ipairs(waitingPlayers) do
