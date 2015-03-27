@@ -1,13 +1,14 @@
 html, body { max-height: 100vh; overflow: hidden; }
 
-section { width: 100%; height:100%; overflow-x: hidden; overflow-y: auto;  padding:20px;
+section { width: 100%; height:100%; overflow-x: hidden; overflow-y:auto; padding:20px;
   ol { padding-left: 2em;
     li { list-style-type: decimal; }
   }
 }
 
 @media (max-width: $mobile-max) {
-  
+  // NEXT LINE: Momentum scrolling (iPhone only)
+  section { overflow-y:scroll; -webkit-overflow-scrolling: touch; }
 }
 
 
