@@ -30,7 +30,8 @@ local deckName = redis.call('hget',KEYS[1],'masterDeck')
 local playerList = redis.call('lrange',KEYS[2],0,-1);
 local whoHad = {}
 for i, name in ipairs(playerList) do
-  if redis.call('sismember','player:previous:' .. ARGV[1] .. ':' .. name,selected) == 1 then
+  local previousKey = 'player:previous:' .. ARGV[1] .. ':' .. name
+  if redis.call('sismember',previousKey,selected) == 1 then
     table.insert(whoHad,name)
   end
 end

@@ -292,7 +292,7 @@ exports.startRequest = function(playerName,roomName,options,callback){
   var genericNo = {success:false, message:'no'};
   client.multi()
    .hmget(roomDataKey(roomName),'dealer','gameState')
-   .lrange(roomPlayersKey(roomName),0,-1)
+   .smembers(roomAllKey(roomName))
    .exec(function(err,data){
      if(data[0] == null){
        return callback(null,genericNo);

@@ -160,13 +160,15 @@ socket.on('startresult', function(data){
 //Receive the statments that everyone will be defending this round.
 //Automatically sent out at the start of a new round
 socket.on('getstatements', function(data){
+  gameOver = false;
   currentStatements = data;
   if( $('#VotingBooth').hasClass('hidden')){
-    $('#roomDiv').hide();
+    $('#roomDiv').addClass('hidden');
     $('#waitingDiv').addClass('hidden');
     $('#RoomSetup').addClass('hidden');
     $('#GameView').removeClass('hidden');
     $('#orderDiv').show();
+    $('#GameOverScreen').addClass('hidden');
   }
 });
 
@@ -336,4 +338,10 @@ socket.on('gameover', function(card,cardScore,players){
     playerString = playerString + 'and ' + players[i];
   }
   $('#WrongestCite').text(playerString);
+
+  //don't display scores in case of restart
+  for (var i = 1; i <=8; i++){
+    $('#player' + i).removeClass('has-score');
+    $('#playerScore' + i).remove();
+  }
 });

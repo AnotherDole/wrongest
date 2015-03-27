@@ -134,6 +134,7 @@ io.on('connection', function (socket){
   socket.on('requestjoin', function(playerName,roomName){
     logic.joinRequest(roomName,playerName, socket.id,function(err,result){
       if (result.success){
+	socket.emit('deckdata',logic.getDeckData());
 	result.link = 'http://' + server_address + '/' + result.roomName;
 	if(!result.waiting){
 	  //join socket.io room

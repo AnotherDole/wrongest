@@ -7,6 +7,7 @@ $('#CreateRoomButton').click(function() {
   $('.create-or-join').addClass('hidden');
   $('.create-screen').removeClass('hidden');
 });
+
 $('#JoinRoomButton').click(function() {
   $('.lead-in').hide();
   $('.create-or-join').addClass('hidden');
@@ -19,19 +20,10 @@ $('#createUsernameInput').keyup(function(e) {
     $("#CreateRoomButton").click();
   }
 });
+
 $('#joinUsernameInput').keyup(function(e) {
   if(e.keyCode == 13){
     $("#JoinRoomButton").click();
-  }
-});
-
-
-$('#createPasswordInput').keyup(function() {
-  console.log($(this).val());
-  if ( $(this).val() === "") {
-    $(this).parent().next().children().removeClass('fa-lock').addClass('fa-unlock');
-  } else {
-    $(this).parent().next().children().removeClass('fa-unlock').addClass('fa-lock');
   }
 });
 
@@ -46,6 +38,23 @@ $('.settings-toggle').click(function() {
   $(this).siblings('dd').slideToggle(500);
 });
 
+$('#StartGameButton').click(function(){
+  var v = playerList.length;
+  console.log(v);
+  ga('send', 'event', { eventCategory: 'player action', eventAction: 'start game', eventLabel: 'players', eventValue: v });
+  socket.emit('requeststart',
+    $('#deck').val(),
+    $('#timeLimit').val(),
+    $('#allowRedraw').val(),
+    $('#dealerSelect').val()
+  );
+});
+
+$('#PlayAgain').click(function(){
+  $('#GameOverScreen').addClass('hidden');
+  $('#RoomSetup').removeClass('hidden');
+  $('#roomDiv').removeClass('hidden');
+});
 
 /////////////////////////////////////////////////
 // GAMEPLAY ACTIONS

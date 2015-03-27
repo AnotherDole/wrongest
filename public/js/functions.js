@@ -71,19 +71,6 @@ function leaveroom(){
   socket.emit('requestleave');
 }
 
-//Request to start the game. Only works if you are the leader of the room
-function startgame(){
-  var v = playerList.length;
-  console.log(v);
-  ga('send', 'event', { eventCategory: 'player action', eventAction: 'start game', eventLabel: 'players', eventValue: v });
-  socket.emit('requeststart',
-    $('#deck').val(),
-    $('#timeLimit').val(),
-    $('#allowRedraw').val(),
-    $('#dealerSelect').val()
-  );
-}
-
 function makeDefend(){
   $('#dealerControls').hide();
   socket.emit('makedefend');
