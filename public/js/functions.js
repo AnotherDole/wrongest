@@ -36,8 +36,11 @@ function getStatements() {
   $('#orderDiv').removeClass('hidden');
 }
 
-function clearToast(u) {
-  setTimeout(function(){ $('ul.toasts[data-toast="'+u+'"] li:first-child').remove(); }, 5200);
+function makeToast(holder, type, msg) {
+  $('ul.toasts[data-toast="'+holder+'"]').append('<li class="'+type+'">'+msg+'</li>');
+  setTimeout(function(){ 
+    $('ul.toasts[data-toast="'+holder+'"] li:first-child').remove();
+  }, 5200);
 }
 
 function showButton() {

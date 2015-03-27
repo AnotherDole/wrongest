@@ -1,9 +1,10 @@
 .setup { background-color:$black; color: $white; position: relative;
   img { margin-bottom: 90px; }
 
-  p.help { margin-top: 120px;
+  p.help {
     a { color:$yellow; }
   }
+  .toasts { height: 120px; }
 }
 
 .starting-screen {

@@ -46,8 +46,7 @@ socket.on('createresult',function(data){
     $('#startDiv').addClass('hidden');
   }
   else{
-    clearToast();
-    $('#SetupToasts').append('<li class="alert">' + data.message + '</li>');
+    makeToast('setup', 'alert', data.message);
   }	
 });
 
