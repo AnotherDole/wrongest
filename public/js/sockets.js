@@ -18,6 +18,7 @@ else{
 }
 
 socket.on('pausegame', function(){
+  $('#roomDiv').addClass('hidden');
   $('#GameView').addClass('hidden');
   $('#VotingBooth').addClass('hidden');
   $('#RoomSetup').removeClass('hidden');

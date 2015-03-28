@@ -143,6 +143,9 @@ io.on('connection', function (socket){
 	  socket.join(roomName);
 	  //tell everyone in same room to update display
 	  socket.emit('joinresult',result);
+	  if(result.paused){
+	    socket.emit('pausegame');
+	  }
 	  logic.getPlayersIn(roomName,function (err,blar){
 	    io.to(roomName).emit('updatecurrentroom',blar.players,blar.leader,blar.dealer);
 	  });

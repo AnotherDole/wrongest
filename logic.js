@@ -253,7 +253,11 @@ exports.joinRequest = function(roomName,playerName,UID,callback){
 	  }
 	  else{
 	    client.rpush(roomPlayersKey(roomName),trimPlayer,function(err,data){
-	      callback(null,{success: true, waiting: false, roomName: roomName, playerName:trimPlayer});
+	      var toReturn = {success: true, waiting: false, paused: false, roomName: roomName, playerName:trimPlayer };
+	      if (gameState == GAME_PAUSED){
+		toReturn.paused = true;
+	      }
+	      callback(null,toReturn);
 	    });
 	  }
 	})
