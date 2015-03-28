@@ -26,7 +26,7 @@ describe('Room Creation',function(){
     it('should accept this user name',function(done){
       logic.createRoom('Player1','hi',function(err,result){
 	result.success.should.equal(true);
-	result.roomName.length.should.be.above(5);
+	result.roomName.length.should.be.above(3);
 	testRoom = result.roomName;
 	done();
       })
@@ -114,7 +114,7 @@ describe('Starting Games',function(){
   })
   describe('Good Start Request',function(){
     it('should accept this start request',function(done){
-      logic.startRequest('Player1',testRoom,{deckName:'General Nonsense'},function(err,result){
+      logic.startRequest('Player1',testRoom,{deckName:'Science Facts'},function(err,result){
 	result.success.should.equal(true);
 
 	logic.getStatements(testRoom,function(err,result){
@@ -267,7 +267,7 @@ describe('Voting',function(){
 	result.should.not.equal(false)
 	result.votesNeeded.should.equal(0);
 	//round 2
-	result.gameData.round.should.equal(2);
+	result.gameData.round.should.equal(1);
 	logic.adjustOrder(testRoom,function(err,result){
 	  result.dealer.should.equal('Player2');
 	  done();
@@ -328,7 +328,7 @@ describe('Leaving',function(){
     })
     it('so it should allow a getWhosUp',function(done){
       logic.getWhosUp(testRoom,'Player3',function(err,result){
-	result.player.should.equal('Player5')
+	result.player.should.equal('Player3')
 	done();
       })
     })
