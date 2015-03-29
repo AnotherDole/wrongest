@@ -21,6 +21,8 @@ else{
 socket.on('pausegame', function(){
   $('#roomDiv').addClass('hidden');
   $('#GameView').addClass('hidden');
+  $('#GameClockHolder').addClass('hidden');
+  $('#defendDiv').addClass('hidden');
   $('#VotingBooth').addClass('hidden');
   $('#RoomSetup').removeClass('hidden');
   $('#pauseDiv').removeClass('hidden');
@@ -138,7 +140,10 @@ socket.on('updatecurrentroom', function(players, leader, dealer){
   }
   if(dealer == username){
     meDealer = true;
-    $('#dealerControls').removeClass('hidden');
+    //this happens if somone leave while someone else is defending
+    if($('#GameClockHolder').hasClass('hidden')){
+      $('#dealerControls').removeClass('hidden');
+    }
   }
   else{
     meDealer = false;
