@@ -223,7 +223,7 @@ exports.joinRequest = function(roomName,playerName,UID,callback){
   }
   client.exists(roomDataKey(roomName),function(err, data){
     if(data == false){
-      return callback(null,{success:false,message:'Room does not exist.'});
+      return callback(null,{success:false,message:'That room does not exist. Make sure you entered the right code.'});
     }
     client.multi()
       .lrange(roomPlayersKey(roomName),0,-1)

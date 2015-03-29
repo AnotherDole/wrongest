@@ -11,7 +11,7 @@ $('.room-pick').click(function() {
 });
 
 $('#JoinRoomButtonWithCode').click(function() {
-  alert('code needs to go here!');
+  socket.emit('requestjoin',$('#joinUsernameInputAlt').val(),$('#joinRoomCode').val());
 });
 
 $('#CreateRoomButton').click(function() {
