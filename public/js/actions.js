@@ -52,7 +52,7 @@ $('.settings-toggle').click(function() {
 $('#StartGameButton').click(function(){
   var v = playerList.length;
   console.log(v);
-  ga('send', 'event', { eventCategory: 'player action', eventAction: 'start game', eventLabel: 'players', eventValue: v });
+  ga('send', 'event', { eventCategory: 'start game', eventAction: 'players', eventLabel: v });
   socket.emit('requeststart',
     $('#deck').val(),
     $('#timeLimit').val(),
@@ -74,7 +74,7 @@ $('#PlayAgain').click(function(){
 $('#DoneEarlyButton').click(function() {
   window.clearInterval(clockTick);
   console.log('done early: '+timer.total);
-  ga('send', 'event', { eventCategory: 'player action', eventAction: 'defended', eventLabel: 'done early', eventValue: timer.total });
+  ga('send', 'event', { eventCategory: 'defended', eventAction: 'done early', eventLabel: timer.total });
   donedefend();
 });
 
@@ -133,6 +133,16 @@ $('#SubmitVotes').click(function() {
     $('input[value="MostWrong"]:checked').attr('name'),
     $('input[value="LeastWrong"]:checked').attr('name')
   );
+});
+
+/////////////////////////////////////////////////
+// GAME OVER ACTIONS
+////////////////////////////////////////////////
+
+$('a.social').click(function() {
+  var n = $(this).attr('data-network');
+  var h = $(this).attr('href');
+  ga('send', 'event', { eventCategory: 'social share', eventAction: n, eventLabel: h });
 });
 
 if(location.pathname.length > 1){
