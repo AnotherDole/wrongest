@@ -124,7 +124,7 @@ function roomWaitingKey(roomName){
 }
 
 function roomLeaversKey(roomName,userName){
-  return 'room:leavers:'+roomName+':'+userName;
+  return 'room:leaveScore:'+roomName+':'+userName;
 }
 
 function roomAllKey(roomName){

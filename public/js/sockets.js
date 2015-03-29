@@ -95,6 +95,9 @@ socket.on('updatecurrentroom', function(players, leader, dealer, scores){
 
   if(scores == null){
     $('.has-score').removeClass('has-score');
+    for(var i = 1; i <= 8; i++){
+      $('#playerScore' + i).empty();
+    }
   }
 
   $toChange.append('Currently in the room:');
