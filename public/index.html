@@ -54,11 +54,27 @@
 
       <img src="svg/logo2.svg" class="game-logo" />
       
-      <!-- This is what I want to change -->
+      <!-- Create or Join game -->
       <div class="starting-screen" id="startDiv">
-        <input type="text" data-holds="playerName" id="createUsernameInput" maxlength="50" placeholder="Your Name">
-        <div class="button-holder">
-          <button id="CreateRoomButton" onclick="createroom();">create game</button>
+        <div class="create-or-join">
+          <div class="create-row row">
+            <input type="text" data-holds="playerName" id="createUsernameInput" maxlength="50" placeholder="Your Name">
+            <div class="button-holder">
+              <button id="IChooseToCreate" class="room-pick">create game</button>
+              <button id="CreateRoomButton" class="room-action" onclick="createroom();">create game</button>
+            </div>
+          </div>
+          <div class="split-row row">
+            <span>or</span>
+          </div>
+          <div class="join-row row">
+            <input type="text" class="room-code" data-holds="roomCode" id="joinRoomCode" maxlength="4" required placeholder="Room Code">
+            <input type="text" data-holds="playerName" id="joinUsernameInputAlt" maxlength="50" required placeholder="Your Name">
+            <div class="button-holder">
+              <button id="IChooseToCreate" class="room-pick">join game</button>
+              <button id="JoinRoomButtonWithCode" class="room-action">join game</button>
+            </div>
+          </div>
         </div>
       </div>
       
