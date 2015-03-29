@@ -197,18 +197,44 @@ exports.getPlayersIn = function(roomName, callback){
       toReturn.leader = dealer;
       var dealerFirst = data[0][1];
       var playerList = data[1];
-      if(dealerFirst == '1'){
-	while(playerList[0] != dealer){
-	  playerList.push(playerList.shift());
+    
+      var theMulti = client.multi();
+      for(var i = 0; i < playerList.length; i++){
+	theMulti.hget(playerDataKey(roomName,playerList[i]),'score')
+      }	
+      theMulti.exec(function(err,scores){
+	toReturn.scores = [];
+	var allZero = true;
+	for(var i = 0; i < scores.length; i++){
+	 var theScore = parseInt(scores[i]);
+	 //in case someone left before the previous multi ran
+	 if(isNaN(theScore)){
+	   playerList.splice(i,1);
+	   continue;
+	 } 
+	 if(theScore != 0) { allZero = false};
+	 toReturn.scores.push(theScore);
 	}
-      }
-      else{
-	while(playerList[playerList.length-1] != dealer){
-	  playerList.unshift(playerList.pop());
+        if(allZero) { toReturn.scores = null};
+	if(dealerFirst == '1'){
+	  while(playerList[0] != dealer){
+	    if(toReturn.scores != null){
+	      toReturn.scores.push(toReturn.scores.shift());
+	    }
+	    playerList.push(playerList.shift());
+	  }
 	}
-      }
-      toReturn.players = playerList;
-      callback(null,toReturn);
+	else{
+	  while(playerList[playerList.length-1] != dealer){
+	    if(toReturn.scores != null){
+	      toReturn.scores.unshift(toReturn.scores.pop());
+	    }
+	    playerList.unshift(playerList.pop());
+	  }
+	}
+	toReturn.players = playerList;
+	callback(null,toReturn);
+      })
     });
 }
 
@@ -391,6 +417,7 @@ exports.getWhosUp = function(roomName,playerName,callback){
 exports.getWinner = function(roomName,callback){
   var seed = Math.floor(Math.random() * Math.pow(2,32));
   //data[0] is card number, data[1] is its score, data[2] is the deck name, data[3] is players who had that card
+  //data[4] is final player list, data[5] is parallel array of scores
   scriptManager.run('getWinner',[roomDataKey(roomName),roomPlayersKey(roomName)],[roomName,seed],function (err,data){
     if (err) {
       console.log(err);
@@ -398,8 +425,11 @@ exports.getWinner = function(roomName,callback){
     }
     var cardNum = parseInt(data[0]), cardScore = parseInt(data[1]);
     var theDeck = decks[data[2]];
-    var playerString = "", i;
-    var toReturn = {card: theDeck.cards[cardNum-1], cardScore: cardScore, players: data[3]};
+    var theScores = [];
+    for (var i = 0; i < data[5].length; i++){
+      theScores.push(parseInt(data[5][i]));
+    }
+    var toReturn = {card: theDeck.cards[cardNum-1], cardScore: cardScore, players: data[3], playerList: data[4], theScores: theScores};
     return callback(null,toReturn);
   })
 }
@@ -438,7 +468,6 @@ exports.processVote = function(roomName,playerName,mostWrong,leastWrong,callback
   //result[3] = array of player names
   //result[4] = array of their scores
   //result[5] = array of the changes to their scores
-  //result[6] = array of socket.io uuids to add to the room
   scriptManager.run('processVote',keys,args,function(err,result){
     if(result == null){
       return callback(null,false)

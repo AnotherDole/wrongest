@@ -60,7 +60,7 @@ function getAndSendStatements(roomName,callback){
   logic.getStatements(roomName,function(err,result){
     if(result == false){
       logic.getWinner(roomName,function(err,data){
-	io.to(roomName).emit('gameover',data.card,data.cardScore,data.players);
+	io.to(roomName).emit('gameover',data.card,data.cardScore,data.players, data.playerList, data.theScores);
 	return callback(false);
       })
     }
@@ -77,19 +77,19 @@ function leaveOrDisconnect(result){
 
   logic.getPlayersIn(result.theRoom,function(err,playerList){
     if(!result.duringGame){
-      io.to(result.theRoom).emit('updatecurrentroom',playerList.players,playerList.leader,playerList.dealer);
+      io.to(result.theRoom).emit('updatecurrentroom',playerList.players,playerList.leader,playerList.dealer, playerList.scores);
       return;
     }
     if(playerList.players.length <= 2){
       io.to(result.theRoom).emit('pausegame');
       //this is necessary because waiting players may have been added
       logic.getPlayersIn(result.theRoom,function(err,newList){
-	io.to(result.theRoom).emit('updatecurrentroom',newList.players,newList.leader,newList.dealer);
+	io.to(result.theRoom).emit('updatecurrentroom',newList.players,newList.leader,newList.dealer,newList.scores);
 	return;
       })
     }
     else{
-      io.to(result.theRoom).emit('updatecurrentroom', playerList.players, playerList.leader, playerList.dealer);
+      io.to(result.theRoom).emit('updatecurrentroom', playerList.players, playerList.leader, playerList.dealer,playerList.scores);
       //if the person who left was defending
       if((result.duringArg && result.defenderLeft) || result.newNeeded == 0){
 	io.to(result.theRoom).emit('newdefendcount',result.newNeeded,true);
@@ -125,7 +125,7 @@ io.on('connection', function (socket){
 	socket.emit('createresult',result);
 	socket.emit('deckdata',logic.getDeckData());
 	var blar = logic.getPlayersIn(result.roomName,function(err,blar){;
-	  io.to(result.roomName).emit('updatecurrentroom',blar.players,blar.leader,blar.dealer);
+	  io.to(result.roomName).emit('updatecurrentroom',blar.players,blar.leader,blar.dealer,blar.scores);
 	});
       }
     });
@@ -133,7 +133,7 @@ io.on('connection', function (socket){
 
   socket.on('requestroomdata', function(roomName){
     logic.getPlayersIn(roomName.toUpperCase(), function(err,result){
-      socket.emit('updatecurrentroom',result.players,result.leader,result.dealer);
+      socket.emit('updatecurrentroom',result.players,result.leader,result.dealer,result.scores);
     });
   });
 
@@ -152,7 +152,7 @@ io.on('connection', function (socket){
 	    socket.emit('pausegame');
 	  }
 	  logic.getPlayersIn(roomName,function (err,blar){
-	    io.to(roomName).emit('updatecurrentroom',blar.players,blar.leader,blar.dealer);
+	    io.to(roomName).emit('updatecurrentroom',blar.players,blar.leader,blar.dealer,blar.scores);
 	  });
 	}
 	else{
@@ -189,7 +189,7 @@ io.on('connection', function (socket){
       if(result.success){
 	getAndSendStatements(socket.roomName,function(uh){
 	  logic.adjustOrder(socket.roomName,function(err,order){
-	    io.to(socket.roomName).emit('updatecurrentroom',order.players,order.leader,order.dealer);
+	    io.to(socket.roomName).emit('updatecurrentroom',order.players,order.leader,order.dealer,order.scores);
 	  });
 	})
       }
@@ -229,7 +229,7 @@ io.on('connection', function (socket){
 	  io.to(socket.roomName).emit('roundend',result);
 	  getAndSendStatements(socket.roomName,function(uh){
 	    logic.adjustOrder(socket.roomName,function(err,order){
-	      io.to(socket.roomName).emit('updatecurrentroom',order.players,order.leader,order.dealer);
+	      io.to(socket.roomName).emit('updatecurrentroom',order.players,order.leader,order.dealer,order.scores);
 	    })
 	  })
 	}
@@ -244,7 +244,7 @@ io.on('connection', function (socket){
     logic.tryRestartGame(socket.roomName,socket.username,function(err,result){
       if(result){
 	logic.adjustOrder(socket.roomName,function(err,order){
-	  io.to(socket.roomName).emit('updatecurrentroom',order.players,order.leader,order.dealer);
+	  io.to(socket.roomName).emit('updatecurrentroom',order.players,order.leader,order.dealer,order.scores);
 	  io.to(socket.roomName).emit('newdefendcount',order.players.length,true);
 	  getAndSendStatements(socket.roomName,function(uh){})
 	})

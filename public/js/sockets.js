@@ -3,8 +3,9 @@
 var username = "";
 var deckData;
 var currentStatements;
+//playerList and playerScores are parallel arrays
 var playerList;
-var playerScores = {};
+var playerScores = [];
 var meDefending = false;
 var meDealer = false;
 var meWaiting = false;
@@ -65,10 +66,6 @@ socket.on('joinresult',function(data){
     if(data.waiting){
       meWaiting = true;
       $('#waitingDiv').removeClass('hidden');
-      for(var i = 1; i <= 8; i++){
-        $('#player'+i).addClass('has-score');
-        $('#player'+i).append('<span class="player-score" id="playerScore' + i + '"></span>');
-      }
     }
   }
   else{
@@ -89,11 +86,16 @@ socket.on('leaveresult',function(data){
 });
 
 //received whenever someone in the current room leaves or joins
-socket.on('updatecurrentroom', function(players, leader, dealer){
+socket.on('updatecurrentroom', function(players, leader, dealer, scores){
   playerList = players;
+  playerScores = scores;
   var $toChange = $('#joinRoomMembers').add('#pauseRoomMembers').add('#detailsRoomMembers');
   var $theDiv;
   $toChange.empty();
+
+  if(scores == null){
+    $('.has-score').removeClass('has-score');
+  }
 
   $toChange.append('Currently in the room:');
   for (var i = 0; i < players.length; i++){
@@ -110,10 +112,9 @@ socket.on('updatecurrentroom', function(players, leader, dealer){
       $theDiv.removeClass('dealer');
     }
     $('#playerName' + (i+1)).empty().append(players[i]);
-    if ($theDiv.hasClass('has-score')){
-      var theScore = playerScores[players[i]];
-      if (theScore == null) {theScore = 0;}
-      $('#playerScore' + (i+1)).empty().append(theScore);
+    if (scores != null){
+      $theDiv.addClass('has-score');
+      $('#playerScore' + (i+1)).empty().append(scores[i]);
     }
   }
   for(var i = players.length+1; i <=8; i++){
@@ -271,21 +272,12 @@ socket.on('roundend', function(data){
   var gameData = data.gameData;
   var playerData = data.playerData;
 
-  //After the first round, add the spans to display score
-  if (gameData.round == 1){
-    for (var i = 1; i <=8; i++){
-      $('#player' + i).addClass('has-score');
-      $('#player' + i).append('<span class="player-score" id="playerScore' + i + '"></span>');
-    }
-  }
-
   var theName, row = 0, changeString;
   //reset player div colors and show score changes
   for(var i = 1; i <= playerList.length; i++){
     $('#player' + i).removeClass('completed');
     theName = playerList[i-1];
     changeString = playerData[theName].scoreChange === 0 ? '' : ('+' + playerData[theName].scoreChange);
-    playerScores[theName] = playerData[theName].newScore;
     if(theName == username){
       $('#MyScoreChange').empty().append(changeString);
       continue;
@@ -320,16 +312,16 @@ socket.on('roundend', function(data){
   },nextRoundInMS);
 });
 
-socket.on('gameover', function(card,cardScore,players){
+socket.on('gameover', function(card,cardScore,players,finalPlayerList,finalScores){
   gameOver = true;
   var scoresArray = [], i;
-  for(i = 0; i < playerList.length; i++){
-    scoresArray.push( {name: playerList[i] , score: playerScores[playerList[i]]} );
+  for(i = 0; i < finalPlayerList.length; i++){
+    scoresArray.push( {name: finalPlayerList[i] , score: finalScores[i]} );
   }
   scoresArray.sort( function (a,b){
     return b.score - a.score;
   });
-  for(i = 0; i < playerList.length; i++){
+  for(i = 0; i < finalPlayerList.length; i++){
     $('#place' + (i+1)).removeClass('hidden');
     $('#namePlace' + (i+1)).text(scoresArray[i].name);
     $('#scorePlace' + (i+1)).text(scoresArray[i].score);
@@ -353,10 +345,4 @@ socket.on('gameover', function(card,cardScore,players){
     playerString = playerString + 'and ' + players[i];
   }
   $('#WrongestCite').text(playerString);
-
-  //don't display scores in case of restart
-  for (var i = 1; i <=8; i++){
-    $('#player' + i).removeClass('has-score');
-    $('#playerScore' + i).remove();
-  }
 });

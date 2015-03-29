@@ -28,14 +28,16 @@ end
 local selected = candidates[math.random(1,table.getn(candidates))]
 local deckName = redis.call('hget',KEYS[1],'masterDeck')
 local playerList = redis.call('lrange',KEYS[2],0,-1);
+local finalScores = {}
 local whoHad = {}
 for i, name in ipairs(playerList) do
   local previousKey = 'player:previous:' .. ARGV[1] .. ':' .. name
   if redis.call('sismember',previousKey,selected) == 1 then
     table.insert(whoHad,name)
   end
+  table.insert(finalScores,redis.call('hget','player:data:' .. ARGV[1] .. ':' .. name,'score'))
 end
 
-local toReturn = {selected, bestCardScore, deckName, whoHad}
+local toReturn = {selected, bestCardScore, deckName, whoHad, playerList,finalScores}
 
 return toReturn
