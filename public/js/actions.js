@@ -137,7 +137,7 @@ $('#SubmitVotes').click(function() {
 
 if(location.pathname.length > 1){
   var theThing = location.pathname.substr(1);
-  if(theThing = 'someonescrewedup'){
+  if(theThing == 'someonescrewedup'){
     makeToast('setup','alert',"That room doesn't exist. Make sure you have the right link.");
   }
   else{
