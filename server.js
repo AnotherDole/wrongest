@@ -38,7 +38,7 @@ server.listen(port,server_ip_address, function(){
 
 app.use(express.static(__dirname + '/public'));
 app.get('/:id',function(req,res){
-  logic.roomExists(req.params.id,function(err,data){
+  logic.roomExists(req.params.id.toUpperCase(),function(err,data){
     if(data == true){
       res.sendFile(__dirname + '/public/index.html');
     }
@@ -127,13 +127,14 @@ io.on('connection', function (socket){
   });
 
   socket.on('requestroomdata', function(roomName){
-    logic.getPlayersIn(roomName, function(err,result){
+    logic.getPlayersIn(roomName.toUpperCase(), function(err,result){
       socket.emit('updatecurrentroom',result.players,result.leader,result.dealer);
     });
   });
 
   // data is requested room name
-  socket.on('requestjoin', function(playerName,roomName){
+  socket.on('requestjoin', function(playerName,anyRoomName){
+    var roomName = anyRoomName.toUpperCase();
     logic.joinRequest(roomName,playerName, socket.id,function(err,result){
       if (result.success){
 	socket.emit('deckdata',logic.getDeckData());

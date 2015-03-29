@@ -164,6 +164,7 @@ socket.on('getstatements', function(data){
     $('#roomDiv').addClass('hidden');
     $('#waitingDiv').addClass('hidden');
     $('#RoomSetup').addClass('hidden');
+    $('#pauseDiv').addClass('hidden');
     $('#GameView').removeClass('hidden');
     $('#orderDiv').removeClass('hidden');
     $('#GameOverScreen').addClass('hidden');
