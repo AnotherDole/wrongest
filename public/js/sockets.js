@@ -7,6 +7,7 @@ var playerList;
 var playerScores = {};
 var meDefending = false;
 var meDealer = false;
+var meWaiting = false;
 var gameOver = false;
 var socket;
 
@@ -60,6 +61,7 @@ socket.on('joinresult',function(data){
     $('#roomURL').add('#pauseRoomURL').val(data.link);
     username = data.playerName;
     if(data.waiting){
+      meWaiting = true;
       $('#waitingDiv').removeClass('hidden');
       for(var i = 1; i <= 8; i++){
         $('#player'+i).addClass('has-score');
@@ -158,6 +160,7 @@ socket.on('startresult', function(data){
 //Receive the statments that everyone will be defending this round.
 //Automatically sent out at the start of a new round
 socket.on('getstatements', function(data){
+  meWaiting = false;
   gameOver = false;
   currentStatements = data;
   if( $('#VotingBooth').hasClass('hidden')){
@@ -172,6 +175,7 @@ socket.on('getstatements', function(data){
 });
 
 socket.on('timetodefend',function(player,time){
+  if(meWaiting) { return };
   if(player == username){
     meDefending = true;
     $('#defendDiv').removeClass('hidden');
@@ -199,6 +203,7 @@ socket.on('timetodefend',function(player,time){
 //received when anyone in the room says they are done defending
 //data is the # of people who are not done
 socket.on('newdefendcount',function(newCount,stopClock){
+  if(meWaiting) return;
   if(stopClock){
     window.clearInterval(clockTick);
     $('.knob-holder').addClass('hidden');

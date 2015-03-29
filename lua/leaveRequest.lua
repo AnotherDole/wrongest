@@ -81,10 +81,10 @@ if roomData[2] == '1' or roomData[2] == '2' then
 
   local voted = redis.call('hget',KEYS[3],'voted')
   if voted == '1' then
-    roomData[3] = redis.call('hincrby',KEYS[3],'votesReceived',-1)
+    roomData[3] = redis.call('hincrby',KEYS[4],'votesReceived',-1)
   elseif roomData[2] == '2' and oldUp == playerIndex then
     -- if they were the one defending
-    redis.call('hset',KEYS[3],'gameState',1)
+    redis.call('hset',KEYS[4],'gameState',1)
     toReturn[5] = true
   end
   -- set new votes needed count

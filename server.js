@@ -139,9 +139,8 @@ io.on('connection', function (socket){
       if (result.success){
 	socket.emit('deckdata',logic.getDeckData());
 	result.link = 'http://' + server_address + '/' + result.roomName;
+	socket.join(roomName);
 	if(!result.waiting){
-	  //join socket.io room
-	  socket.join(roomName);
 	  //tell everyone in same room to update display
 	  socket.emit('joinresult',result);
 	  if(result.paused){
@@ -222,15 +221,6 @@ io.on('connection', function (socket){
     logic.processVote(socket.roomName,socket.username,most,least,function(err,result){
       if (result){
 	if(result.votesNeeded == 0){
-	  //add players from the waiting list
-	  if(result.socketsToAdd.length > 0){
-	    for(var i = 0; i < result.socketsToAdd.length; i++){
-	      io.sockets.connected[result.socketsToAdd[i]].join(socket.roomName);
-	    }
-	    //var blar = logic.getPlayersIn(socket.roomName);
-	    //io.to(socket.roomName).emit('updatecurrentroom',blar.players,blar.leader,blar.dealer);
-	  }
-	  delete result.socketsToAdd;
 	  io.to(socket.roomName).emit('roundend',result);
 	  getAndSendStatements(socket.roomName,function(uh){
 	    logic.adjustOrder(socket.roomName,function(err,order){

@@ -45,7 +45,6 @@ local toReturn = {votesNeeded}
 local resultNames = {}
 local resultNewScores = {}
 local resultScoreChanges = {}
-local resultNewUIDs = {}
 local cardsLeft = redis.call('hget',KEYS[1],'cardsLeft')
 
 for i, name in ipairs(playerList) do
@@ -89,9 +88,8 @@ for i, name in pairs(waitingList) do
   table.insert(resultNames,name)
   table.insert(resultScoreChanges,0)
   local playerDataString = ('player:data:' .. ARGV[4] .. ':' .. name)
-  local playerData = redis.call('hmget',playerDataString,'score','uid')
-  table.insert(resultNewScores,playerData[1])
-  table.insert(resultNewUIDs,playerData[2])
+  local playerData = redis.call('hget',playerDataString,'score')
+  table.insert(resultNewScores,playerData)
   redis.call('rpush',KEYS[2],name)
 end
 
@@ -102,6 +100,5 @@ table.insert(toReturn,cardsLeft)
 table.insert(toReturn,resultNames)
 table.insert(toReturn,resultNewScores)
 table.insert(toReturn,resultScoreChanges)
-table.insert(toReturn,resultNewUIDs)
 
 return toReturn
