@@ -3,6 +3,17 @@
 // SETUP ACTIONS
 ////////////////////////////////////////////////
 
+$('.room-pick').click(function() {
+  $(this).parent().parent().addClass('chosen');
+  $(this).parent().parent().siblings('.row').addClass('hidden');
+  $('.create-or-join .row.chosen input').fadeIn(300);
+  $('.create-or-join .row.chosen input:first-child').focus();
+});
+
+$('#JoinRoomButtonWithCode').click(function() {
+  socket.emit('requestjoin',$('#joinUsernameInputAlt').val(),$('#joinRoomCode').val());
+});
+
 $('#CreateRoomButton').click(function() {
   $('.create-or-join').addClass('hidden');
   $('.create-screen').removeClass('hidden');

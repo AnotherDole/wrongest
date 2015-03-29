@@ -7,9 +7,21 @@
   .toasts { height: 120px; }
 }
 
+.create-or-join {
+  input { display:none; }
+  .split-row { text-align: center; padding: 1em; }
+  .room-action { display: none; }
+  .room-code { text-transform: uppercase; }
+  .row.chosen {
+    //input { display: block; }
+    .room-pick { display:none; }
+    .room-action { display: block; }
+  }
+}
+
 .starting-screen {
   .game-explanation { text-align: center; padding-top: 1em; padding-bottom: 1em;}
-  input { padding: 0.4em; display: block; width: 100%; font-size: 2em; border:2px solid $grey; border-bottom:none }
+  input { padding: 0.4em; /* display: block; */ width: 100%; font-size: 2em; border:2px solid $grey; border-bottom:none }
   button { font-size:7vw; display: block; width: 100%; padding:0.4em; border:2px solid $grey; border-top:1px solid $grey; }
 }
 
@@ -40,7 +52,6 @@
       &.spin { animation: rotate 6s infinite linear; }
     }
     .icon-gear { width:4em; height:4em; }
-    //&.expanded { @include translateY(-220px); }
   }
 }
 
