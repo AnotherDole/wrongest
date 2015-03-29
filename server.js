@@ -38,14 +38,19 @@ server.listen(port,server_ip_address, function(){
 
 app.use(express.static(__dirname + '/public'));
 app.get('/:id',function(req,res){
-  logic.roomExists(req.params.id.toUpperCase(),function(err,data){
-    if(data == true){
-      res.sendFile(__dirname + '/public/index.html');
-    }
-    else{
-      res.redirect('../error.html');
-    }
-  })
+  if(req.params.id == 'someonescrewedup'){
+    res.sendFile(__dirname + '/public/index.html');
+  }
+  else{
+    logic.roomExists(req.params.id.toUpperCase(),function(err,data){
+      if(data == true){
+	res.sendFile(__dirname + '/public/index.html');
+      }
+      else{
+	res.redirect('/someonescrewedup');
+      }
+    })
+  }
 });
 
 //call logic to assign statements to everyone
