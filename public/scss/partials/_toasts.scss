@@ -7,3 +7,15 @@ ul.toasts {
   
   &.vote { margin-top: 220px; }
 }
+
+.landscape-alert { background-color:$red; display:block; width:17em; color:$white; padding:1em; border:2px solid $black; border-radius:0.5em; text-align:center; position:absolute; left:50%; margin-left:-8.5em; top:30%; z-index:$z-landscape-alert;
+  display: none;
+  h3 { font-size:1.2em; padding-bottom:1em; }
+  figure {
+    svg { height:4em; height:4em; }
+  }
+}
+
+@media only screen  and (max-device-width: 640px) and (orientation: landscape) {
+  .landscape-alert { display:block; }
+}
