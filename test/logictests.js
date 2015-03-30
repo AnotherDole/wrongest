@@ -269,7 +269,7 @@ describe('Voting',function(){
 	//round 2
 	result.gameData.round.should.equal(1);
 	logic.adjustOrder(testRoom,function(err,result){
-	  result.dealer.should.equal('Player2');
+	  result.dealer.should.equal('Player4');
 	  done();
 	})
       })
@@ -283,7 +283,7 @@ describe('Leaving',function(){
       logic.leaveRequest(testRoom,'Player2',function(err,result){
 	logic.getPlayersIn(testRoom,function(err,result){
 	  result.players.length.should.equal(3);
-	  result.dealer.should.equal('Player3');
+	  result.dealer.should.equal('Player4');
 	  done();
 	})
       })
@@ -292,7 +292,7 @@ describe('Leaving',function(){
       logic.leaveRequest(testRoom,'Player1',function(err,result){
 	logic.getPlayersIn(testRoom,function(err,result){
 	  result.players.length.should.equal(2);
-	  result.dealer.should.equal('Player3');
+	  result.dealer.should.equal('Player4');
 	  done();
 	})
       })
@@ -314,20 +314,20 @@ describe('Leaving',function(){
     it('should only allow a restart from the dealer',function(done){
       logic.joinRequest(testRoom,'Player5','hi',function(err,result){
 	result.success.should.equal(true);
-	logic.tryRestartGame(testRoom,'Player4',function(err,result){
+	logic.tryRestartGame(testRoom,'Player3',function(err,result){
 	  result.should.equal(false);
 	  done();
 	})
       })
     })
     it('should allow this restart',function(done){
-      logic.tryRestartGame(testRoom,'Player3',function(err,result){
+      logic.tryRestartGame(testRoom,'Player4',function(err,result){
 	result.should.equal(true);
 	done();
       })
     })
     it('so it should allow a getWhosUp',function(done){
-      logic.getWhosUp(testRoom,'Player3',function(err,result){
+      logic.getWhosUp(testRoom,'Player4',function(err,result){
 	result.player.should.equal('Player3')
 	done();
       })

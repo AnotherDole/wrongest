@@ -216,22 +216,6 @@ exports.getPlayersIn = function(roomName, callback){
 	 toReturn.scores.push(theScore);
 	}
         if(allZero) { toReturn.scores = null};
-	if(dealerFirst == '1'){
-	  while(playerList[0] != dealer){
-	    if(toReturn.scores != null){
-	      toReturn.scores.push(toReturn.scores.shift());
-	    }
-	    playerList.push(playerList.shift());
-	  }
-	}
-	else{
-	  while(playerList[playerList.length-1] != dealer){
-	    if(toReturn.scores != null){
-	      toReturn.scores.unshift(toReturn.scores.pop());
-	    }
-	    playerList.unshift(playerList.pop());
-	  }
-	}
 	toReturn.players = playerList;
 	callback(null,toReturn);
       })

@@ -11,19 +11,27 @@ for i = 1,numPlayers,1 do
   end
 end
 
+local cycles = 1
 --first round
 if roomData[3] == '1' then
   --dealer first
   if roomData[2] == '1' then
-    redis.call('hset',KEYS[1],'whosUp',dealerIndex)
+    cycles = numPlayers - dealerIndex + 1
+    if cycles == numPlayers then
+      cycles = 0
+    end
   else
-    redis.call('hset',KEYS[1],'whosUp',(dealerIndex % numPlayers) + 1)
-  end
-else
-  local newIndex = (dealerIndex % numPlayers) + 1
-  if roomData[2] == '1' then
-    redis.call('hmset',KEYS[1],'whosUp',newIndex,'dealer',playerList[newIndex])
-  else
-    redis.call('hmset',KEYS[1],'whosUp',(newIndex % numPlayers) + 1,'dealer',playerList[newIndex])
+    cycles = numPlayers - dealerIndex
   end
 end
+for i = 1,cycles,1 do
+  table.insert(playerList,1,table.remove(playerList))
+  redis.call('lpush',KEYS[2],redis.call('rpop',KEYS[2]))
+end
+local newIndex
+if roomData[2] == '1' then
+  newIndex = 1
+else
+  newIndex = numPlayers
+end
+redis.call('hmset',KEYS[1],'whosUp',1,'dealer',playerList[newIndex])

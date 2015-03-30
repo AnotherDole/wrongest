@@ -11,7 +11,7 @@ if (roomData[1] ~= '2') or (voted == '1') or (up ~= ARGV[1]) then
   return false
 end
 
-local newNext = (tonumber(roomData[2]) % table.getn(playerList)) + 1
+local newNext = (tonumber(roomData[2])) + 1
 redis.call('hmset',KEYS[1],'gameState',1,'whosUp',newNext)
 redis.call('hset',KEYS[2],'voted',1)
 local votes = redis.call('hincrby',KEYS[1],'votesReceived',1)
