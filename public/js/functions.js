@@ -44,7 +44,7 @@ function makeToast(holder, type, msg) {
 }
 
 function showButton() {
-  if ( $('input[value="LeastWrong"]:checked').length > 0 && $('input[value="MostWrong"]:checked').length > 0 ) {
+  if ( $('.least-wrong').length > 0 && $('.most-wrong').length > 0 ) {
     $('.button-holder').removeClass('hidden');
   } else {
     $('.button-holder').addClass('hidden');
