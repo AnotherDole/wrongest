@@ -14,7 +14,7 @@ var rooms = {}, decks = {}, deckData = {};
 var client = null;
 var gamesCreated = 0;
 
-var ROUND_LIMIT = 5;
+var ROUND_LIMIT = 2;
 
 var MIN_PLAYERS = 3;
 var MAX_PLAYERS = 8;
@@ -333,8 +333,12 @@ exports.startRequest = function(playerName,roomName,options,callback){
      if(options['dealerFirstOrLast'] == 'first'){
        dealerFirst = 1;
      }
-     client.hmset(roomDataKey(roomName),'masterDeck',options['deckName'],'timeLimit',timeLimit,
-	 'allowRedraw',allowRedraw,'dealerFirst',dealerFirst,function(err,data){
+     client.multi()
+       .hmset(roomDataKey(roomName),'masterDeck',options['deckName'],'timeLimit',timeLimit,
+	 'allowRedraw',allowRedraw,'dealerFirst',dealerFirst)
+       .hincrby('decks:gamesStartedToday',options['deckName'],1)
+       .hincrby('decks:gamesStartedLifetime',options['deckName'],1)
+       .exec(function(err,data){
 	   return initializeGame(roomName,options['deckName'],players,callback);
 	 });
    });
@@ -401,7 +405,7 @@ exports.getWhosUp = function(roomName,playerName,callback){
 exports.getWinner = function(roomName,callback){
   var seed = Math.floor(Math.random() * Math.pow(2,32));
   //data[0] is card number, data[1] is its score, data[2] is the deck name, data[3] is players who had that card
-  //data[4] is final player list, data[5] is parallel array of scores
+  //data[4] is final player list, data[5] is parallel array of scores, data[6] is array of final card scores
   scriptManager.run('getWinner',[roomDataKey(roomName),roomPlayersKey(roomName)],[roomName,seed],function (err,data){
     if (err) {
       console.log(err);
@@ -414,7 +418,14 @@ exports.getWinner = function(roomName,callback){
       theScores.push(parseInt(data[5][i]));
     }
     var toReturn = {card: theDeck.cards[cardNum-1], cardScore: cardScore, players: data[3], playerList: data[4], theScores: theScores};
-    return callback(null,toReturn);
+    var theMulti = client.multi();
+    for(var i = 0; i < data[6].length; i++){
+      theMulti.hincrby('todayScores:' + data[2], theDeck.cards[i],parseInt(data[6][i]));
+      theMulti.hincrby('lifetimeScores:' + data[2], theDeck.cards[i], parseInt(data[6][i]));
+    }
+    theMulti.exec(function(err,blar){
+      return callback(null,toReturn);
+    })
   })
 }
 

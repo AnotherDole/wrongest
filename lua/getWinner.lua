@@ -11,10 +11,12 @@ local bestCardScore = 999
 local candidates = {}
 local tempCardScore
 local cardKey
+local finalCardScores = {}
 
 for i = 1,deckLength,1 do
   cardKey = 'card:' .. ARGV[1] .. ':' .. i
   tempCardScore = tonumber(redis.call('hget', cardKey,'score'))
+  table.insert(finalCardScores,tempCardScore)
   if tempCardScore == bestCardScore then
     table.insert(candidates,i)
   elseif tempCardScore < bestCardScore then
@@ -38,6 +40,9 @@ for i, name in ipairs(playerList) do
   table.insert(finalScores,redis.call('hget','player:data:' .. ARGV[1] .. ':' .. name,'score'))
 end
 
-local toReturn = {selected, bestCardScore, deckName, whoHad, playerList,finalScores}
+redis.call('hincrby','decks:gamesFinishedToday',deckName,1)
+redis.call('hincrby','decks:gamesFinishedLifetime',deckName,1);
+
+local toReturn = {selected, bestCardScore, deckName, whoHad, playerList,finalScores,finalCardScores}
 
 return toReturn

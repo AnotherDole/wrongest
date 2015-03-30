@@ -251,7 +251,8 @@ socket.on('newdefendcount',function(newCount,stopClock){
     $('.button-holder').addClass('hidden');
     $('.most-wrong').removeClass('most-wrong');
     $('.least-wrong').removeClass('least-wrong');
-    $('input[Value="MostWrong"]').prop('checked',false);
+    $('input[Value="MostWrong"]').prop('checked',false)
+    $('input[Value="LeastWrong"]').prop('checked',false)
     updateVoteSelectors();
   }
   $('.active').removeClass('active');
