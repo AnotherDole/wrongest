@@ -38,7 +38,7 @@ $('#joinUsernameInput').keyup(function(e) {
   }
 });
 
-$('#roomURL, #roomCode').click(function() {
+$('input[data-holds="roomURL"], input[data-holds="roomURL"]').click(function() {
   this.selectionStart=0;
   this.selectionEnd=this.value.length;
   return false;

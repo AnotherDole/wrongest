@@ -98,9 +98,13 @@
       <div class="pause-screen hidden" id="pauseDiv">
         <p>The number of active players in the room dropped below 3 and so the game was paused.</p>
         <p>When the number of players in the room reaches 3 or more again, the leader can restart the game.</p>
-        <figure>
-          <figcaption>Copy and paste:</figcaption>
-          <input type="url" readonly id="pauseRoomURL" />
+        <figure class="room-code">
+          <figcaption>Give out this code</figcaption>
+          <input type="text" data-holds="roomCode" maxlength="4" value="FUCK">
+        </figure>
+        <figure class="room-url">
+          <figcaption>Or this URL</figcaption>
+          <input type="url" data-holds="roomURL" />
         </figure>
         <div class="lobby-box">
           <ol class="players" id="pauseRoomMembers"></ol>
@@ -121,12 +125,12 @@
         
         <figure class="room-code">
           <figcaption>Give out this code</figcaption>
-          <input type="text" id="roomCode" maxlength="4" value="FUCK">
+          <input type="text" data-holds="roomCode" maxlength="4" value="FUCK">
         </figure>
 
         <figure class="room-url">
           <figcaption>Or this URL</figcaption>
-          <input type="url" id="roomURL" />
+          <input type="url" data-holds="roomURL" />
         </figure>
         <div class="lobby-box">
           <ol class="players" id="detailsRoomMembers">Retrieving player list...</ol>
