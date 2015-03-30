@@ -44,9 +44,8 @@ socket.on('createresult',function(data){
   if(data.success){
     $('#roomresult').text('Room created!');
     username = data.playerName;
-    $('#roomLink').text(data.link);
-    $('#roomCode').val(data.roomName);
-    $('#roomURL').add('#pauseRoomURL').val(data.link);
+    $('input[data-holds="roomCode"]').val(data.roomName);
+    $('input[data-holds="roomURL"]').val(data.link);
     $('#createDiv').addClass('hidden');
     $('#roomDiv').removeClass('hidden');
     $('#startDiv').addClass('hidden');
@@ -62,7 +61,8 @@ socket.on('joinresult',function(data){
     $('#joinDiv').addClass('hidden');
     $('#roomDiv').removeClass('hidden');
     $('#startDiv').addClass('hidden');
-    $('#roomURL').add('#pauseRoomURL').val(data.link);
+    $('input[data-holds="roomCode"]').val(data.roomName);
+    $('input[data-holds="roomURL"]').val(data.link);
     username = data.playerName;
     if(data.waiting){
       meWaiting = true;
