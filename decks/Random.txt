@@ -1,7 +1,7 @@
 A Miscellanious Assortment
 Let me be honest with you, all of the cards in this deck are just the cards that didn't fit in any other deck.
 
-Froot Loops are spelled that way because the cereal contains no fruit, {but lots of pig blood.}
+Froot Loops are spelled that way because the cereal contains no fruit{, but lots of pig blood.}
 
 Spaghetti and Meatballs is actually known as {Pasketti and Meatbulbs} in Italy.
 
@@ -11,7 +11,7 @@ No one understands how {drums} work.
 
 The best selling death metal album of all time is {Babel by Mumford & Sons.}
 
-They keys to Steinway pianos are made from {human finger bones.}
+The keys to Steinway pianos are made from { human finger bones.}
 
 The constitution {must be fed with 20ml of honey per day} or it starts to create amendments.
 
