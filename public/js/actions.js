@@ -38,7 +38,7 @@ $('#joinUsernameInput').keyup(function(e) {
   }
 });
 
-$('#roomURL').click(function() {
+$('#roomURL, #roomCode').click(function() {
   this.selectionStart=0;
   this.selectionEnd=this.value.length;
   return false;

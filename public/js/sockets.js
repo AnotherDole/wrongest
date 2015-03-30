@@ -45,6 +45,7 @@ socket.on('createresult',function(data){
     $('#roomresult').text('Room created!');
     username = data.playerName;
     $('#roomLink').text(data.link);
+    $('#roomCode').val(data.roomName);
     $('#roomURL').add('#pauseRoomURL').val(data.link);
     $('#createDiv').addClass('hidden');
     $('#roomDiv').removeClass('hidden');
