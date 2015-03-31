@@ -16,6 +16,8 @@ ul.toasts {
   }
 }
 
-@media only screen  and (max-device-width: 640px) and (orientation: landscape) {
+@media only screen 
+  and (max-device-width: 660px)
+  and (min-aspect-ratio: 13/9) {
   .landscape-alert { display:block; }
 }
