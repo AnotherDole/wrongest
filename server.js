@@ -157,6 +157,9 @@ io.on('connection', function (socket){
 	}
 	else{
 	  socket.emit('joinresult',result);
+	  logic.getPlayersIn(roomName, function (err, blar){
+	    socket.emit('updatecurrentroom',blar.players,blar.leader,blar.dealer,blar.scores);
+	  })
 	}
 	socket.username = playerName;
 	socket.roomName = roomName;

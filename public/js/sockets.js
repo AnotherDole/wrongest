@@ -67,6 +67,7 @@ socket.on('joinresult',function(data){
     if(data.waiting){
       meWaiting = true;
       $('#waitingDiv').removeClass('hidden');
+      $('.admin-options').addClass('hidden');
     }
   }
   else{
