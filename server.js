@@ -243,11 +243,13 @@ io.on('connection', function (socket){
   socket.on('restartgame', function(data){
     logic.tryRestartGame(socket.roomName,socket.username,function(err,result){
       if(result){
-	logic.adjustOrder(socket.roomName,function(err,order){
-	  io.to(socket.roomName).emit('updatecurrentroom',order.players,order.leader,order.dealer,order.scores);
-	  io.to(socket.roomName).emit('newdefendcount',order.players.length,true);
-	  getAndSendStatements(socket.roomName,function(uh){})
+	getAndSendStatements(socket.roomName,function(uh){
+	  logic.adjustOrder(socket.roomName,function(err,order){
+	    io.to(socket.roomName).emit('updatecurrentroom',order.players,order.leader,order.dealer,order.scores);
+	    io.to(socket.roomName).emit('newdefendcount',order.players.length,true);
+	  })
 	})
+
       }
     });
   });

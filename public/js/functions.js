@@ -110,7 +110,11 @@ function updateVoteSelectors(){
   }
 }
 
-
+function makeStatementTeaser(statement){
+  var splat = statement.split('{');
+  var toReturn = splat[0] + '...';
+  return toReturn + statement.split('}')[1];
+}
 
 ///////////////////////////////////////////
 // TIMER STUFF 

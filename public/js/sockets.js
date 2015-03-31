@@ -154,12 +154,12 @@ socket.on('updatecurrentroom', function(players, leader, dealer, scores){
     meDealer = false;
     $('#dealerControls').addClass('hidden');
   }	
+  $('.on-deck').removeClass('on-deck');
+  $('.player-tease').empty();
   if(playerList[0] == username && !$('#player1').hasClass('completed')){
-    var splat = currentStatements[username].quote.split('{');
-    var toDisplay = splat[0] + '...';
-    toDisplay = toDisplay + currentStatements[username].quote.split('}')[1];
+    var myStatement = currentStatements[username].quote;
     $('#player1').addClass('on-deck');
-    $('#playerTease1').text(toDisplay);
+    $('#playerTease1').text(makeStatementTeaser(myStatement));
   }
 });
 
@@ -199,7 +199,7 @@ socket.on('timetodefend',function(player,time){
     $('#orderDiv').addClass('hidden');
     var myStatement = currentStatements[username].quote.replace('{','').replace('}','');
     $('#statementDiv').empty().text(myStatement);
-    if(myStatement.score < -1){
+    if(currentStatements[username].score < -1){
       $('#HardCardSticker').removeClass('hidden');
     }
     else{
@@ -242,12 +242,10 @@ socket.on('newdefendcount',function(newCount,stopClock){
       }
     }
     if(playerList[playersDone] == username){
-      var splat = currentStatements[username].quote.split('{');
-      var toDisplay = splat[0] + '...';
-      toDisplay = toDisplay + currentStatements[username].quote.split('}')[1];
+      var myStatement = currentStatements[username].quote;
       var num = playersDone + 1;
       $('#player' + num).addClass('on-deck');
-      $('#playerTease' + num).text(toDisplay);
+      $('#playerTease' + num).text(makeStatementTeaser(myStatement));
     }
     else{
       $('.on-deck').removeClass('on-deck');
@@ -255,6 +253,8 @@ socket.on('newdefendcount',function(newCount,stopClock){
     }
   }
   else{
+    $('.on-deck').removeClass('on-deck');
+    $('.player-tease').empty();
     //$('#orderDiv').hide();
     if(!$('#VotingBooth').hasClass('hidden')){
       makeToast('vote','info','Someone left the room. Please vote again.');
