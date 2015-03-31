@@ -197,8 +197,8 @@ socket.on('timetodefend',function(player,time){
     meDefending = true;
     $('#defendDiv').removeClass('hidden');
     $('#orderDiv').addClass('hidden');
-    var myStatement = currentStatements[username].quote.replace('{','').replace('}','');
-    $('#statementDiv').empty().text(myStatement);
+    var myStatement = currentStatements[username].quote.replace('{','<span class="revealed">').replace('}','</span>');
+    $('#statementDiv').empty().append(myStatement);
     if(currentStatements[username].score < -1){
       $('#HardCardSticker').removeClass('hidden');
     }
