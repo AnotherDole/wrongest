@@ -42,6 +42,7 @@ if numPlayers == 0 then
   for i = 1, table.getn(allPlayers), 1 do
     redis.call('del','player:previous:' .. ARGV[2] .. ':' .. allPlayers[i])
     redis.call('del','room:leaveScore:' .. ARGV[2] .. ':' .. allPlayers[i])
+    redis.call('del','player:data:' .. ARGV[2] .. ':' .. allPlayers[i])
   end
   redis.call('del',KEYS[5])
   toReturn[2] = true
