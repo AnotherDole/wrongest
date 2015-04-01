@@ -3,7 +3,10 @@
 }
 
 .social {
-  &.flattr { color:#93d72e; }
+  &.flattr { color:#89b443;
+    .top-left { fill:#f9ad33; }
+    .bottom-right { fill:#89b443; }
+  }
   &.github { color:#fff; }
   &.twitter { color:#55acee; }
   &.facebook { color:#3B5998; }
