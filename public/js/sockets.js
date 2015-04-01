@@ -155,6 +155,13 @@ socket.on('updatecurrentroom', function(players, leader, dealer, scores){
     meDealer = false;
     $('#dealerControls').addClass('hidden');
   }	
+  $('.on-deck').removeClass('on-deck');
+  $('.player-tease').empty();
+  if(playerList[0] == username && !$('#player1').hasClass('completed')){
+    var myStatement = currentStatements[username].quote;
+    $('#player1').addClass('on-deck');
+    $('#playerTease1').text(makeStatementTeaser(myStatement));
+  }
 });
 
 socket.on('startresult', function(data){
@@ -191,9 +198,9 @@ socket.on('timetodefend',function(player,time){
     meDefending = true;
     $('#defendDiv').removeClass('hidden');
     $('#orderDiv').addClass('hidden');
-    var myStatement = currentStatements[username];
-    $('#statementDiv').empty().text(myStatement.quote);
-    if(myStatement.score < -1){
+    var myStatement = currentStatements[username].quote.replace('{','<span class="revealed">').replace('}','</span>');
+    $('#statementDiv').empty().append(myStatement);
+    if(currentStatements[username].score < -1){
       $('#HardCardSticker').removeClass('hidden');
     }
     else{
@@ -235,8 +242,20 @@ socket.on('newdefendcount',function(newCount,stopClock){
         $('#player' + i).removeClass('completed');
       }
     }
+    if(playerList[playersDone] == username){
+      var myStatement = currentStatements[username].quote;
+      var num = playersDone + 1;
+      $('#player' + num).addClass('on-deck');
+      $('#playerTease' + num).text(makeStatementTeaser(myStatement));
+    }
+    else{
+      $('.on-deck').removeClass('on-deck');
+      $('.player-tease').empty();
+    }
   }
   else{
+    $('.on-deck').removeClass('on-deck');
+    $('.player-tease').empty();
     //$('#orderDiv').hide();
     if(!$('#VotingBooth').hasClass('hidden')){
       makeToast('vote','info','Someone left the room. Please vote again.');

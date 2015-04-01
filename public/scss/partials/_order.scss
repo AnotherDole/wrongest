@@ -2,7 +2,7 @@ section.order { background-color:$white; position: relative; }
 
 .player-order { font-family: $font; padding:0.5em; font-size:1.5em; counter-reset: ol-counter; margin-bottom:0; 
   li { font-weight:700; border:1px solid $black; margin-bottom:0.4em; padding:0.5em; background-color:#fff; position:relative; padding-left:2.2em; overflow:hidden;
-    .player-teaser { display: none; font-size: 0.6em; font-style: italic; background-color: $black; color:$white; margin-left: -1.2em; padding-left: 1em; margin-right: -1.2em; margin-top: 0.5em; padding-top: 0.5em; padding-bottom: 0.5em;
+    .player-tease { display: none; font-size: 0.6em; font-style: italic; background-color: $black; color:$white; margin-left: -1.2em; padding-left: 1em; margin-right: -1.2em; margin-top: 0.5em; padding-top: 0.5em; padding-bottom: 0.5em;
       &:before { content: '“'; font-size: 1.2em; }
       &:after {   content: '”'; font-size: 1.2em; }
     }
@@ -23,7 +23,7 @@ section.order { background-color:$white; position: relative; }
     &.completed { opacity:.6; }
     
     &.on-deck { padding-bottom: 0;
-      .player-teaser { display:none; }
+      .player-tease { display:block; }
     }
     
     span.player-score {position: absolute; top: 0.2em; right: 0; z-index: $z-player-score; font-size: 0.65em; width: 1.6em; text-align: center; color: $white; }

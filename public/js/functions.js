@@ -92,12 +92,12 @@ function updateVoteSelectors(){
   for(var i = 0; i < playerList.length; i++){
     theName = playerList[i];
     if (theName == username){
-      $('#MyQuote').empty().append(currentStatements[username].quote);
+      $('#MyQuote').empty().append(currentStatements[username].quote.replace('{','').replace('}',''));
       $('#MyCite').empty().append(theName);
       continue;
     }
     row++;
-    var theStatement = currentStatements[theName].quote;
+    var theStatement = currentStatements[theName].quote.replace('{','').replace('}','');
     $('#voterow' + row).removeClass('hidden');
     $('#votequote' + row).empty().text(theStatement);
     $('#quotecite' + row).empty().text(theName);
@@ -110,7 +110,11 @@ function updateVoteSelectors(){
   }
 }
 
-
+function makeStatementTeaser(statement){
+  var splat = statement.split('{');
+  var toReturn = splat[0] + '...';
+  return toReturn + statement.split('}')[1];
+}
 
 ///////////////////////////////////////////
 // TIMER STUFF 

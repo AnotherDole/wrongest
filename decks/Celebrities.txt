@@ -1,40 +1,38 @@
 Celebrity Lies
 NONE OF THESE ARE TRUE. There, now we can't get sued for what it says on these cards.
 
-Nancy Reagan kept a handgun in her hair.
+Nancy Reagan kept a {handgun} in her hair.
 
-Justin Bieber has an IQ of 186.
+{Justin Bieber} has an IQ of 186.
 
-Damon Wayans Jr. is actually Damon Wayans Sr. with a wig on.
+Damon Wayans Jr. is actually {Damon Wayans Sr. with a wig on.}
 
-Shaquille O'Neal has memorized pi to 256 places.
+Shaquille O'Neal has {memorized pi to 256 places.}
 
-Michael Bay directed Boyhood, but was embarassed by the result and credited Richard Linklater.
+Michael Bay {directed Boyhood, but was embarassed by the result and credited} Richard Linklater.
 
-Chumbawumba's #1 hit is a sly reference to Britney Spears, who invented tubthumping.
+Chumbawumba's #1 hit is a sly reference to {Britney Spears, who invented tubthumping.}
 
-David Beckham credits wiccan magick as the reason for his success in football.
+David Beckham credits {wiccan magick} as the reason for his success in football.
 
-The Mercury Thermometer actually contains molten aluminum. It was invented by Freddy Mercury.
+The Mercury Thermometer actually contains {molten aluminum. It was invented by Freddy Mercury.}
 
-The first couple Matchbox 20 albums are actually really good.
+{The first couple Matchbox 20} albums are actually really good.
 
-Stevie Knicks has never taken drugs, but pretended to do so in order to be popular.
+{Stevie Knicks} has never taken drugs.
 
-Gwyneth Paltrow's love of semen-based skin lotion caused her to call her magazine "Goop".
+Gwyneth Paltrow's love of {semen-based skin lotion caused her to call} her magazine "Goop".
 
-Kanye West doesn't get the credit he deserves.
+Kanye West doesn't {get the credit he deserves.}
 
-Poor use of menu fonts caused Guy Fieri to lose 1 of his 3 Michelin stars.
+Poor use of {menu fonts caused Guy Fieri} to lose 1 of his 3 Michelin stars.
 
-Bob Dole comes from a long line of wealthy and violent pineapple barons.
+Bob Dole comes from a long line of {wealthy and violent pineapple barons.}
 
-Sylvester Stallone bought all the minidiscs.
+Sylvester Stallone bought {all the minidiscs.}
 
-Paul Wall and Chamillionaire met at Seminary.
+{Paul Wall and Chamillionaire} met at Seminary.
 
-Bruce Lee was black.
+{Bruce Lee} was black.
 
-Snow is a side effect of nuclear fallout
-
-Toby Keith converted to Islam in 2013.
+Toby Keith converted {to Islam in 2013.}
