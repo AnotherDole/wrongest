@@ -354,7 +354,7 @@ socket.on('gameover', function(card,cardScore,players,finalPlayerList,finalScore
   for(i++; i <=8; i++){
     $('#place' + i).addClass('hidden');
   }
-  $('#WrongestQuote').text(card);
+  $('#WrongestQuote').text(card.replace('{','').replace('}',''));
   $('#WrongestScore').text(cardScore);
   var playerString = '';
   if(players.length == 1){
