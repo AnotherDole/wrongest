@@ -233,6 +233,7 @@ exports.getPlayersIn = function(roomName, callback){
 
 //playerName requests to join roomName
 exports.joinRequest = function(roomName,playerName,UID,callback){
+  var joinFailMessage = "Oops. Make sure you entered the code correctly and that the name you want isn't taken.";
   if (playerName == null || playerName.trim() == ""){
     return callback(null, {success:false,message:"Please enter a name."});
   }
@@ -242,7 +243,7 @@ exports.joinRequest = function(roomName,playerName,UID,callback){
   }
   client.exists(roomDataKey(roomName),function(err, data){
     if(data == false){
-      return callback(null,{success:false,message:'That room does not exist. Make sure you entered the right code.'});
+      return callback(null,{success:false,message:joinFailMessage});
     }
     client.multi()
       .lrange(roomPlayersKey(roomName),0,-1)
@@ -256,10 +257,10 @@ exports.joinRequest = function(roomName,playerName,UID,callback){
 	var previousScore = data[3];
 	previousScore = (previousScore == null ? 0 : parseInt(previousScore));
 	if(currentPlayers.length + waitingPlayers.length >= MAX_PLAYERS){
-	  return callback(null,{success:false, message:'Room is full'});
+	  return callback(null,{success:false, message:joinFailMessage});
 	}
 	if((currentPlayers.indexOf(trimPlayer) != -1) || (waitingPlayers.indexOf(trimPlayer) != -1)){
-	  return callback(null,{success:false, message:'That name is already taken.'});
+	  return callback(null,{success:false, message:joinFailMessage});
 	}
 	client.multi()
 	.hmset(playerDataKey(roomName,trimPlayer),'uid',UID,'score',previousScore,'card',-1,'voted',0)
