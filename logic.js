@@ -14,7 +14,7 @@ var rooms = {}, decks = {}, deckData = {};
 var client = null;
 var gamesCreated = 0;
 
-var ROUND_LIMIT = 5;
+var ROUND_LIMIT = 2;
 
 var MIN_PLAYERS = 3;
 var MAX_PLAYERS = 8;
@@ -63,14 +63,23 @@ function masterDeck(name, description){
   this.cards = [];
 }
 
-function gameCard(number,masterCard) {
-  this.number=number;
-  this.inPlay=false;
-  this.discarded=false;
-  this.mostVotes = 0;
-  this.leastVotes = 0;
-  this.score=0;
-  this.masterCard = masterCard;
+function sixDigits(theDate){
+  var month = theDate.getMonth() + 1;
+  month = month < 10 ? '0' + month : month;
+  var day = theDate.getDate();
+  day = day < 10 ? '0' + day : day;
+  var year = theDate.getFullYear().toString().substr(2,2);
+  return '' + month + day + year;
+}
+
+//credit: http://stackoverflow.com/questions/5210376/how-to-get-first-and-last-day-of-the-week-in-javascript
+function makeWeekString(){
+  var curr = new Date;
+  var first = curr.getDate() - curr.getDay();
+  var last = first + 6;
+  var firstDay = new Date(curr.setDate(first));
+  var lastDay = new Date(curr.setDate(firstDay.getDate()+6));
+  return sixDigits(firstDay) + ':' + sixDigits(lastDay);
 }
 
 function initializeGame(roomName,deckName,playerList,callback) {
@@ -336,7 +345,7 @@ exports.startRequest = function(playerName,roomName,options,callback){
      client.multi()
        .hmset(roomDataKey(roomName),'masterDeck',options['deckName'],'timeLimit',timeLimit,
 	 'allowRedraw',allowRedraw,'dealerFirst',dealerFirst)
-       .hincrby('decks:gamesStartedToday',options['deckName'],1)
+       .hincrby('decks:gamesStarted:'+makeWeekString(),options['deckName'],1)
        .hincrby('decks:gamesStartedLifetime',options['deckName'],1)
        .exec(function(err,data){
 	   return initializeGame(roomName,options['deckName'],players,callback);
@@ -406,7 +415,9 @@ exports.getWinner = function(roomName,callback){
   var seed = Math.floor(Math.random() * Math.pow(2,32));
   //data[0] is card number, data[1] is its score, data[2] is the deck name, data[3] is players who had that card
   //data[4] is final player list, data[5] is parallel array of scores, data[6] is array of final card scores
-  scriptManager.run('getWinner',[roomDataKey(roomName),roomPlayersKey(roomName)],[roomName,seed],function (err,data){
+  scriptManager.run('getWinner',[roomDataKey(roomName),roomPlayersKey(roomName)],
+      [roomName,seed,makeWeekString()],
+  function (err,data){
     if (err) {
       console.log(err);
       return callback(err,null);
@@ -419,8 +430,9 @@ exports.getWinner = function(roomName,callback){
     }
     var toReturn = {card: theDeck.cards[cardNum-1], cardScore: cardScore, players: data[3], playerList: data[4], theScores: theScores};
     var theMulti = client.multi();
+    var weekString = makeWeekString();
     for(var i = 0; i < data[6].length; i++){
-      theMulti.hincrby('todayScores:' + data[2], theDeck.cards[i],parseInt(data[6][i]));
+      theMulti.hincrby('weekScores:' + data[2] + ':' + weekString, theDeck.cards[i],parseInt(data[6][i]));
       theMulti.hincrby('lifetimeScores:' + data[2], theDeck.cards[i], parseInt(data[6][i]));
     }
     theMulti.exec(function(err,blar){

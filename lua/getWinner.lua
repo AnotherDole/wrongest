@@ -1,5 +1,5 @@
 -- KEYS[1] is room data key, KEYS[2] is player list key
--- ARGV[1] is room name, ARGV[2] is random seed
+-- ARGV[1] is room name, ARGV[2] is random seed, ARGV[3] is week string
 
 math.randomseed(tonumber(ARGV[2]))
 
@@ -40,7 +40,7 @@ for i, name in ipairs(playerList) do
   table.insert(finalScores,redis.call('hget','player:data:' .. ARGV[1] .. ':' .. name,'score'))
 end
 
-redis.call('hincrby','decks:gamesFinishedToday',deckName,1)
+redis.call('hincrby','decks:gamesFinished:' .. ARGV[3],deckName,1)
 redis.call('hincrby','decks:gamesFinishedLifetime',deckName,1);
 
 local toReturn = {selected, bestCardScore, deckName, whoHad, playerList,finalScores,finalCardScores}
