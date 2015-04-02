@@ -1,10 +1,10 @@
 // jshint -W117
 
 var username = "";
-var deckData;
-var currentStatements;
+var deckData = null;
+var currentStatements = null;
 //playerList and playerScores are parallel arrays
-var playerList;
+var playerList = [];
 var playerScores = [];
 var meDefending = false;
 var meDealer = false;
@@ -158,7 +158,7 @@ socket.on('updatecurrentroom', function(players, leader, dealer, scores){
   }	
   $('.on-deck').removeClass('on-deck');
   $('.player-tease').empty();
-  if(playerList[0] == username && !$('#player1').hasClass('completed')){
+  if(playerList[0] == username && !$('#player1').hasClass('completed') && currentStatements != null){
     var myStatement = currentStatements[username].quote;
     $('#player1').addClass('on-deck');
     $('#playerTease1').text(makeStatementTeaser(myStatement));
