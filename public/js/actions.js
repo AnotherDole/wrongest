@@ -146,14 +146,10 @@ $('a.social').click(function() {
 });
 
 if(location.pathname.length > 1){
-  var theThing = location.pathname.substr(1);
-  if(theThing == 'someonescrewedup'){
-    makeToast('setup','alert',"That room doesn't exist. Make sure you have the right link.");
-  }
-  else{
-    $('#startDiv').addClass('hidden');
-    $('#joinDiv').removeClass('hidden');
-    $('#joinRoomName').val(theThing);
-    socket.emit('requestroomdata',theThing);
-  }
+  var theCode = location.pathname.substr(1);
+  $('#JoinWithCodeRow').addClass('chosen');
+  $('#JoinWithCodeRow').siblings('.row').addClass('hidden');
+  $('.create-or-join .row.chosen input').fadeIn(300);
+  $('.create-or-join .row.chosen input:first-child').focus();
+  $('#joinRoomCode').val(theCode);
 }

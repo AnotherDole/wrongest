@@ -57,7 +57,7 @@
       <!-- Create or Join game -->
       <div class="starting-screen" id="startDiv">
         <div class="create-or-join">
-          <div class="create-row row">
+          <div class="create-row row" id="CreateGameRow">
             <input type="text" data-holds="playerName" id="createUsernameInput" maxlength="50" placeholder="Your Name">
             <div class="button-holder">
               <button id="IChooseToCreate" class="room-pick">create game</button>
@@ -67,7 +67,7 @@
           <div class="split-row row">
             <span>or</span>
           </div>
-          <div class="join-row row">
+          <div class="join-row row" id="JoinWithCodeRow">
             <input type="text" class="room-code" data-holds="roomCode" id="joinRoomCode" maxlength="4" required placeholder="Room Code">
             <input type="text" data-holds="playerName" id="joinUsernameInputAlt" maxlength="50" required placeholder="Your Name">
             <div class="button-holder">
@@ -78,7 +78,7 @@
         </div>
       </div>
       
-      <!-- Join room screen -->
+      <!-- Join room screen 
       <div class="join-screen hidden" id="joinDiv">
         <div class="room-details">
           <ol class="players" id="joinRoomMembers">Retrieving the player list...</ol>
@@ -93,6 +93,7 @@
           <button type="submit" id="JoinRoomButton" onclick="joinroom();">JOIN!</button>
         </div>
       </div>
+      -->
 
       <!-- Game is paused. -->
       <div class="pause-screen hidden" id="pauseDiv">

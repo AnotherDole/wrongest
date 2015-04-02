@@ -38,19 +38,7 @@ server.listen(port,server_ip_address, function(){
 
 app.use(express.static(__dirname + '/public'));
 app.get('/:id',function(req,res){
-  if(req.params.id == 'someonescrewedup'){
-    res.sendFile(__dirname + '/public/index.html');
-  }
-  else{
-    logic.roomExists(req.params.id.toUpperCase(),function(err,data){
-      if(data == true){
-	res.sendFile(__dirname + '/public/index.html');
-      }
-      else{
-	res.redirect('/someonescrewedup');
-      }
-    })
-  }
+  res.sendFile(__dirname + '/public/index.html');
 });
 
 //call logic to assign statements to everyone
@@ -132,9 +120,11 @@ io.on('connection', function (socket){
   });
 
   socket.on('requestroomdata', function(roomName){
-    logic.getPlayersIn(roomName.toUpperCase(), function(err,result){
-      socket.emit('updatecurrentroom',result.players,result.leader,result.dealer,result.scores);
-    });
+    if(socker.roomName == roomName){
+      logic.getPlayersIn(roomName.toUpperCase(), function(err,result){
+	socket.emit('updatecurrentroom',result.players,result.leader,result.dealer,result.scores);
+      });
+    }
   });
 
   // data is requested room name
