@@ -27,6 +27,7 @@ socket.on('pausegame', function(){
   $('#VotingBooth').addClass('hidden');
   $('#RoomSetup').removeClass('hidden');
   $('#pauseDiv').removeClass('hidden');
+  $('.button-holder').removeClass('hidden');
 });
 
 //received after creating or joining a room
