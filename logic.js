@@ -14,7 +14,7 @@ var rooms = {}, decks = {}, deckData = {};
 var client = null;
 var gamesCreated = 0;
 
-var ROUND_LIMIT = 2;
+var ROUND_LIMIT = 5;
 
 var MIN_PLAYERS = 3;
 var MAX_PLAYERS = 8;
