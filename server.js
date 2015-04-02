@@ -103,6 +103,9 @@ function leaveOrDisconnect(result){
 io.on('connection', function (socket){
   //data is the requested room name
   socket.on('createroom', function(playerName){
+    if(socket.username != undefined){
+      return false;
+    }
     logic.createRoom(playerName, socket.id,function(err,result){
       if(!err){
 	//join the socket.io room
