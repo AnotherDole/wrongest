@@ -32,9 +32,9 @@ $('#createUsernameInput').keyup(function(e) {
   }
 });
 
-$('#joinUsernameInput').keyup(function(e) {
+$('#joinUsernameInputAlt').keyup(function(e) {
   if(e.keyCode == 13){
-    $("#JoinRoomButton").click();
+    $("#JoinRoomButtonWithCode").click();
   }
 });
 

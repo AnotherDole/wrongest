@@ -1,4 +1,8 @@
-button { cursor: pointer; background-color:$blue; border:none; outline: none;
+.button-holder { text-align: center;
+  button, .button { padding: 0.25em 0.75em; font-size: 2em; }
+}
+
+button, .button { cursor: pointer; background-color:$blue; border:none; outline: none;
   color:$white; text-shadow: 0.03em 0.03em 0.06em $black;
   &:not(:disabled) { @include transition(all, 0.1s);
     &:hover { background-color:saturate($blue,20%); }

@@ -20,16 +20,12 @@
 .starting-screen {
   .game-explanation { text-align: center; padding-top: 1em; padding-bottom: 1em;}
   input { padding: 0.4em; /* display: block; */ width: 100%; font-size: 2em; border:2px solid $grey; border-bottom:none }
-  button { font-size:7vw; display: block; width: 100%; padding:0.4em; border:2px solid $grey; border-top:1px solid $grey; }
+  button { display: block; width: 100%; padding:0.4em; border:2px solid $grey; border-top:1px solid $grey; }
 }
 
 .create-screen { margin-top: 10vh; }
 .inputs { width: 100%;
   input:not(.hidden) { width: 100%; font-size:2em; margin-bottom: 1em; padding: 0.25em 0.5em; }
-}
-
-.button-holder { text-align: center;
-  button { padding: 0.25em 0.75em; font-size: 2em; }
 }
 
 .room-details, .pause-screen { margin-top: 5vh;
