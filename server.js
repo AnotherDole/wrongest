@@ -3,6 +3,10 @@ var app = express();
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);
 
+if(process.env.OPENSHIFT_NODEJS_PORT){
+  io.origins('http://www.wrongest.net:*');
+}
+
 var redis = require('redis');
 
 var redisHost = process.env.REDIS_HOST || '127.0.0.1';
