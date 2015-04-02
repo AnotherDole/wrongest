@@ -61,11 +61,15 @@ $('#StartGameButton').click(function(){
   );
 });
 
-$('#PlayAgain').click(function(){
-  $('#GameOverScreen').addClass('hidden');
-  $('#RoomSetup').removeClass('hidden');
-  $('#roomDiv').removeClass('hidden');
-});
+if(location.pathname.length > 1){
+  var theCode = location.pathname.substr(1);
+  $('#JoinWithCodeRow').addClass('chosen');
+  $('#JoinWithCodeRow').siblings('.row').addClass('hidden');
+  $('.create-or-join .row.chosen input').fadeIn(300);
+  $('#joinUsernameInputAlt').focus();
+  $('#joinRoomCode').val(theCode);
+}
+
 
 /////////////////////////////////////////////////
 // GAMEPLAY ACTIONS
@@ -145,11 +149,8 @@ $('a.social').click(function() {
   ga('send', 'event', { eventCategory: 'social share', eventAction: n, eventLabel: h });
 });
 
-if(location.pathname.length > 1){
-  var theCode = location.pathname.substr(1);
-  $('#JoinWithCodeRow').addClass('chosen');
-  $('#JoinWithCodeRow').siblings('.row').addClass('hidden');
-  $('.create-or-join .row.chosen input').fadeIn(300);
-  $('.create-or-join .row.chosen input:first-child').focus();
-  $('#joinRoomCode').val(theCode);
-}
+$('#PlayAgain').click(function(){
+  $('#GameOverScreen').addClass('hidden');
+  $('#RoomSetup').removeClass('hidden');
+  $('#roomDiv').removeClass('hidden');
+});
