@@ -90,7 +90,7 @@ for i, name in pairs(waitingList) do
   local playerDataString = ('player:data:' .. ARGV[4] .. ':' .. name)
   local playerData = redis.call('hget',playerDataString,'score')
   table.insert(resultNewScores,playerData)
-  redis.call('rpush',KEYS[2],name)
+  redis.call('linsert',KEYS[2],'AFTER',playerList[1],name)
 end
 
 redis.call('del',KEYS[6])

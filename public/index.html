@@ -146,7 +146,7 @@
                 <label for="timeLimit">Time Limit:</label>
                 <div class="select-holder">
                   <select id="timeLimit">
-                    <option value="30">30 seconds</option>
+                    <option selected value="30">30 seconds</option>
                     <option value="60">60 seconds</option>
                     <option value="90">90 seconds</option>
                   </select>
@@ -156,7 +156,7 @@
                 <label for="allowRedraw">Redraw same card?</label>
                 <div class="select-holder">
                   <select id="allowRedraw">
-                    <option value="no">No</option>
+                    <option selected value="no">No</option>
                     <option value="yes">Yes</option>
                   </select>
                 </div>
@@ -165,8 +165,8 @@
                 <label for="dealerSelect">Dealer defends...</label>
                 <div class="select-holder">
                   <select id="dealerSelect">
+                    <option selected value="first">First</option>
                     <option value="last">Last</option>
-                    <option value="first">First</option>
                   </select>
                 </div>
               </li>
@@ -242,7 +242,7 @@
               <div class="inner">
                 <img src="svg/hard.svg" id="HardCardSticker" class="this-is-hard">
                 <blockquote id="statementDiv"></blockquote>
-                <div class="button-holder">
+                <div class="button-holder" id="EarlyButtonHolder">
                   <button id="DoneEarlyButton">I'm done early.</button>
                 </div>
               </div>

@@ -199,6 +199,7 @@ socket.on('timetodefend',function(player,time){
     meDefending = true;
     $('#defendDiv').removeClass('hidden');
     $('#orderDiv').addClass('hidden');
+    $('#EarlyButtonHolder').removeClass('hidden');
     var myStatement = currentStatements[username].quote.replace('{','<span class="revealed">').replace('}','</span>');
     $('#statementDiv').empty().append(myStatement);
     if(currentStatements[username].score < -1){
