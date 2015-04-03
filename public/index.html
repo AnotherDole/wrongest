@@ -39,6 +39,7 @@
     <meta name="twitter:description" content="A game where you and your friends must struggle to defend some very stupid ideas." />
     <meta name="twitter:image" content="/img/twitter-card.png" />
     <meta name="twitter:url" content="http://www.wrongest.net" />
+    
     <!-- Facebook -->
     <meta property="og:title" content="The Wrongest Words">
     <meta property="og:type" content="game">
@@ -50,7 +51,7 @@
   <body>
 
     <!-- PREGAME screen (mostly lobby setup) -->
-    <section id="RoomSetup" class="setup screen">
+    <section id="RoomSetup" data-contains="setup" class="setup screen">
 
       <img src="svg/logo2.svg" class="game-logo" />
       
@@ -180,7 +181,7 @@
     </section>
 
     <!-- GAMEPLAY screen (includes order and playing card -->
-    <section id="GameView" class="order screen hidden">
+    <section id="GameView" data-contains="gameplay" class="order screen hidden">
       <!-- Stopclock -->
       <div class="knob-holder hidden" id="GameClockHolder">
         <input class="knob knobtext" data-height="120" data-width="120" type="text" id="GameClock" />
@@ -258,7 +259,7 @@
     </section>
 
     <!-- VOTING BOOTH screen (includes the ability to vote, as well as post-vote results) -->
-    <section id="VotingBooth" class="vote screen hidden">
+    <section id="VotingBooth" data-contains="voting" class="vote screen hidden">
       <div class="statement-holder">
         <table>
           <thead class="my-statement">
@@ -462,7 +463,7 @@
     </section>
 
     <!-- GAME OVER screen -->
-    <section id="GameOverScreen" class="game-over screen hidden">
+    <section id="GameOverScreen" data-contains="game-over" class="game-over screen hidden">
       <figure class="wrongest-reveal">
         <figcaption>The (actual) Wrongest Words</figcaption>
         <div class="quote-holder">

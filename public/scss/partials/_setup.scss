@@ -64,7 +64,7 @@
   }
 }
 
-dl.admin-options { position: absolute; right:0; bottom:0; left: 0; z-index: $z-admin-options;
+dl.admin-options { position:absolute; right:0; bottom:0; left: 0; z-index: $z-admin-options;
   dd { background-color:$white; padding: 20px; display: none;
     ul { }
     li { @extend %clearfix; }
@@ -91,4 +91,10 @@ dl.admin-options { position: absolute; right:0; bottom:0; left: 0; z-index: $z-a
 @keyframes rotate {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+@media (max-width: $mobile-max) {
+  dl.admin-options { position:fixed;
+    dt { padding-right:10px; }
+  }
 }
