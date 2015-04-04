@@ -1,5 +1,6 @@
 var express = require('express');
 var app = express();
+app.set('trust proxy', true);
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);
 
@@ -47,7 +48,6 @@ server.listen(port,server_ip_address, function(){
 
 var morgan = require('morgan');
 
-app.use(morgan('combined'));
 
 //credit: http://stackoverflow.com/a/15773824 
 app.use(function(req, res, next) {
@@ -60,6 +60,7 @@ app.use(function(req, res, next) {
 });
 
 app.use(express.static(__dirname + '/public'));
+app.use(morgan('combined'));
 app.get('/:id',function(req,res){
   res.sendFile(__dirname + '/public/index.html');
 });
