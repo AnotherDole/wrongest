@@ -40,10 +40,56 @@ server.listen(port,server_ip_address, function(){
   console.log('Server listening on ' + server_ip_address + ' on port ' + port);
 });
 
+//credit: http://stackoverflow.com/a/15773824 
+app.use(function(req, res, next) {
+    if (req.path.substr(-1) == '/' && req.path.length > 1) {
+        var query = req.url.slice(req.path.length);
+        res.redirect(301, req.path.slice(0, -1) + query);
+    } else {
+        next();
+    }
+});
+
 app.use(express.static(__dirname + '/public'));
 app.get('/:id',function(req,res){
   res.sendFile(__dirname + '/public/index.html');
 });
+app.get('/scores/:deckname/lifetime',function(req,res){
+  var deckName = req.params.deckname;
+  res.set('Access-Control-Allow-Origin','*');
+  client.hgetall('lifetimeScores:' + deckName,function(err,result){
+    if (result == null){
+      res.json({});
+    }
+    else{
+      for(var quote in result){
+	result[quote] = parseInt(result[quote]);
+      }
+      res.json(result);
+    }
+  })
+})
+app.get('/scores/:deckname/:start/:end',function(req,res){
+  var deckName = req.params.deckname;
+  var start = req.params.start;
+  var end = req.params.end;
+  res.set('Access-Control-Allow-Origin','*');
+  if(start.length != 6 || end.length != 6){
+    res.json({});
+    return;
+  }
+  client.hgetall('weekScores:' + deckName + ':' + start + ':' + end,function(err,result){
+    if (result == null){
+      res.json({});
+    }
+    else{
+      for(var quote in result){
+	result[quote] = parseInt(result[quote]);
+      }
+      res.json(result);
+    }
+  })
+})
 
 //call logic to assign statements to everyone
 //receive a summary to send to everyone in room
