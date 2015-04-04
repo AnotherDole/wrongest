@@ -7,6 +7,11 @@ if(process.env.OPENSHIFT_NODEJS_PORT){
   io.origins('http://www.wrongest.net:*');
 }
 
+io.use(function(socket,next){
+  console.log(new Date(),socket.handshake);
+  next();
+})
+
 var redis = require('redis');
 
 var redisHost = process.env.REDIS_HOST || '127.0.0.1';
@@ -39,6 +44,10 @@ if(process.argv[2] == 'test'){
 server.listen(port,server_ip_address, function(){
   console.log('Server listening on ' + server_ip_address + ' on port ' + port);
 });
+
+var morgan = require('morgan');
+
+app.use(morgan('combined'));
 
 //credit: http://stackoverflow.com/a/15773824 
 app.use(function(req, res, next) {
