@@ -346,3 +346,18 @@ io.on('connection', function (socket){
   }
   /***************** End code for testing ***************/
 });
+
+process.on('SIGTERM',function(){
+  console.log('Disonnecting remaining sockets...');
+  for(var socket in io.sockets.connected){
+    io.sockets.connected[socket].disconnect();
+  }
+  process.exit();
+})
+process.on('SIGINT',function(){
+  console.log('Disonnecting remaining sockets...');
+  for(var socket in io.sockets.connected){
+    io.sockets.connected[socket].disconnect();
+  }
+  process.exit();
+})

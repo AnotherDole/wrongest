@@ -36,6 +36,8 @@ if numPlayers == 0 then
       redis.call('del', 'card:' .. ARGV[2] .. ':' .. i)
     end
   end
+  --delete this line when the real bug is fixed
+  redis.call('del','card:' .. ARGV[2] .. ':-1')
 
   redis.call('del',KEYS[4])
   local allPlayers = redis.call('smembers',KEYS[5])
