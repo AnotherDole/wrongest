@@ -43,7 +43,6 @@ socket.on('deckdata',function(data){
 //received after emitting createroom
 socket.on('createresult',function(data){
   if(data.success){
-    $('#roomresult').text('Room created!');
     username = data.playerName;
     $('input[data-holds="roomCode"]').val(data.roomName);
     $('input[data-holds="roomURL"]').val(data.link);
