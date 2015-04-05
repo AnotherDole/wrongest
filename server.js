@@ -311,6 +311,9 @@ io.on('connection', function (socket){
   });
 
   socket.on('disconnect', function(data){
+    if(socket.username === undefined){
+      return;
+    }
     logic.leaveRequest(socket.roomName,socket.username,function(err,result){
       if(result && !result.roomDeleted){
 	leaveOrDisconnect(result);
