@@ -50,6 +50,8 @@ socket.on('createresult',function(data){
     $('#createDiv').addClass('hidden');
     $('#roomDiv').removeClass('hidden');
     $('#startDiv').addClass('hidden');
+    history.pushState({}, 'room '+data.roomName, '/'+data.roomName);
+    ga('send', 'pageview', '/'+data.roomName);
   }
   else{
     makeToast('setup', 'alert', data.message);
@@ -64,6 +66,8 @@ socket.on('joinresult',function(data){
     $('#startDiv').addClass('hidden');
     $('input[data-holds="roomCode"]').val(data.roomName);
     $('input[data-holds="roomURL"]').val(data.link);
+    history.pushState({}, 'room '+data.roomName, '/'+data.roomName);
+    ga('send', 'pageview', '/'+data.roomName);
     username = data.playerName;
     if(data.waiting){
       meWaiting = true;
@@ -96,7 +100,7 @@ socket.on('updatecurrentroom', function(players, leader, dealer, scores){
   var $theDiv;
   $toChange.empty();
 
-  if(scores == null){
+  if(scores === null){
     $('.has-score').removeClass('has-score');
     for(var i = 1; i <= 8; i++){
       $('#playerScore' + i).empty();
@@ -118,7 +122,7 @@ socket.on('updatecurrentroom', function(players, leader, dealer, scores){
       $theDiv.removeClass('dealer');
     }
     $('#playerName' + (i+1)).empty().append(players[i]);
-    if (scores != null){
+    if (scores !== null){
       $theDiv.addClass('has-score');
       $('#playerScore' + (i+1)).empty().append(scores[i]);
     }
@@ -158,7 +162,7 @@ socket.on('updatecurrentroom', function(players, leader, dealer, scores){
   }	
   $('.on-deck').removeClass('on-deck');
   $('.player-tease').empty();
-  if(playerList[0] == username && !$('#player1').hasClass('completed') && currentStatements != null){
+  if(playerList[0] == username && !$('#player1').hasClass('completed') && currentStatements !== null){
     var myStatement = currentStatements[username].quote;
     $('#player1').addClass('on-deck');
     $('#playerTease1').text(makeStatementTeaser(myStatement));
@@ -194,7 +198,7 @@ socket.on('getstatements', function(data){
 });
 
 socket.on('timetodefend',function(player,time){
-  if(meWaiting) { return };
+  if(meWaiting) { return; }
   if(player == username){
     meDefending = true;
     $('#defendDiv').removeClass('hidden');
@@ -274,8 +278,8 @@ socket.on('newdefendcount',function(newCount,stopClock){
     $('.button-holder').addClass('hidden');
     $('.most-wrong').removeClass('most-wrong');
     $('.least-wrong').removeClass('least-wrong');
-    $('input[Value="MostWrong"]').prop('checked',false)
-    $('input[Value="LeastWrong"]').prop('checked',false)
+    $('input[Value="MostWrong"]').prop('checked',false);
+    $('input[Value="LeastWrong"]').prop('checked',false);
     updateVoteSelectors();
   }
   $('.active').removeClass('active');
