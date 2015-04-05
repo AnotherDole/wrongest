@@ -132,8 +132,8 @@ function roomWaitingKey(roomName){
   return 'room:waiting:'+roomName;
 }
 
-function roomLeaversKey(roomName,userName){
-  return 'room:leaveScore:'+roomName+':'+userName;
+function roomLeaversKey(roomName){
+  return 'room:leaveScore:'+roomName;
 }
 
 function roomAllKey(roomName){
@@ -249,7 +249,7 @@ exports.joinRequest = function(roomName,playerName,UID,callback){
       .lrange(roomPlayersKey(roomName),0,-1)
       .lrange(roomWaitingKey(roomName),0,-1)
       .hget(roomDataKey(roomName),'gameState')
-      .get(roomLeaversKey(roomName,trimPlayer))
+      .hget(roomLeaversKey(roomName),trimPlayer)
       .exec(function(err, data){
 	var currentPlayers = data[0];
 	var waitingPlayers = data[1];

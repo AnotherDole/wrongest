@@ -43,9 +43,10 @@ if numPlayers == 0 then
   local allPlayers = redis.call('smembers',KEYS[5])
   for i = 1, table.getn(allPlayers), 1 do
     redis.call('del','player:previous:' .. ARGV[2] .. ':' .. allPlayers[i])
-    redis.call('del','room:leaveScore:' .. ARGV[2] .. ':' .. allPlayers[i])
     redis.call('del','player:data:' .. ARGV[2] .. ':' .. allPlayers[i])
   end
+  redis.call('del','room:leaveScore:' .. ARGV[2])
+
   redis.call('del',KEYS[5])
   toReturn[2] = true
   toReturn[8] = redis.call('decr','activeRooms')
@@ -116,7 +117,7 @@ end
 
 -- record their score so they get it back if they return
 local theirScore = redis.call('hget',KEYS[3],'score')
-redis.call('set','room:leaveScore:' .. ARGV[2] .. ':' .. ARGV[1],theirScore)
+redis.call('hset','room:leaveScore:' .. ARGV[2], ARGV[1],theirScore)
 
 -- if there are only 2 active players, pause the game
 -- -1 = game paused
