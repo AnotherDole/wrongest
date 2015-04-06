@@ -49,7 +49,7 @@ if numPlayers == 0 then
 
   redis.call('del',KEYS[5])
   toReturn[2] = true
-  toReturn[8] = redis.call('decr','activeRooms')
+  redis.call('srem','activeRooms',ARGV[2])
   return toReturn
 end
 
