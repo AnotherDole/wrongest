@@ -76,7 +76,7 @@ section.vote { background-color: #fff;
       td { background-color: transparent; color:$red; }
     }
     .votebutton {
-      label { opacity: 0; }
+      label { opacity: 0; cursor: default; }
     }
   }
   

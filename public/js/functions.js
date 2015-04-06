@@ -165,8 +165,7 @@ function startTimer(time) {
     'fgColor': '#7a6969',
     'bgColor': '#eae6e6',
     'dynamicDraw': true,
-    'thickness': 0.5,
-    
+    'thickness': 0.5
   });
   $('.knob').val(timer.total).trigger('change');
   $('.knob').trigger('configure', {
