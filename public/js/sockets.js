@@ -47,6 +47,8 @@ socket.on('createresult',function(data){
     $('input[data-holds="roomCode"]').val(data.roomName);
     $('input[data-holds="roomURL"]').val(data.link);
     $('#createDiv').addClass('hidden');
+    $('.create-or-join').addClass('hidden');
+    $('.create-screen').removeClass('hidden');
     $('#roomDiv').removeClass('hidden');
     $('#startDiv').addClass('hidden');
     history.pushState({}, 'room '+data.roomName, '/'+data.roomName);

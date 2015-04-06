@@ -15,8 +15,7 @@ $('#JoinRoomButtonWithCode').click(function() {
 });
 
 $('#CreateRoomButton').click(function() {
-  $('.create-or-join').addClass('hidden');
-  $('.create-screen').removeClass('hidden');
+  socket.emit('createroom',$('#createUsernameInput').val());
 });
 
 $('#JoinRoomButton').click(function() {

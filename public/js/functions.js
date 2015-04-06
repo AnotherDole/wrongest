@@ -57,11 +57,6 @@ function updateDeckDescription(){
 }
 
 //send username, room name, password 
-function createroom(){
-  socket.emit('createroom',$('#createUsernameInput').val());
-}
-
-//send username, room name, password 
 function joinroom(){
   socket.emit('requestjoin',
     $('#joinUsernameInput').val(),
