@@ -488,3 +488,9 @@ exports.processVote = function(roomName,playerName,mostWrong,leastWrong,callback
     callback(null,toReturn);
   })
 }
+
+exports.purge = function(callback){
+  scriptManager.run('purge',[],[],function(err,result){
+    callback();
+  })
+}

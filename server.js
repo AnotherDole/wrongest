@@ -352,15 +352,13 @@ io.on('connection', function (socket){
 
 process.on('SIGTERM',function(){
   console.log('Disonnecting remaining sockets...');
-  for(var socket in io.sockets.connected){
-    io.sockets.connected[socket].disconnect();
-  }
-  process.exit();
+  logic.purge(function(){
+    process.exit();
+  })
 })
 process.on('SIGINT',function(){
   console.log('Disonnecting remaining sockets...');
-  for(var socket in io.sockets.connected){
-    io.sockets.connected[socket].disconnect();
-  }
-  process.exit();
+  logic.purge(function(){
+    process.exit();
+  })
 })
