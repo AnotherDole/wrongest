@@ -380,8 +380,8 @@ socket.on('gameover', function(card,cardScore,players,finalPlayerList,finalScore
   if(meDealer){
     var topPlayerScore = parseInt($('#scorePlace1').text());
     ga('send', 'event', { eventCategory: 'Wrongest Words of the Game', eventAction: wrongestwordsofthegame, eventLabel: cardScore });
-    ga('send', 'event', { eventCategory: 'Players @ Game End', eventAction: finalPlayerList.length });
-    ga('send', 'event', { eventCategory: 'Top Score', eventAction: topPlayerScore });
+    ga('send', 'event', { eventCategory: 'end game', eventAction: 'players', eventLabel: finalPlayerList.length });
+    ga('send', 'event', { eventCategory: 'Top Score', eventAction: 'top score', eventLabel: topPlayerScore });
   }
   
 });
