@@ -51,7 +51,6 @@ $('.settings-toggle').click(function() {
 
 $('#StartGameButton').click(function(){
   var v = playerList.length;
-  console.log(v);
   ga('send', 'event', { eventCategory: 'start game', eventAction: 'players', eventLabel: v });
   socket.emit('requeststart',
     $('#deck').val(),
@@ -77,7 +76,6 @@ if(location.pathname.length > 1){
 
 $('#DoneEarlyButton').click(function() {
   window.clearInterval(clockTick);
-  console.log('done early: '+timer.total);
   ga('send', 'event', { eventCategory: 'defended', eventAction: 'done early', eventLabel: timer.total });
   donedefend();
 });

@@ -359,7 +359,8 @@ socket.on('gameover', function(card,cardScore,players,finalPlayerList,finalScore
   for(i++; i <=8; i++){
     $('#place' + i).addClass('hidden');
   }
-  $('#WrongestQuote').text(card.replace('{','').replace('}',''));
+  var wrongestwordsofthegame = card.replace('{','').replace('}','');
+  $('#WrongestQuote').text(wrongestwordsofthegame);
   $('#WrongestScore').text(cardScore);
   var playerString = '';
   if(players.length == 1){
@@ -375,4 +376,12 @@ socket.on('gameover', function(card,cardScore,players,finalPlayerList,finalScore
     playerString = playerString + 'and ' + players[i];
   }
   $('#WrongestCite').text(playerString);
+  
+  if(meDealer){
+    var topPlayerScore = parseInt($('#scorePlace1').text());
+    ga('send', 'event', { eventCategory: 'Wrongest Words of the Game', eventAction: wrongestwordsofthegame, eventLabel: cardScore });
+    ga('send', 'event', { eventCategory: 'Players @ Game End', eventAction: finalPlayerList.length });
+    ga('send', 'event', { eventCategory: 'Top Score', eventAction: topPlayerScore });
+  }
+  
 });
