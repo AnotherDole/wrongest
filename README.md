@@ -13,12 +13,12 @@ Project uses:
 * [jQuery Knob](http://anthonyterrien.com/knob/)
 * [OpenShift](https://www.openshift.com/)
 
-## Changelog
-* `v0.1.2`
+## Changelog <a id="changelog"></a>
+* `v0.1.2` <a id="v012"></a>
   * Game over screen matches colors with ties.
   * Some new cards from [@Goons_TXT](https://twitter.com/goons_txt)
-* `v0.1.1`
+* `v0.1.1` <a id="v011"></a>
   * "All The Cards" deck added.
   * F Plus decks merged together
-* `v0.1.0`
+* `v0.1.0` <a id="v010"></a>
   * Initial release
