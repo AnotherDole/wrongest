@@ -34,22 +34,22 @@
     .player-name { max-width: 12.5em; display: block; @extend %truncate; }
     span.player-score {position: absolute; top: 0.2em; right: 0; z-index: 3; font-size: 0.65em; width: 1.6em; text-align: center; color: $white; }
     
-    &:nth-child(1) { border-color: $green;
+    &.first-place { border-color: $green;
       &:before { border-color: $green; }
       &:after { background-color:$green; }
       span.player-score { color:$black; }
     }
-    &:nth-child(2) { border-color: $blue; 
+    &.second-place { border-color: $blue; 
       &:before { border-color: $blue; }
       &:after { background-color:$blue; }
       span.player-score { color:$black; }
     }
-    &:nth-child(3) { border-color: $yellow;
+    &.third-place { border-color: $yellow;
       &:before { border-color: $yellow; }
       &:after { background-color:$yellow; }
       span.player-score { color:$black; }
     }
-    &:nth-child(4) { border-color: $pink;
+    &.fourth-place { border-color: $pink;
       &:before { border-color: $pink; }
       &:after { background-color:$pink; }
       span.player-score { color:$black; }
