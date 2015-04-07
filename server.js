@@ -64,38 +64,58 @@ app.use(morgan('combined'));
 app.get('/:id',function(req,res){
   res.sendFile(__dirname + '/public/index.html');
 });
-app.get('/scores/:deckname/lifetime',function(req,res){
-  var deckName = req.params.deckname;
+app.get('/top10/lifetime',function(req,res){
   res.set('Access-Control-Allow-Origin','*');
-  client.hgetall('lifetimeScores:' + deckName,function(err,result){
+  client.zrange('lifetimeScores',-10,-1,'WITHSCORES',function(err,result){
     if (result == null){
       res.json({});
     }
     else{
-      for(var quote in result){
-	result[quote] = parseInt(result[quote]);
-      }
       res.json(result);
     }
   })
 })
-app.get('/scores/:deckname/:start/:end',function(req,res){
-  var deckName = req.params.deckname;
-  var start = req.params.start;
-  var end = req.params.end;
+app.get('/bottom10/lifetime',function(req,res){
   res.set('Access-Control-Allow-Origin','*');
-  if(start.length != 6 || end.length != 6){
-    res.json({});
-    return;
-  }
-  client.hgetall('weekScores:' + deckName + ':' + start + ':' + end,function(err,result){
+  client.zrange('lifetimeScores',0,9,'WITHSCORES',function(err,result){
     if (result == null){
       res.json({});
     }
     else{
-      for(var quote in result){
-	result[quote] = parseInt(result[quote]);
-      }
+      res.json(result);
+    }
+  })
+})
+app.get('/top10/:start/:end',function(req,res){
+  res.set('Access-Control-Allow-Origin','*');
+  var start = req.params.start;
+  var end = req.params.end;
+  if(start.length != 6 || end.length != 6){
+    res.json({});
+    return;
+  }
+  client.zrange('weekScores:'+start+':'+end,-10,-1,'WITHSCORES',function(err,result){
+    if (result == null){
+      res.json({});
+    }
+    else{
+      res.json(result);
+    }
+  })
+})
+app.get('/bottom10/:start/:end',function(req,res){
+  res.set('Access-Control-Allow-Origin','*');
+  var start = req.params.start;
+  var end = req.params.end;
+  if(start.length != 6 || end.length != 6){
+    res.json({});
+    return;
+  }
+  client.zrange('weekScores:'+start+':'+end,0,9,'WITHSCORES',function(err,result){
+    if (result == null){
+      res.json({});
+    }
+    else{
       res.json(result);
     }
   })

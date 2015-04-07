@@ -14,7 +14,7 @@ var rooms = {}, decks = {}, deckData = {};
 var client = null;
 var gamesCreated = 0;
 
-var ROUND_LIMIT = 5;
+var ROUND_LIMIT = 1;
 
 var MIN_PLAYERS = 3;
 var MAX_PLAYERS = 8;
@@ -429,8 +429,8 @@ exports.getWinner = function(roomName,callback){
     var theMulti = client.multi();
     var weekString = makeWeekString();
     for(var i = 0; i < data[6].length; i++){
-      theMulti.hincrby('weekScores:' + data[2] + ':' + weekString, theDeck.cards[i],parseInt(data[6][i]));
-      theMulti.hincrby('lifetimeScores:' + data[2], theDeck.cards[i], parseInt(data[6][i]));
+      theMulti.zincrby('weekScores:' + weekString, parseInt(data[6][i]),theDeck.cards[i]);
+      theMulti.zincrby('lifetimeScores', parseInt(data[6][i]),theDeck.cards[i]);
     }
     theMulti.exec(function(err,blar){
       return callback(null,toReturn);
