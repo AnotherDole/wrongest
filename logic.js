@@ -14,7 +14,10 @@ var rooms = {}, decks = {}, deckData = {};
 var client = null;
 var gamesCreated = 0;
 
-var ROUND_LIMIT = 1;
+var ROUND_LIMIT = 5;
+if(process.env.ROUND_LIMIT){
+  ROUND_LIMIT = parseInt(process.env.ROUND_LIMIT);
+}
 
 var MIN_PLAYERS = 3;
 var MAX_PLAYERS = 8;
