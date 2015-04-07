@@ -353,10 +353,18 @@ socket.on('gameover', function(card,cardScore,players,finalPlayerList,finalScore
   scoresArray.sort( function (a,b){
     return b.score - a.score;
   });
+  placeClasses=["first-place","second-place","third-place","fourth-place","fifth-place","sixth-place","seventh-place","eighth-place"];
+  var p=0;
   for(i = 0; i < finalPlayerList.length; i++){
     $('#place' + (i+1)).removeClass('hidden');
     $('#namePlace' + (i+1)).text(scoresArray[i].name);
     $('#scorePlace' + (i+1)).text(scoresArray[i].score);
+    if (i < 1) {
+      // first-place
+    } else if (scoresArray[i].score !== scoresArray[i-1].score) {
+      p++;
+    }
+    $('#place' + (i+1)).addClass(placeClasses[p]);
   }
   for(i++; i <=8; i++){
     $('#place' + i).addClass('hidden');

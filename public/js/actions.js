@@ -11,10 +11,12 @@ $('.room-pick').click(function() {
 });
 
 $('#JoinRoomButtonWithCode').click(function() {
+  $('#joinUsernameInputAlt').blur();
   socket.emit('requestjoin',$('#joinUsernameInputAlt').val(),$('#joinRoomCode').val());
 });
 
 $('#CreateRoomButton').click(function() {
+  $('#createUsernameInput').blur();
   socket.emit('createroom',$('#createUsernameInput').val());
 });
 
