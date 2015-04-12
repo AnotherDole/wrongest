@@ -181,7 +181,6 @@ function leaveOrDisconnect(result){
 
 
 io.on('connection', function (socket){
-  //data is the requested room name
   socket.on('createroom', function(playerName){
     if(socket.username != undefined){
       return false;
@@ -210,7 +209,6 @@ io.on('connection', function (socket){
     }
   });
 
-  // data is requested room name
   socket.on('requestjoin', function(playerName,anyRoomName){
     var roomName = anyRoomName.toUpperCase();
     logic.joinRequest(roomName,playerName, socket.id,function(err,result){
@@ -243,8 +241,7 @@ io.on('connection', function (socket){
     });
   })
 
-  //data isn't necessary 
-  socket.on('requestleave', function(data){
+  socket.on('requestleave', function(){
     logic.leaveRequest(socket.roomName,socket.username,function(err,result){
       if (result){
 	socket.leave(socket.roomName);
@@ -280,7 +277,7 @@ io.on('connection', function (socket){
     })
   });
 
-  socket.on('donedefending', function(data){
+  socket.on('donedefending', function(){
     logic.doneDefending(socket.roomName, socket.username,function(err,result){
       if(result.success){
 	//tell everyone in room new votesNeeded
@@ -316,7 +313,7 @@ io.on('connection', function (socket){
     })
   });
 
-  socket.on('restartgame', function(data){
+  socket.on('restartgame', function(){
     logic.tryRestartGame(socket.roomName,socket.username,function(err,result){
       if(result){
 	getAndSendStatements(socket.roomName,function(uh){
@@ -330,7 +327,7 @@ io.on('connection', function (socket){
     });
   });
 
-  socket.on('disconnect', function(data){
+  socket.on('disconnect', function(){
     if(socket.username === undefined){
       return;
     }
