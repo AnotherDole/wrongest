@@ -8,10 +8,12 @@ if(process.env.OPENSHIFT_NODEJS_PORT){
   io.origins('http://www.wrongest.net:*');
 }
 
+/*
 io.use(function(socket,next){
   console.log(new Date(),socket.handshake);
   next();
 })
+*/
 
 var redis = require('redis');
 
@@ -181,6 +183,8 @@ function leaveOrDisconnect(result){
 
 
 io.on('connection', function (socket){
+  console.log(socket);
+
   socket.on('createroom', function(playerName){
     if(socket.username != undefined){
       return false;
