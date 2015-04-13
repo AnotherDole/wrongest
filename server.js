@@ -8,10 +8,12 @@ if(process.env.OPENSHIFT_NODEJS_PORT){
   io.origins('http://www.wrongest.net:*');
 }
 
+/*
 io.use(function(socket,next){
   console.log(new Date(),socket.handshake);
   next();
 })
+*/
 
 var redis = require('redis');
 
@@ -60,7 +62,7 @@ app.use(function(req, res, next) {
 });
 
 app.use(express.static(__dirname + '/public'));
-app.use(morgan('combined'));
+//app.use(morgan('combined'));
 app.get('/:id',function(req,res){
   res.sendFile(__dirname + '/public/index.html');
 });
@@ -181,6 +183,7 @@ function leaveOrDisconnect(result){
 
 
 io.on('connection', function (socket){
+  console.log(socket.id + ' connected');
   socket.on('createroom', function(playerName){
     if(socket.username != undefined){
       return false;
@@ -188,6 +191,7 @@ io.on('connection', function (socket){
     logic.createRoom(playerName, socket.id,function(err,result){
       if(!err){
 	//join the socket.io room
+	console.log(socket.id + ' name: ' + result.playerName + ' room: ' + result.roomName);
 	socket.username = result.playerName;
 	socket.roomName = result.roomName;
 	socket.join(result.roomName);
@@ -213,9 +217,10 @@ io.on('connection', function (socket){
     var roomName = anyRoomName.toUpperCase();
     logic.joinRequest(roomName,playerName, socket.id,function(err,result){
       if (result.success){
+	console.log(socket.id + ' name: ' + result.playerName + ' room: ' + result.roomName);
 	socket.emit('deckdata',logic.getDeckData());
 	result.link = 'http://' + server_address + '/' + result.roomName;
-	socket.join(roomName);
+	socket.join(result.roomName);
 	if(!result.waiting){
 	  //tell everyone in same room to update display
 	  socket.emit('joinresult',result);
@@ -232,8 +237,8 @@ io.on('connection', function (socket){
 	    socket.emit('updatecurrentroom',blar.players,blar.leader,blar.dealer,blar.scores);
 	  })
 	}
-	socket.username = playerName;
-	socket.roomName = roomName;
+	socket.username = result.playerName;
+	socket.roomName = result.roomName;
       }
       else{
 	socket.emit('joinresult',result);
@@ -328,6 +333,7 @@ io.on('connection', function (socket){
   });
 
   socket.on('disconnect', function(){
+    console.log(socket.id + ' disconnects. name: ' + socket.username + ' room: ' + socket.roomName);
     if(socket.username === undefined){
       return;
     }
