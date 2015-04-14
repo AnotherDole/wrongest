@@ -159,7 +159,6 @@
                     <option value="3">3 rounds</option>
                     <option selected value="5">5 rounds</option>
                     <option value="7">7 rounds</option>
-                    <option value="0">NEVER</option>
                   </select>
                 </div>
               </li>
@@ -193,6 +192,17 @@
 
     <!-- GAMEPLAY screen (includes order and playing card -->
     <section id="GameView" data-contains="gameplay" class="order screen hidden">
+      
+      <!-- What round is this? -->
+      <div class="current-round">
+        <span class="text-holder">
+          <span class="label">round</span>
+          <span class="number current">1</span>
+          <span class="label">of</span>
+          <span class="number total">5</span>
+        </span>
+      </div>
+      
       <!-- Stopclock -->
       <div class="knob-holder hidden" id="GameClockHolder">
         <input class="knob knobtext" data-height="120" data-width="120" type="text" id="GameClock" />
