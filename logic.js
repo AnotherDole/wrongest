@@ -168,7 +168,7 @@ exports.createRoom = function(playerName,UID,callback){
   }
   var trimPlayer = playerName.trim();
   if(!isValidName(trimPlayer)){
-    return callback(null,{success: false, message: "Invalid name."});
+    return callback(null,{success: false, message: "Names can only contain letters, numbers, and spaces."});
   }
   client.incr('roomsCreated', function(err, data) {
     if(err){
@@ -241,7 +241,7 @@ exports.joinRequest = function(roomName,playerName,UID,callback){
   }
   var trimPlayer = playerName.trim();
   if(!isValidName(trimPlayer)){
-    return callback(null,{success:false,message:'Invalid name'});
+    return callback(null,{success:false,message:"Names can only contain letters, numbers, and spaces."});
   }
   client.exists(roomDataKey(roomName),function(err, data){
     if(data == false){

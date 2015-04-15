@@ -237,8 +237,20 @@ io.on('connection', function (socket){
 	    socket.emit('updatecurrentroom',blar.players,blar.leader,blar.dealer,blar.scores);
 	  })
 	}
-	socket.username = result.playerName;
-	socket.roomName = result.roomName;
+	//Why this is happening, I have no idea.
+	if(socket.username){
+	  logic.leaveRequest(socket.roomName,socket.username,function(err,wtf){
+	    socket.username = result.playerName;
+	    socket.roomName = result.roomName;
+	    if(wtf && !wtf.roomDeleted){
+	      leaveOrDisconnect(wtf);
+	    }
+	  })
+	}
+	else{
+	  socket.username = result.playerName;
+	  socket.roomName = result.roomName;
+	}
       }
       else{
 	socket.emit('joinresult',result);
