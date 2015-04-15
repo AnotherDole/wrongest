@@ -179,7 +179,7 @@ exports.createRoom = function(playerName,UID,callback){
       .sadd('activeRooms',roomName)
       .hmset([playerDataKey(roomName,trimPlayer),'uid',UID,'score',0,'card',-1,'voted',0])
       .hmset([roomDataKey(roomName),'dealer',trimPlayer,'gameState',GAME_NOT_STARTED,
-		'votesReceived',0,'masterDeck','','timeLimit',-1,'allowRedraw',-1,'dealerFirst',1,
+		'votesReceived',0,'masterDeck','','timeLimit',-1,'roundLimit',5,'dealerFirst',1,
 		'whosUp',-1,'round',0])
       .rpush([roomPlayersKey(roomName),trimPlayer])
       .sadd(roomAllKey(roomName),trimPlayer)
@@ -334,9 +334,9 @@ exports.startRequest = function(playerName,roomName,options,callback){
      if(isNaN(timeLimit) || timeLimit < 30){
        timeLimit = 60;
      }
-     var allowRedraw = 0;
-     if(options['allowRedraw'] == 'yes'){
-       allowRedraw = 1;
+     var roundLimit = parseInt(options['roundLimit']);
+     if(isNaN(roundLimit) || roundLimit <= 0){
+       roundLimit = ROUND_LIMIT;
      }
      var dealerFirst = 0;
      if(options['dealerFirstOrLast'] == 'first'){
@@ -344,7 +344,7 @@ exports.startRequest = function(playerName,roomName,options,callback){
      }
      client.multi()
        .hmset(roomDataKey(roomName),'masterDeck',options['deckName'],'timeLimit',timeLimit,
-	 'allowRedraw',allowRedraw,'dealerFirst',dealerFirst)
+	 'roundLimit',roundLimit,'dealerFirst',dealerFirst)
        .hincrby('decks:gamesStarted:'+makeWeekString(),options['deckName'],1)
        .hincrby('decks:gamesStartedLifetime',options['deckName'],1)
        .exec(function(err,data){
@@ -371,7 +371,7 @@ exports.getStatements = function(roomName,callback){
   var seed = Math.floor(Math.random() * Math.pow(2,32));
   //run lua script
   //result[0] is array of player names, result[1] is array of selected cards, result[2] is array of scores, result[3] is deck name
-  scriptManager.run('getStatements',[roomDataKey(roomName),roomPlayersKey(roomName)],[ROUND_LIMIT,roomName,seed],function(err,result){
+  scriptManager.run('getStatements',[roomDataKey(roomName),roomPlayersKey(roomName)],[roomName,seed],function(err,result){
     if(err){
       console.log(err);
     }
