@@ -1,7 +1,7 @@
 -- KEYS[1] is room data key, KEYS[2] is player list key, ARGV[1] is room name, ARGV[2] is random seed
 math.randomseed(tonumber(ARGV[2]))
 
-local roomData = redis.call('hmget',KEYS[1],'round','masterDeck','allowRedraw','deckLength','roundLimit');
+local roomData = redis.call('hmget',KEYS[1],'round','masterDeck','allowRedraw','deckLength','roundLimit')
 
 if tonumber(roomData[1]) > tonumber(roomData[5]) then
   return nil
@@ -47,4 +47,6 @@ for key,value in pairs(playerData) do
 end
 
 table.insert(toReturn,roomData[2])
+table.insert(toReturn,roomData[1])
+table.insert(toReturn,roomData[5])
 return toReturn

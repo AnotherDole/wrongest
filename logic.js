@@ -371,6 +371,7 @@ exports.getStatements = function(roomName,callback){
   var seed = Math.floor(Math.random() * Math.pow(2,32));
   //run lua script
   //result[0] is array of player names, result[1] is array of selected cards, result[2] is array of scores, result[3] is deck name
+  //result[4] is current round, result[5] is round limit
   scriptManager.run('getStatements',[roomDataKey(roomName),roomPlayersKey(roomName)],[roomName,seed],function(err,result){
     if(err){
       console.log(err);
@@ -379,10 +380,10 @@ exports.getStatements = function(roomName,callback){
       return callback(null,false);
     }
     var theDeck = decks[result[3]];
-    var toReturn = {};
+    var toReturn = {cardData: {}, round: parseInt(result[4]), roundLimit: parseInt(result[5])};
     for (var i = 0; i < result[0].length; i++){
       var theCard = theDeck.cards[result[1][i] - 1]
-      toReturn[result[0][i]] = {quote: theCard, score: result[2][i]};
+      toReturn.cardData[result[0][i]] = {quote: theCard, score: result[2][i]};
     }
     callback(err,toReturn);
   })
