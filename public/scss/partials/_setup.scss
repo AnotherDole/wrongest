@@ -5,7 +5,7 @@
   .toasts { height: 120px; }
 }
 
-.create-or-join { margin-top: 20vh;
+.create-or-join { margin-top: 15vh;
   input { display:none; }
   .split-row { text-align: center; padding: 1em; }
   .room-action { display: none; }
@@ -60,7 +60,7 @@
     a.icon { display: inline-block; cursor: pointer;
       &.spin { animation: rotate 6s infinite linear; }
     }
-    .icon-gear { width:4em; height:4em; }
+    .icon-gear { width:4em; height:4em; color:$blue; }
   }
 }
 
@@ -69,11 +69,11 @@ dl.admin-options { position:absolute; right:0; bottom:0; left: 0; z-index: $z-ad
     ul { }
     li { @extend %clearfix; }
     label, .select-holder { float: left; display: block; }
-    label { color:$pink; text-align: right; padding-right: 0.5em; width:44%; padding-top: 0.25em; }
+    label { color:$grey; text-align: right; padding-right: 0.5em; width:44%; padding-top: 0.25em; }
     .select-holder { text-align: left; padding-left: 0.5em; width: 56%;
-      select { width:100%; padding: 0.25em 0.5em; background-color:$pink; color:$white; }
+      select { width:100%; padding: 0.25em 0.5em; background-color:$pink; color:$white; outline: none; }
     }
-    summary { color:$grey; font-size: 0.85em; @extend %clearfix; display: block; padding-top: 0.7em; padding-bottom: 1em; }
+    summary { color:$black; font-size: 0.85em; display: block; padding-top: 0.7em; padding-bottom: 0.7em; clear:both; }
   }
 }
 
@@ -97,4 +97,9 @@ dl.admin-options { position:absolute; right:0; bottom:0; left: 0; z-index: $z-ad
   dl.admin-options { position:fixed;
     dt { padding-right:10px; }
   }
+}
+
+// Okay, here's a plan to try to hide the admin screen when there's an OSD keyboard.
+@media (max-height: 400px) {
+  dl.admin-options { position: relative; }
 }

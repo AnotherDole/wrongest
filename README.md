@@ -14,6 +14,10 @@ Project uses:
 * [OpenShift](https://www.openshift.com/)
 
 ## Changelog <a id="changelog"></a>
+* `v0.1.3` <a id="v013"></a>
+  * Ability to choose round limit, displayed on player order screen
+  * Tweaks to the game leader interface
+  * Explorative logging on unexpected disconnects
 * `v0.1.2` <a id="v012"></a>
   * Game over screen matches colors with ties.
   * Some new cards from [@Goons_TXT](https://twitter.com/goons_txt)

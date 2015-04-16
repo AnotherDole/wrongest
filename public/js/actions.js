@@ -56,7 +56,7 @@ $('#StartGameButton').click(function(){
   socket.emit('requeststart',
     $('#deck').val(),
     $('#timeLimit').val(),
-    $('#allowRedraw').val(),
+    $('#endGame').val(),
     $('#dealerSelect').val()
   );
 });

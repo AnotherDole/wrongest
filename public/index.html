@@ -3,10 +3,10 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>The Wrongest Words v0.1.2</title>
+    <title>The Wrongest Words v0.1.3</title>
     <meta name="description" content="A game where you and your friends must struggle to defend some very stupid ideas.">
     <link href="http://fonts.googleapis.com/css?family=Comfortaa:400,700,300" rel="stylesheet" type="text/css">
-    <link href="css/wrongest.css?v=0-1-2" rel="stylesheet" />
+    <link href="css/wrongest.css?v=0-1-3" rel="stylesheet" />
     
     <!-- Begin favicons -->
     <link rel="apple-touch-icon" sizes="57x57" href="/apple-touch-icon-57x57.png">
@@ -153,6 +153,16 @@
                 </div>
               </li>
               <li class="option">
+                <label for="endGame">End Game:</label>
+                <div class="select-holder">
+                  <select id="endGame">
+                    <option value="3">3 rounds</option>
+                    <option selected value="5">5 rounds</option>
+                    <option value="7">7 rounds</option>
+                  </select>
+                </div>
+              </li>
+              <!-- <li class="option">
                 <label for="allowRedraw">Redraw same card?</label>
                 <div class="select-holder">
                   <select id="allowRedraw">
@@ -160,7 +170,7 @@
                     <option value="yes">Yes</option>
                   </select>
                 </div>
-              </li>
+              </li> -->
               <li class="option">
                 <label for="dealerSelect">Dealer defends...</label>
                 <div class="select-holder">
@@ -182,6 +192,17 @@
 
     <!-- GAMEPLAY screen (includes order and playing card -->
     <section id="GameView" data-contains="gameplay" class="order screen hidden">
+      
+      <!-- What round is this? -->
+      <div class="current-round">
+        <span class="text-holder">
+          <span class="label">round</span>
+          <span class="number current" id="currentRound">1</span>
+          <span class="label">of</span>
+          <span class="number total" id="roundLimit">5</span>
+        </span>
+      </div>
+      
       <!-- Stopclock -->
       <div class="knob-holder hidden" id="GameClockHolder">
         <input class="knob knobtext" data-height="120" data-width="120" type="text" id="GameClock" />
@@ -551,7 +572,7 @@
     <footer class="hidden">
       <script src="https://cdn.socket.io/socket.io-1.3.5.js"></script>
       <script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
-      <script src="js/min/wrongest.min.js?v=0-1-2"></script>
+      <script src="js/min/wrongest.min.js?v=0-1-3"></script>
       
       <!-- BELOW: SVG icon definitions for use in the project -->
       <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewbox="0 0 100 100" enable-background="new 0 0 100 100" xml:space="preserve">

@@ -186,7 +186,9 @@ socket.on('startresult', function(data){
 socket.on('getstatements', function(data){
   meWaiting = false;
   gameOver = false;
-  currentStatements = data;
+  currentStatements = data.cardData;
+  $('#currentRound').text(data.round);
+  $('#roundLimit').text(data.roundLimit);
   if( $('#VotingBooth').hasClass('hidden')){
     $('#roomDiv').addClass('hidden');
     $('#waitingDiv').addClass('hidden');

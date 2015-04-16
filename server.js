@@ -271,8 +271,8 @@ io.on('connection', function (socket){
   });
 
   //request to start a game with certain options
-  socket.on('requeststart', function(deckName, time, allowRedraw, dealerFirstOrLast){
-    var options = {deckName: deckName, time: time, allowRedraw: allowRedraw, dealerFirstOrLast: dealerFirstOrLast};
+  socket.on('requeststart', function(deckName, time, roundLimit, dealerFirstOrLast){
+    var options = {deckName: deckName, time: time, roundLimit: roundLimit, dealerFirstOrLast: dealerFirstOrLast};
     logic.startRequest(socket.username,socket.roomName,options,function(err,result){
       socket.emit('startresult',result);
       //time to start game, send out the first statements
