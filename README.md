@@ -14,6 +14,8 @@ Project uses:
 * [OpenShift](https://www.openshift.com/)
 
 ## Changelog <a id="changelog"></a>
+* `v0.1.4` <a id="v014"></a>
+  * Current Round display toggles with the timer.
 * `v0.1.3` <a id="v013"></a>
   * Ability to choose round limit, displayed on player order screen
   * Tweaks to the game leader interface
