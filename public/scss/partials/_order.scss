@@ -1,7 +1,7 @@
 section.order { background-color:$white; position: relative; }
 
 
-.current-round { text-align: center;
+.current-round { text-align: center; height: 120px; padding-top: 44px;
   .text-holder { display: inline-block; }
   .label { line-height: 200%; float: left; color:$grey; }
   .number { font-size:2em; display: inline-block; float: left; line-height: 100%; padding: 0 0.2em; }

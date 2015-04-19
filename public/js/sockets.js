@@ -13,7 +13,7 @@ var gameOver = false;
 var socket = null;
 
 function createSocket(){
-  if (socket != null){
+  if (socket !== null){
     return;
   }
   if(location.hostname.indexOf('wrongest.net') > -1){
@@ -158,7 +158,7 @@ function createSocket(){
       meDealer = true;
       //this happens if somone leave while someone else is defending
       if($('#GameClockHolder').hasClass('hidden')){
-	$('#dealerControls').removeClass('hidden');
+        $('#dealerControls').removeClass('hidden');
       }
     }
     else{
@@ -228,6 +228,7 @@ function createSocket(){
       }
     }
     startTimer(time);
+    $('.current-round').addClass('hidden');
     $('.knob-holder').removeClass('hidden');
   });
 
@@ -238,6 +239,7 @@ function createSocket(){
     if(stopClock){
       window.clearInterval(clockTick);
       $('.knob-holder').addClass('hidden');
+      $('.current-round').removeClass('hidden');
     }
     if(!meDefending){
       if(meDealer && stopClock){

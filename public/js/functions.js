@@ -167,6 +167,7 @@ function startTimer(time) {
     'fgColor': '#7a6969',
     'inputColor':"#2d2929"
   });
+  $('.current-round').addClass('hidden');
   $('.knob-holder').removeClass('hidden');
   timer.current = timer.total;
   clockTick = setInterval(function(){ 
