@@ -16,6 +16,7 @@ Project uses:
 ## Changelog <a id="changelog"></a>
 * `v0.1.4` <a id="v014"></a>
   * Current Round display toggles with the timer.
+  * More cards from the [suggestion form](http://goo.gl/forms/wXHLNXYVRJ)
 * `v0.1.3` <a id="v013"></a>
   * Ability to choose round limit, displayed on player order screen
   * Tweaks to the game leader interface
