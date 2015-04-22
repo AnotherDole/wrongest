@@ -192,8 +192,6 @@ io.on('connection', function (socket){
       if(!err){
 	//join the socket.io room
 	console.log(socket.id + ' name: ' + result.playerName + ' room: ' + result.roomName);
-	socket.username = result.playerName;
-	socket.roomName = result.roomName;
 	socket.join(result.roomName);
 	result.link = 'http://' + server_address + '/' + result.roomName;
 	socket.emit('createresult',result);
@@ -201,6 +199,19 @@ io.on('connection', function (socket){
 	var blar = logic.getPlayersIn(result.roomName,function(err,blar){;
 	  io.to(result.roomName).emit('updatecurrentroom',blar.players,blar.leader,blar.dealer,blar.scores);
 	});
+	if(socket.username){
+	  logic.leaveRequest(socket.roomName,socket.username,function(err,wtf){
+	    socket.username = result.playerName;
+	    socket.roomName = result.roomName;
+	    if(wtf && !wtf.roomDeleted){
+	      leaveOrDisconnect(wtf);
+	    }
+	  })
+	}
+	else{
+	  socket.username = result.playerName;
+	  socket.roomName = result.roomName;
+	}
       }
     });
   });
