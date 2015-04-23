@@ -466,8 +466,7 @@ exports.processVote = function(roomName,playerName,mostWrong,leastWrong,callback
 
   var keys = [roomDataKey(roomName),roomPlayersKey(roomName),playerDataKey(roomName,playerName),
 		playerDataKey(roomName,mostWrong),playerDataKey(roomName,leastWrong),roomWaitingKey(roomName)];
-  var seed = Math.floor(Math.random() * Math.pow(2,32));
-  var args = [playerName,mostWrong,leastWrong,roomName,seed]
+  var args = [playerName,mostWrong,leastWrong,roomName]
 
   //result[0] is votes needed
   //if result[0] is 0 then it also returns:

@@ -1,6 +1,6 @@
 -- KEYS[1] is roomDataKey, KEYS[2] is player list key, KEYS[3] is voter key, KEYS[4] is mostWrong key
 -- KEYS[5] is leastWrong key, KEYS[6] is room waiting list
--- ARGV[1] is voter name, ARGV[2] is most name, ARGV[3] is least name, ARGV[4] is room name, ARGV[5] is random seed
+-- ARGV[1] is voter name, ARGV[2] is most name, ARGV[3] is least name, ARGV[4] is room name
 
 local gameState = redis.call('hget',KEYS[1],'gameState')
 --magic number, 3 is waiting votes
@@ -37,8 +37,6 @@ if votesNeeded > 0 then
   return {votesNeeded}
 end
 
-math.randomseed(tonumber(ARGV[5]))
-
 local toReturn = {votesNeeded}
 
 -- if votesNeeded = 0, it's time to end the round
@@ -64,16 +62,9 @@ for i, name in ipairs(playerList) do
 
   redis.call('hset',playerDataString,'voted',0)
   local newCardScore = tonumber(redis.call('hincrby',cardDataString,'score',tonumber(cardData[3])-tonumber(cardData[2])))
-  if newCardScore >= 0 then
+  if newCardScore >= -1 then
     redis.call('hset',cardDataString,'discarded',1)
     cardsLeft = redis.call('hincrby',KEYS[1],'cardsLeft',-1)
-  elseif newCardScore == -1 then
-    if math.random(1,2) == 1 then
-      redis.call('hset',cardDataString,'discarded',1)
-      cardsLeft = redis.call('hincrby',KEYS[1],'cardsLeft',-1)
-    else
-      redis.call('hset',cardDataString,'inPlay',0)
-    end
   else
     redis.call('hset',cardDataString,'inPlay',0)
   end
