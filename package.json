@@ -4,7 +4,7 @@
   "description": "The Wrongest Words Game",
   "main": "server.js",
   "dependencies": {
-    "express": "^4.11.1",
+    "express": "^4.12.3",
     "hashids": "^1.0.1",
     "morgan": "^1.5.2",
     "redis": "^0.12.1",

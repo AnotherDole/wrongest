@@ -183,7 +183,7 @@ function leaveOrDisconnect(result){
 
 
 io.on('connection', function (socket){
-  console.log(socket.id + ' connected');
+  console.log(new Date() + ': ' + socket.id + ' connected');
   socket.on('createroom', function(playerName){
     if(socket.username != undefined){
       return false;
@@ -191,7 +191,7 @@ io.on('connection', function (socket){
     logic.createRoom(playerName, socket.id,function(err,result){
       if(!err){
 	//join the socket.io room
-	console.log(socket.id + ' name: ' + result.playerName + ' room: ' + result.roomName);
+	console.log(new Date() + ': ' +socket.id + ' name: ' + result.playerName + ' creates room: ' + result.roomName);
 	socket.join(result.roomName);
 	result.link = 'http://' + server_address + '/' + result.roomName;
 	socket.emit('createresult',result);
@@ -228,7 +228,7 @@ io.on('connection', function (socket){
     var roomName = anyRoomName.toUpperCase();
     logic.joinRequest(roomName,playerName, socket.id,function(err,result){
       if (result.success){
-	console.log(socket.id + ' name: ' + result.playerName + ' room: ' + result.roomName);
+	console.log(new Date() + ': ' + socket.id + ' name: ' + result.playerName + ' joins room: ' + result.roomName);
 	socket.emit('deckdata',logic.getDeckData());
 	result.link = 'http://' + server_address + '/' + result.roomName;
 	socket.join(result.roomName);
@@ -356,7 +356,7 @@ io.on('connection', function (socket){
   });
 
   socket.on('disconnect', function(){
-    console.log(socket.id + ' disconnects. name: ' + socket.username + ' room: ' + socket.roomName);
+    console.log(new Date() + ': ' + socket.id + ' disconnects. name: ' + socket.username + ' room: ' + socket.roomName);
     if(socket.username === undefined){
       return;
     }

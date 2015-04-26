@@ -23,6 +23,10 @@ function createSocket(){
     socket = io();
   }
 
+  socket.on('reconnect',function(){
+    console.log('Reconnected. ID: ' + socket.id);
+  })
+
   socket.on('pausegame', function(){
     $('#roomDiv').addClass('hidden');
     $('#GameView').addClass('hidden');
@@ -57,6 +61,7 @@ function createSocket(){
       $('#startDiv').addClass('hidden');
       history.pushState({}, 'room '+data.roomName, '/'+data.roomName);
       ga('send', 'pageview', '/'+data.roomName);
+      console.log(socket.id);
     }
     else{
       makeToast('setup', 'alert', data.message);
@@ -79,6 +84,7 @@ function createSocket(){
 	$('#waitingDiv').removeClass('hidden');
 	$('.admin-options').addClass('hidden');
       }
+      console.log(socket.id);
     }
     else{
       makeToast('setup','alert',data.message);
