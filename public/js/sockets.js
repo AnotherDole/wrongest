@@ -24,7 +24,20 @@ function createSocket(){
   }
 
   socket.on('reconnect',function(){
-    console.log('Reconnected. ID: ' + socket.id);
+    $('#roomDiv').addClass('hidden');
+    $('#GameView').addClass('hidden');
+    $('#GameClockHolder').addClass('hidden');
+    $('#defendDiv').addClass('hidden');
+    $('#VotingBooth').addClass('hidden');
+    $('#RoomSetup').removeClass('hidden');
+    $('#startDiv').removeClass('hidden');
+    $('.create-or-join').removeClass('hidden');
+    $('#CreateGameRow').addClass('hidden');
+    $('.split-row').addClass('hidden');
+    $('#JoinWithCodeRow').removeClass('hidden').addClass('chosen');
+    $('.create-or-join .row.chosen input').fadeIn(300);
+    $('#joinUsernameInputAlt').val(username);
+    makeToast('setup','alert','Sorry, you got disonnected from the game. Click join to try to reconnect.');
   })
 
   socket.on('pausegame', function(){
