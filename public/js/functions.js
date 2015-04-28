@@ -130,7 +130,9 @@ function everySecond() {
     window.clearInterval(clockTick);
       if(meDefending){
         console.log('time up: '+timer.total);
-        ga('send', 'event', { eventCategory: 'defended', eventAction: 'time up', eventLabel: timer.total });
+        if (gaTracking === true) {
+          ga('send', 'event', { eventCategory: 'defended', eventAction: 'time up', eventLabel: timer.total });
+        }
         donedefend();
       }
     return;

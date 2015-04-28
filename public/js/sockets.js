@@ -92,7 +92,9 @@ function createSocket(){
       $('#roomDiv').removeClass('hidden');
       $('#startDiv').addClass('hidden');
       history.pushState({}, 'room '+data.roomName, '/'+data.roomName);
-      ga('send', 'pageview', '/'+data.roomName);
+      if (gaTracking === true) {
+        ga('send', 'pageview', '/'+data.roomName);
+      }
       console.log(socket.id);
     }
     else{
@@ -109,7 +111,9 @@ function createSocket(){
       $('input[data-holds="roomCode"]').val(data.roomName);
       $('input[data-holds="roomURL"]').val(data.link);
       history.pushState({}, 'room '+data.roomName, '/'+data.roomName);
-      ga('send', 'pageview', '/'+data.roomName);
+      if (gaTracking === true) {
+        ga('send', 'pageview', '/'+data.roomName);
+      }
       username = data.playerName;
       if(data.waiting){
 	meWaiting = true;
@@ -435,9 +439,11 @@ function createSocket(){
     
     if(meDealer){
       var topPlayerScore = parseInt($('#scorePlace1').text());
-      ga('send', 'event', { eventCategory: 'Wrongest Words of the Game', eventAction: wrongestwordsofthegame, eventLabel: cardScore });
-      ga('send', 'event', { eventCategory: 'end game', eventAction: 'players', eventLabel: finalPlayerList.length });
-      ga('send', 'event', { eventCategory: 'Top Score', eventAction: 'top score', eventLabel: topPlayerScore });
+      if (gaTracking === true) {
+        ga('send', 'event', { eventCategory: 'Wrongest Words of the Game', eventAction: wrongestwordsofthegame, eventLabel: cardScore });
+        ga('send', 'event', { eventCategory: 'end game', eventAction: 'players', eventLabel: finalPlayerList.length });
+        ga('send', 'event', { eventCategory: 'Top Score', eventAction: 'top score', eventLabel: topPlayerScore });
+      }
     }
     
   });

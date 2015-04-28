@@ -54,7 +54,9 @@ $('.settings-toggle').click(function() {
 
 $('#StartGameButton').click(function(){
   var v = playerList.length;
-  ga('send', 'event', { eventCategory: 'start game', eventAction: 'players', eventLabel: v });
+  if (gaTracking === true) {
+    ga('send', 'event', { eventCategory: 'start game', eventAction: 'players', eventLabel: v });
+  }
   socket.emit('requeststart',
     $('#deck').val(),
     $('#timeLimit').val(),
@@ -79,7 +81,9 @@ if(location.pathname.length > 1){
 
 $('#DoneEarlyButton').click(function() {
   window.clearInterval(clockTick);
-  ga('send', 'event', { eventCategory: 'defended', eventAction: 'done early', eventLabel: timer.total });
+  if (gaTracking === true) {
+    ga('send', 'event', { eventCategory: 'defended', eventAction: 'done early', eventLabel: timer.total });
+  }
   donedefend();
 });
 
@@ -147,7 +151,9 @@ $('#SubmitVotes').click(function() {
 $('a.social').click(function() {
   var n = $(this).attr('data-network');
   var h = $(this).attr('href');
-  ga('send', 'event', { eventCategory: 'social share', eventAction: n, eventLabel: h });
+  if (gaTracking === true) {
+    ga('send', 'event', { eventCategory: 'social share', eventAction: n, eventLabel: h });
+  }
 });
 
 $('#PlayAgain').click(function(){
