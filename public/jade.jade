@@ -1,0 +1,197 @@
+- var version = "0.2.0"
+- var description = "A game where you and your friends must struggle to defend some very stupid ideas."
+
+doctype html
+html(lang="en")
+  head
+    include includes/head.jade
+  body
+    // PREGAME screen (mostly lobby setup)
+    section#RoomSetup(data-contains="setup" class="setup screen")
+      img.game-logo(src="svg/logo2.svg")
+      
+      // CREATE or JOIN game
+      .starting-screen#startDiv
+        .create-or-join
+          .row.create-row#CreateGameRow
+            input#createUsernameInput(type="text" data-holds="playerName" maxlength="50" placeholder="Your Name")
+            .button-holder
+              button.room-pick#IChooseToCreate create game
+              button.room-action#CreateRoomButton create game
+          .row.split-row
+            span or
+          .row.join-row#JoinWithCodeRow
+            input#joinRoomCode(type="text" class="room-code" data-holds="roomCode" maxlength="4" required placeholder="Room Code")
+            input#joinUsernameInputAlt(type="text" data-holds="playerName" maxlength="50" required placeholder="Your Name")
+            .button-holder
+              button.room-pick#IChooseToJoin join game
+              button.room-action#JoinRoomButtonWithCode join game
+      
+      // Game is paused
+      .pause-screen.hidden#pauseDiv
+        p The number of active players in the room dropped below 3 and so the game was paused.
+        p When the number of players in the room reaches 3 or more again, the leader can restart the game.
+        figure.room-code
+          figcaption Give out this code
+          input(type="text" data-holds="roomCode" maxlength="4")
+        figure.room-url
+          figcaption Or this URL
+          input(type="url" data-holds="roomURL")
+        .lobby-box
+          ol.players#pauseRoomMembers
+        .button-holder.hidden#restartOption
+          button#RestartButton(onclick="socket.emit('restartgame');") Restart Game
+      
+      // The Lobby Screen. People are in a room, but the game hasn't started yet.
+      .room-details.hidden#roomDiv
+      
+        // only if you're waiting for the round to end
+        .hidden#waitingDiv
+          p You have joined a game in progress. When the current round ends, you will be able to start playing.
+        figure.room-code
+          figcaption Give out this code
+          input(type="text" data-holds="roomCode" maxlength="4")
+        figure.room-url
+          figcaption Or this URL
+          input(type="url" data-holds="roomURL")
+        .lobby-box
+          ol.players#detailsRoomMembers Retrieving player list...
+        .button-holder.admin-options
+          button#StartGameButton Start Game
+          span#StartGameBother You need at least 3 players. Go bug your friends!
+        
+        // Game settings for the lobby leader
+        dl.admin-options
+          dt.settings-toggle
+            span settings
+            a.icon
+              svg.icon-gear.icon-settings(viewbox="0 0 100 100")
+                use(xlink:href="#Icon-Gear")
+          dd
+            ul.admin-options#leaderControls
+              li.option
+                label(for="deck")
+                  span Deck:
+                .select-holder
+                  select#deck(onchange="updateDeckDescription();")
+                summary#deckdescription
+              li.option
+                label(for="timeLimit") Time Limit:
+                .select-holder
+                  select#timeLimit
+                    option(selected value="30") 30 seconds
+                    option(value="60") 60 seconds
+                    option(value="90") 90 seconds
+              li.option
+                label(for="endGame") End Game:
+                .select-holder
+                  select#endGame
+                    option(value="3") 3 rounds
+                    option(value="5") 5 rounds
+                    option(value="7") 7 rounds
+              li.option
+                label(for="dealerSelect") Dealer Defends:
+                .select-holder
+                  select#dealerSelect
+                    option(value="first" selected) First
+                    option(value="last") Last
+              li#startresult
+      
+      ul.toasts.setup#SetupToasts(data-toast="setup")
+      p.help 
+        | Confused? 
+        a(href="http://www.wrongest.website/#HowToPlay") Get unconfused
+        | .
+        
+    // GAMEPLAY screen (includes order and playing card
+    section.order.screen.hidden#GameView(data-contains="gameplay")
+    
+      // What round is this?
+      .current-round
+        span.text-holder
+          span.label round
+          span.number.current#currentRound 1
+          span.number.total#roundLimit 5
+      
+      // Stop Clock
+      .knob-holder.hidden#GameClockHolder
+        input.knob.knobtext#GameClock(data-height="120" data-width="120" type="text")
+      
+      // Player Order
+      #orderDiv
+        ol.player-order
+          -for (var x = 1; x < 9; x++)
+            li(id="player#{x}")
+              span.player-name(id="playerName#{x}")
+              span.player-score(id="playerScore#{x}")
+              span.player-tease(id="playerTease#{x}")
+        .button-holder.hidden#dealerControls
+          button(onclick="makeDefend();") Deal a Card
+      
+      // Your Playing Card
+      .card.hidden#defendDiv
+        .flip-container
+          .flipper
+            .front
+              .inner
+                img.this-is-hard#HardCardSticker(src="svg/hard.svg")
+                blockquote#statementDiv
+                .button-holder#EarlyButtonHolder
+                  button#DoneEarlyButton I'm done early.
+            .back
+              .inner
+                #votestatus It is not time to vote yet.
+                
+    // VOTING BOOTH screen (includes the ability to vote, as well as post-vote results) 
+    section.vote.screen.hidden#VotingBooth(data-contains="voting")
+      .statement-holder
+        table
+          thead.my-statement
+            tr
+              td.votebutton
+              td
+                blockquote#MyQuote
+                cite
+                  span#MyCite
+              td.votebutton
+                .player-score
+                  span.inner#MyScoreChange
+          tbody#VotingOptions
+          -for (var x = 1; x < 9; x++)
+            tr(id="voterow#{x}")
+              td.votebutton
+                label
+                  a.vote-button.least-wrong-button
+                    svg(viewbox="0 0 100 100")
+                      use(xlink:href="#Icon-ThumbsUp")
+                  input(type="radio" value="LeastWrong" id="mostwrong#{x}" name="player#{x}")
+              td
+                blockquote(id="votequote#{x}")
+                cite
+                  span(id="quotecite#{x}")
+              td.votebutton
+                .player-score
+                  span.inner(id="ScoreChange#{x}")
+                label
+                  a.vote-button.most-wrong-button
+                    svg(viewbox="0 0 100 100")
+                      use(xlink:href="#Icon-ThumbsDown")
+                  input(type="radio" value="MostWrong" id="leastwrong#{x}" name="player#{x}" )
+      .button-holder.hidden
+        button#SubmitVotes Submit Votes
+        summary.hidden#WaitingAtBoothBecause
+      ul.toasts.vote#VoteToasts(data-toast="vote")
+    
+    // FOOTER contains javascripts and SVG palettes.
+    footer.hidden
+      script(src="https://cdn.socket.io/socket.io-1.3.5.js")
+      script(src="https://code.jquery.com/jquery-2.1.3.min.js")
+      script(src="js/min/wrongest.min.js?v=#{x}")
+      svg(xmlns="http://www.w3.org/2000/svg")
+        defs
+          g#Icon-Hard(fill="#C1272D")
+            path(d="M43.6 74.5h3.2l-1.6-4.2M60.9 71.6c0-.6-.2-1.2-.7-1.6-.4-.4-1-.7-1.6-.7h-2.3v4.6h2.3c.6 0 1.2-.2 1.6-.7.5-.4.7-1 .7-1.6zM71 69.3h-1.7v9.1H71c1.3 0 2.3-.4 3.2-1.3.9-.9 1.3-2 1.3-3.2 0-1.3-.4-2.3-1.3-3.2s-2-1.4-3.2-1.4z")
+            path(d="M51 3.9C25.7 3.9 5.1 24.5 5.1 49.8S25.7 95.7 51 95.7s45.9-20.5 45.9-45.9S76.4 3.9 51 3.9zM50.3 16c4-1.8 13.5-1.6 14.8 13.5 1.3 15.1-7.4 23.1-7.4 23.1-2.9-1.2-4.9-3.7-4.9-3.7 10.2-8.7 6.8-29.1 1.1-28-6.3 1.2-8.1 10.3-8.1 10.3-3.2.2-4.3.4-6.7 1.2 1.5-9.3 7.2-14.7 11.2-16.4zM35.1 79c0 .2-.1.3-.2.4-.1.1-.2.2-.4.2s-.3-.1-.4-.2c-.1-.1-.1-.2-.1-.4v-4.6h-5.7V79c0 .2-.1.3-.2.4-.1.1-.2.2-.4.2s-.3-.1-.4-.2c-.1-.1-.2-.2-.2-.4V68.8c0-.2.1-.3.2-.4.1-.1.2-.2.4-.2s.3.1.4.2c.1.1.2.2.2.4v4.6H34v-4.6c0-.2.1-.3.2-.4.1-.1.2-.2.4-.2s.3.1.4.2c.1.1.2.2.2.4V79zm14.4.4c-.1.1-.2.2-.4.2s-.3-.1-.4-.2c-.1-.1-.1-.1-.1-.2l-1.4-3.6h-4.1l-1.4 3.6c0 .1-.1.1-.1.2-.1.1-.2.2-.4.2s-.3-.1-.4-.2c-.1-.1-.2-.2-.2-.4v-.2l4-10.2c0-.1.1-.2.1-.2.1-.1.2-.2.4-.2s.3.1.4.2c.1.1.1.1.1.2l4 10.2v.2c.1.2.1.3-.1.4zm-21.2-20C22 53.8 23 44.2 30.5 38.1c11.1-9.2 27.8-4.3 27.8-4.3-.2 3.5-1.1 5.9-1.1 5.9-17.5-6.1-30.6 6.2-26.5 13.5 4.1 7.2 15.3.8 15.3.8 1.6 1.8 2.8 2.7 4.7 4.2-8.5 5.5-17.4 5.8-22.4 1.2zm34.2 20c-.1.1-.2.2-.4.2s-.4-.1-.5-.3L58.9 75h-2.5v4c0 .2-.1.3-.2.4-.1.1-.2.2-.4.2s-.3-.1-.4-.2c-.1-.1-.2-.2-.2-.4V68.8c0-.2.1-.3.2-.4.1-.1.2-.2.4-.2h2.8c.9 0 1.7.3 2.4 1s1 1.5 1 2.4c0 .9-.3 1.7-1 2.4-.3.3-.6.5-1 .7l2.5 4c.1.1.1.2.1.3 0 .2 0 .3-.1.4zM75 77.9c-1.1 1.1-2.5 1.7-4 1.7h-2.3c-.2 0-.3-.1-.4-.2-.1-.1-.2-.2-.2-.4V68.8c0-.2.1-.3.2-.4.1-.1.2-.2.4-.2H71c1.6 0 2.9.6 4 1.7s1.7 2.5 1.7 4c0 1.6-.6 2.9-1.7 4zM58.5 61.1C43.2 54.2 39.6 41 39.6 41s1.5-1.5 6-1.7c1.4 6.7 6.8 12.6 14.9 16 7.7 3.3 12.2.3 11.4-3.5-1-4.8-7.3-8.5-7.3-8.5.7-1.9 1.3-3.6 1.6-6.2 22.8 16.1 7.2 30.8-7.7 24z")
+          path#Icon-Gear(fill="#2D2929" d="M83.6 39.1c-.5-1.9-1.3-3.8-2.4-5.9 2-2.7 4.2-5.4 6.2-8.4.6-.8.6-1.8 0-2.7-2.5-3.6-6.6-7.3-10-10.2-.8-.8-2-.8-2.9-.1l-8.7 6.4c-1.7-.8-3.6-1.5-5.4-2.3L58.8 5c-.1-1.1-.9-1.9-2.2-1.9H43.2c-1.2 0-2.1.7-2.3 1.8-.8 3.5-1.2 7.5-1.7 11.1-1.9.6-3.7 1.3-5.4 2.4L25.6 12c-.5-.4-1.2-.7-1.7-.7-2.1 0-10.1 9-11.7 11-.8 1-.7 1.7.1 2.8 2.2 2.9 4.3 5.6 6.4 8.4-.9 2-1.7 3.5-2.3 5.6L5.1 40.6c-.9.2-1.7 1.3-1.7 2.4v13.3c0 1 .7 2 1.8 2.2l11 1.8c.5 1.9 1.4 3.8 2.4 5.8-2 2.8-4.1 5.4-6.2 8.4-.6.9-.5 1.9 0 2.7 2.6 3.6 6.6 7.3 10 10.3.9.8 2 .8 2.9.2l8.7-6.4c1.8.8 3.6 1.5 5.4 2.2L41 94.4c.1.9 1 1.9 2.3 1.9h13.4c1.2 0 1.9-.7 2.2-1.8.9-3.5 1.3-7.5 1.8-11.1 1.9-.6 3.7-1.4 5.5-2.3l8.4 6.5c.5.4 1.1.5 1.7.5 2 0 10.1-9.1 11.7-11.1.6-.8.5-1.7-.2-2.7-2.2-3-4.3-5.7-6.4-8.7.9-1.7 1.7-3.3 2.4-5.4l11.1-1.7c1-.1 1.8-1.2 1.8-2.1V43.1c0-.9-.7-2-1.8-2.3l-11.3-1.7zM49.9 65.2c-8.5 0-15.4-6.9-15.4-15.4 0-8.7 6.9-15.6 15.4-15.6 8.6 0 15.5 6.9 15.5 15.6 0 8.4-7 15.4-15.5 15.4z")
+          path#Icon-ThumbsDown(fill="#C1272D" d="M48.3 31.4c1.6 1.6 1.6 3.5-.1 4.8-1.2.9-2 1.1-6.5 1.1-4.7 0-5.3-.1-6.3-1.2-1.4-1.5-1.4-3.2.1-4.7 1.2-1.2 1.6-1.2 6.4-1.2 4.8-.1 5.3 0 6.4 1.2zM30.8 31c.4.8.3 3.7-.2 6.6-.1.6-1 1.6-2 2.2-1.1.7-2 1.8-2.5 3.2-.8 2.1-.8 2.3.3 5.1 1.1 2.9 1.1 3 .2 5.5-1.2 3.2-.8 6 1.2 8.8 1.5 2 1.5 2.4 1.2 5.2-.3 2.6-.2 3.3.8 4.8.6 1 1.8 4.1 2.6 7 1.2 4.3 1.5 6.2 1.5 10.3 0 0 .2 2.5-.4 3.9-.3.7-1.3 2.9-1.3 2.9-1.5 1.5-2 1.7-4.4 1.7-2.3 0-2.8-.2-4.4-1.7-1.3-1.3-1.7-2.2-1.7-3.5 0-3.1-1.9-11.6-3.3-14.4-1.4-2.9-4.3-5.7-7.6-7.4-3.6-1.8-5.2-3.4-6.8-6.6-1.9-4.3-1.8-9-1.6-13.6 0-11.9.2-12.9 4.1-17 3-3.3 5.2-3.8 15.5-3.8 7.5-.1 8.3 0 8.8.8zm23.8 10.8c2.9 2.3 2.9 5.2.1 7.4-2.3.9-2.1 1.2-11.5 1.3-4.2.1-13.8-.4-13.9-5-.1-4.5 9.1-4.5 13.3-4.4 6.8-.2 11.3-.1 12 .7zm1.2 12.8c.9.7 1.3 1.9 1.3 2.8 0 1.4-1.6 3.2-2.7 3.4-1.3.1-6 0-10.9 0-7.2-.1-13.8-.3-14.6-3.9.4-2.5 2.7-3.2 14.7-3.2 10.2-.2 11-.1 12.2.9zm-5.1 11.2c1.4 2.4 1.4 3.1.2 5 0 0-1.1 1.1-1.7 1.3-1.9.8-7 .4-7 .4-8.5-.2-9.4-2.3-9.4-4.5-.1-4.4 5.8-4.4 9.5-4.4 0 0 5.1.2 6.9.9.7.4 1.5 1.3 1.5 1.3z")
+          path#Icon-ThumbsUp(fill="#50B848" d="M51.2,69 c-1.6-1.6-1.6-3.5,0.1-4.8c1.2-0.9,2.1-1.1,6.6-1.1c4.8,0,5.3,0.1,6.3,1.2c1.5,1.6,1.4,3.2-0.1,4.7c-1.2,1.2-1.6,1.3-6.4,1.3 C52.8,70.3,52.3,70.2,51.2,69z M68.9,69.4c-0.5-0.8-0.3-3.7,0.3-6.6c0.1-0.6,1-1.6,2-2.2c1.2-0.7,2-1.8,2.6-3.2 c0.8-2.1,0.8-2.3-0.3-5.2c-1.1-2.9-1.1-3.1-0.2-5.5c1.2-3.3,0.8-6-1.2-8.8c-1.5-2-1.6-2.4-1.3-5.3c0.3-2.6,0.2-3.3-0.8-4.8 c-0.6-1-1.8-4.2-2.6-7.1c-1.2-4.3-1.5-6.3-1.5-10.4c0,0-0.2-2.5,0.4-3.9c0.3-0.7,1.4-2.9,1.4-2.9C69,2,69.6,1.8,71.9,1.8 c2.3,0,2.9,0.2,4.4,1.7C77.6,4.8,78,5.7,78,7c0,3.2,2,11.7,3.3,14.5c1.4,2.9,4.4,5.8,7.7,7.4c3.6,1.8,5.3,3.4,6.9,6.6 c2,4.3,1.9,9,1.6,13.7c0,12-0.3,13-4.1,17.2c-3.1,3.3-5.3,3.9-15.7,3.9C70.2,70.3,69.3,70.2,68.9,69.4z M44.8,58.5 c-3-2.3-3-5.2-0.1-7.4c2.3-0.9,2.1-1.2,11.6-1.3c4.3-0.1,13.9,0.4,14,5.1c0.1,4.6-9.2,4.5-13.4,4.4C50.1,59.4,45.6,59.4,44.8,58.5 z M43.6,45.7c-0.9-0.7-1.3-1.9-1.3-2.8c0-1.4,1.6-3.3,2.7-3.4c1.3-0.1,6.1,0,11,0c7.3,0.1,14,0.3,14.8,3.9 c-0.4,2.5-2.8,3.2-14.8,3.2C45.6,46.8,44.9,46.7,43.6,45.7z M48.8,34.4c-1.4-2.4-1.5-3.1-0.2-5c0,0,1.1-1.1,1.7-1.4 c1.9-0.8,7.1-0.5,7.1-0.5c8.6,0.2,9.5,2.3,9.5,4.6c0.1,4.4-5.8,4.4-9.5,4.5c0,0-5.2-0.2-7-0.9C49.6,35.3,48.8,34.4,48.8,34.4z")
