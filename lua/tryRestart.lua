@@ -23,7 +23,7 @@ for i, name in pairs(playerList) do
     local cardKey = 'card:' .. ARGV[2] .. ':' .. cardNum
     redis.call('hmset',cardKey,'inPlay',0,'mostVotes',0,'leastVotes',0)
   end
-  redis.call('hset',theKey,'card',-1)
+  redis.call('hmset',theKey,'card',-1,'voted',0)
 end
 
 return true
