@@ -14,6 +14,9 @@ Project uses:
 * [OpenShift](https://www.openshift.com/)
 
 ## Changelog <a id="changelog"></a>
+* `v0.2.0` <a id="v020"></a>
+  * The game is now written in [jade](http://jade-lang.com/)
+  * New cards from the [suggestion form](http://goo.gl/forms/wXHLNXYVRJ)
 * `v0.1.5` <a id="v015"></a>
   * Better interface for reconnecting
   * Fix another bug causing games to crash
