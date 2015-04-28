@@ -14,6 +14,9 @@ Project uses:
 * [OpenShift](https://www.openshift.com/)
 
 ## Changelog <a id="changelog"></a>
+* `v0.1.5` <a id="v015"></a>
+  * Better interface for reconnecting
+  * Fix another bug causing games to crash
 * `v0.1.4` <a id="v014"></a>
   * Current Round display toggles with the timer.
   * More cards from the [suggestion form](http://goo.gl/forms/wXHLNXYVRJ)

@@ -37,7 +37,26 @@ function createSocket(){
     $('#JoinWithCodeRow').removeClass('hidden').addClass('chosen');
     $('.create-or-join .row.chosen input').fadeIn(300);
     $('#joinUsernameInputAlt').val(username);
-    makeToast('setup','alert','Sorry, you got disonnected from the game. Click join to try to reconnect.');
+    $('.button-holder').removeClass('hidden');
+    makeToast('setup','alert','Click join to rejoin your game.');
+  })
+  
+  socket.on('reconnecting',function(){
+    $('#roomDiv').addClass('hidden');
+    $('#GameView').addClass('hidden');
+    $('#GameClockHolder').addClass('hidden');
+    $('#defendDiv').addClass('hidden');
+    $('#VotingBooth').addClass('hidden');
+    $('#RoomSetup').removeClass('hidden');
+    $('#startDiv').removeClass('hidden');
+    $('.create-or-join').removeClass('hidden');
+    $('#CreateGameRow').addClass('hidden');
+    $('.split-row').addClass('hidden');
+    $('#JoinWithCodeRow').removeClass('hidden').addClass('chosen');
+    $('.create-or-join .row.chosen input').fadeIn(300);
+    $('#joinUsernameInputAlt').val(username);
+    $('.button-holder').addClass('hidden');
+    makeToast('setup','alert','Sorry, you got disconnected from the game. When you are reconnected, you can rejoin your game.');
   })
 
   socket.on('pausegame', function(){

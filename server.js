@@ -2,7 +2,7 @@ var express = require('express');
 var app = express();
 app.set('trust proxy', true);
 var server = require('http').createServer(app);
-var io = require('socket.io')(server);
+var io = require('socket.io')(server,{pingTimeout:10000,pingInterval:10000});
 
 if(process.env.OPENSHIFT_NODEJS_PORT){
   io.origins('http://www.wrongest.net:*');
