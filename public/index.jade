@@ -8,7 +8,7 @@ html(lang="en")
     include includes/head.jade
   body
     // PREGAME screen (mostly lobby setup)
-    section#RoomSetup(data-contains="setup" class="setup screen hidden")
+    section#RoomSetup(data-contains="setup" class="setup screen")
       img.game-logo(src="svg/logo2.svg")
       
       // CREATE or JOIN game
@@ -184,7 +184,7 @@ html(lang="en")
         summary.hidden#WaitingAtBoothBecause
       ul.toasts.vote#VoteToasts(data-toast="vote")
       
-    section.game-over.screen#GameOverScreen(data-contains="game-over")
+    section.game-over.screen.hidden#GameOverScreen(data-contains="game-over")
       figure.wrongest-reveal
         figcaption The (actual) Wrongest Words
         .quote-holder
