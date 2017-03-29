@@ -1,7 +1,9 @@
-#The Wrongest Words
-####a party game for 3-8 players
+# The Wrongest Words
+#### a party game for 3-8 players
 
-Visit the project page at [wrongest.website](http://www.wrongest.website/) to learn more.
+**This project has been retired**. If you want to work with it, go right ahead, but we probably won't be able to provide support.
+
+...
 
 This project was made by [Dole](https://github.com/AnotherDole) and [Lemon](https://github.com/AhoyLemon), with some help from the [F Plus Ridiculists](http://thefpl.us/meet).
 
